@@ -1,0 +1,29 @@
+[
+  {
+    "slug": "mbu-more-berry-uses",
+    "version": "2.0.1",
+    "version_id": "rUPqYzH4",
+    "filename": "moreberryuses-2.0.1-for-forge-26.2.jar",
+    "size": 99661,
+    "url": "https://cdn.modrinth.com/data/lTP9Y7EE/versions/rUPqYzH4/moreberryuses-2.0.1-for-forge-26.2.jar",
+    "sha512": "17c29e27c0a1206ff38afd95f8285264c6bebf19c59c142070690ef41a0cac32db5e6eb324d111be026a56d18a6f3ef423d488807b9599ca9a982849f05c7f26"
+  },
+  {
+    "slug": "crate-delight",
+    "version": "26.07.01-26.2-forge",
+    "version_id": "8mwy8hQa",
+    "filename": "cratedelight-26.07.01-26.2-forge.jar",
+    "size": 205869,
+    "url": "https://cdn.modrinth.com/data/9rlXSyLg/versions/8mwy8hQa/cratedelight-26.07.01-26.2-forge.jar",
+    "sha512": "cb69c6d21092088b54076db37f769daaef5efd6643f0d91d46d89d1b75c65e0903f3fb9677c63e72027656847cdd59d39ae8db1c169203f0cf97ec4c1c4d883d"
+  },
+  {
+    "slug": "stacked-blocks",
+    "version": "26.06.24-26.2-forge",
+    "version_id": "kDhiDygB",
+    "filename": "stackedblocks-26.06.24-26.2-forge.jar",
+    "size": 360602,
+    "url": "https://cdn.modrinth.com/data/UYrNpKJN/versions/kDhiDygB/stackedblocks-26.06.24-26.2-forge.jar",
+    "sha512": "8dd806c0f95f16868771d829b0d41cc2fb8cfd4fc4e2691a408ea407df3548f9aae10a939e1ca2f896acf399edf36d0f1949f83bf8949f0af3aa9936c077b2dc"
+  }
+]

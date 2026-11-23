@@ -1,0 +1,26 @@
+{
+  "fabric-api-base": {
+    "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api-base/2.0.4+ece063239e/fabric-api-base-2.0.4+ece063239e.jar",
+    "sha256": "91679a213120ca9fe8681461f4e9ff65f296a80a844d50c7dfc2113787b8b41a"
+  },
+  "fabric-command-api-v2": {
+    "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-command-api-v2/3.1.0+00cb03469e/fabric-command-api-v2-3.1.0+00cb03469e.jar",
+    "sha256": "067dc4f579ba2810826bd13538f8968cf3643795a6948cfac231ebd5209851e1"
+  },
+  "fabric-loader": {
+    "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loader/0.19.3/fabric-loader-0.19.3.jar",
+    "sha256": "73eed8c34bbad0320a2a3cba5346351e822f74f82b3f3c060574068474132958"
+  },
+  "neo": {
+    "url": "https://maven.neoforged.net/releases/net/neoforged/neoforge/26.2.0.93/neoforge-26.2.0.93-universal.jar",
+    "sha256": "c9ce1b3ab2fc182b35a0a81f29720d194eda0a55f846d228432a533945bec85c"
+  },
+  "neo-bus": {
+    "url": "https://maven.neoforged.net/releases/net/neoforged/bus/8.0.5/bus-8.0.5.jar",
+    "sha256": "705e24f37752809499a5cd0c7dd31eaabf3d933c5d3b2060168e94e9ef62593a"
+  },
+  "neo-loader": {
+    "url": "https://maven.neoforged.net/releases/net/neoforged/fancymodloader/loader/11.0.16/loader-11.0.16.jar",
+    "sha256": "73a5cc860b452e80cf0a9789f32ae08a43be180221819b7d339b84391e1e5a97"
+  }
+}

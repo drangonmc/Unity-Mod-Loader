@@ -1,0 +1,65 @@
+{
+  "originals": [
+    {
+      "id": "fjZyYXGJ",
+      "url": "https://cdn.modrinth.com/data/F9Vuwq3S/versions/fjZyYXGJ/ImmersiveOres-26.2-0.3.jar",
+      "sha512": "426984339b6d2a5828a2cf86685cdd4fdea965a6afc6d988c4f52b166c6708831bfb2f8cfbee78e64091da5ffc7be8cced923da1b7920a26d33167d2de48eae7",
+      "filename": "ImmersiveOres-26.2-0.3.jar",
+      "size": 544454,
+      "version": "26.2-0.3",
+      "version_id": "fjZyYXGJ"
+    },
+    {
+      "id": "VNgfrtBA",
+      "url": "https://cdn.modrinth.com/data/1VSGxqkt/versions/VNgfrtBA/BlockRunner-v26.2.0-mc26.2.x-NeoForge.jar",
+      "sha512": "38b6b62c4eb6d414941469e574f6c9d6be12a79503bfa097a0f7e6663a8ad7f35b551ca551b4eb61e3927a518ed4646447d6e052e09cf0248edd3429bc15456e",
+      "filename": "BlockRunner-v26.2.0-mc26.2.x-NeoForge.jar",
+      "size": 74436,
+      "version": "26.2.0",
+      "version_id": "VNgfrtBA"
+    },
+    {
+      "id": "XkWV0WSp",
+      "url": "https://cdn.modrinth.com/data/QAGBst4M/versions/XkWV0WSp/puzzleslib-v26.2.5-mc26.2.x%2Bneoforge.jar",
+      "sha512": "3eba05b808ee4d669dc667032bcdfff64cc10b23e94e1169bb46a5d143178b14d990f2a206ff82d5ff7b4f17044f19acbe400571ef973be7f281e17207dce4ce",
+      "filename": "puzzleslib-v26.2.5-mc26.2.x+neoforge.jar",
+      "size": 1080361,
+      "version": "26.2.5",
+      "version_id": "XkWV0WSp"
+    }
+  ],
+  "fabricModules": [
+    {
+      "id": "fabric-biome-api-v1",
+      "filename": "fabric-biome-api-v1-18.0.6+c7bd5b8e9c.jar",
+      "version": "18.0.6+c7bd5b8e9c",
+      "sha512": "9a634c60fb1e92b69eae909410e6836f2e085233fc5e2347c5f91c2d0a157d20ba9c9ca5481d27c38ea7ea78dfac05023b9ffe2ac853b6fe0b9e10f565343f31",
+      "source": "net.fabricmc.fabric-api:fabric-api:0.152.1+26.2",
+      "member": "META-INF/jars/fabric-biome-api-v1-18.0.6+c7bd5b8e9c.jar",
+      "size": 76343
+    },
+    {
+      "id": "fabric-block-api-v1",
+      "filename": "fabric-block-api-v1-3.0.3+ec56b6019c.jar",
+      "version": "3.0.3+ec56b6019c",
+      "sha512": "7fcf9ee31070f9077247a757f1ffc9a85b39f0236252eed15b67d7669903286e5479b3ccd5ed38ba328e930dbb1a18b8f8b2d7ac69be538f953d7a5befd8fa60",
+      "source": "net.fabricmc.fabric-api:fabric-api:0.152.1+26.2",
+      "member": "META-INF/jars/fabric-block-api-v1-3.0.3+ec56b6019c.jar",
+      "size": 16796
+    },
+    {
+      "id": "fabric-key-mapping-api-v1",
+      "filename": "fabric-key-mapping-api-v1-2.0.5+e2bdee789c.jar",
+      "version": "2.0.5+e2bdee789c",
+      "sha512": "2dfe9962402f0950fce3725d9b4aa152873b0d2fea7a8c05e06d971f3f07f81ded6d90b2865890e73f370b13680d89fcac411dc105053082816b8516c6a45201",
+      "source": "net.fabricmc.fabric-api:fabric-api:0.152.1+26.2",
+      "member": "META-INF/jars/fabric-key-mapping-api-v1-2.0.5+e2bdee789c.jar",
+      "size": 16009
+    }
+  ],
+  "fabricApi": {
+    "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/0.152.1+26.2/fabric-api-0.152.1+26.2.jar",
+    "sha512": "8dcbcabcb71443e57bf5b7da4c2b4fb0e3b98cd576146db989cb6886484b2422c802624082215e23e10e8e67441cd894744aa68d4d9b68ea1bd182afb15dd22b",
+    "size": 2501570
+  }
+}

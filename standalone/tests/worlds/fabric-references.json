@@ -1,0 +1,22 @@
+{
+  "archive": {
+    "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-api/0.152.1+26.2/fabric-api-0.152.1+26.2.jar",
+    "sha512": "8dcbcabcb71443e57bf5b7da4c2b4fb0e3b98cd576146db989cb6886484b2422c802624082215e23e10e8e67441cd894744aa68d4d9b68ea1bd182afb15dd22b",
+    "size": 2501570
+  },
+  "modules": {
+    "fabric-api-base-2.0.4+ece063239c.jar": "ed2828c21a41e1de67438a0740d5f61ecc1c12258acdb4133938500de79e78e9",
+    "fabric-rendering-v1-25.1.6+46a6d00c9c.jar": "9c79782e6a4a99f25ce69b36b3e9321cfeb2a0e348f858eab1e9905313ba686f",
+    "fabric-model-loading-api-v1-8.0.11+c80601bb9c.jar": "e5efa50aaf7b0d1f13d1698b20ddf12c8cd67a83725333a3546cfa6189cf5061",
+    "fabric-events-interaction-v0-5.2.6+8f57f7ee9c.jar": "c3f8a1b32e158ae9f8285127c13bf4d494f441e7b650ca2e02fa59dbc15954fd",
+    "fabric-registry-sync-v0-7.1.0+c7bd5b8e9c.jar": "3737f76322e686d709b5ac85b2ca7e75257dc2424cd5d8d5c9749c0803f9ac24",
+    "fabric-lifecycle-events-v1-4.1.3+4575b05f9c.jar": "1fc939ef019b78f21527fb468c63127218269bd92334b268bf9396a03d140200",
+    "fabric-object-builder-api-v1-24.0.6+46a6d00c9c.jar": "caa777058a7a6315659c0a906176459bd385b9300da5b87af6672e4e12e92670",
+    "fabric-loot-api-v3-3.0.17+06488ac19c.jar": "80a9c0c2ed40ca2869c4c22a2e8a98b9e83e5bf9d055d6ea1efd1876e4e3e34d",
+    "fabric-data-attachment-api-v1-2.2.16+aa0fd6fe9c.jar": "a255e3b289dddcb33e4231fb211e0bdbd7460b0082c94e658365baeac6c0eb7f",
+    "fabric-command-api-v2-3.1.0+00cb03469c.jar": "dead3651770182794807470a109e2d1d06368a71164540e715a918b054d0f887",
+    "fabric-transfer-api-v1-8.0.11+39b5a3929c.jar": "656c46a550440a21e10e23d51b6e3501b863707576dd332240c5ee6c20f88d9d",
+    "fabric-api-lookup-api-v1-2.0.17+11e1c9a39c.jar": "e85ab48dc61eaac95d2049bb1a5b8d1e92409ef0a00f0ea583e244c38260c495",
+    "fabric-networking-api-v1-6.3.3+72073ef09c.jar": "add778c6e7a73c4ad2352402be0a98184437a277ce42efc8ea1e4df1bf80995f"
+  }
+}

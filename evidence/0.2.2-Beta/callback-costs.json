@@ -1,0 +1,1479 @@
+{
+  "loader": "2a1e533575812f9079ab7ee4ae6d92d369e1d1ce5444c2ae32a6042982895ec9",
+  "java": "25.0.4+7-LTS",
+  "batches": {
+    "0": {
+      "core": [
+        {
+          "iteration": 0,
+          "elapsedNs": 639000,
+          "calls": 300000,
+          "checksum": 1
+        },
+        {
+          "iteration": 1,
+          "elapsedNs": 1109100,
+          "calls": 300000,
+          "checksum": 2
+        },
+        {
+          "iteration": 2,
+          "elapsedNs": 699200,
+          "calls": 300000,
+          "checksum": 3
+        },
+        {
+          "iteration": 3,
+          "elapsedNs": 891500,
+          "calls": 300000,
+          "checksum": 4
+        },
+        {
+          "iteration": 4,
+          "elapsedNs": 591000,
+          "calls": 300000,
+          "checksum": 5
+        },
+        {
+          "iteration": 5,
+          "elapsedNs": 594500,
+          "calls": 300000,
+          "checksum": 6
+        },
+        {
+          "iteration": 6,
+          "elapsedNs": 587400,
+          "calls": 300000,
+          "checksum": 7
+        },
+        {
+          "iteration": 7,
+          "elapsedNs": 900400,
+          "calls": 300000,
+          "checksum": 8
+        },
+        {
+          "iteration": 8,
+          "elapsedNs": 731300,
+          "calls": 300000,
+          "checksum": 9
+        },
+        {
+          "iteration": 9,
+          "elapsedNs": 707400,
+          "calls": 300000,
+          "checksum": 10
+        },
+        {
+          "iteration": 10,
+          "elapsedNs": 1124200,
+          "calls": 300000,
+          "checksum": 11
+        },
+        {
+          "iteration": 11,
+          "elapsedNs": 1133100,
+          "calls": 300000,
+          "checksum": 12
+        },
+        {
+          "iteration": 12,
+          "elapsedNs": 1173400,
+          "calls": 300000,
+          "checksum": 13
+        },
+        {
+          "iteration": 13,
+          "elapsedNs": 1145300,
+          "calls": 300000,
+          "checksum": 14
+        },
+        {
+          "iteration": 14,
+          "elapsedNs": 1241000,
+          "calls": 300000,
+          "checksum": 15
+        },
+        {
+          "iteration": 15,
+          "elapsedNs": 1199700,
+          "calls": 300000,
+          "checksum": 16
+        },
+        {
+          "iteration": 16,
+          "elapsedNs": 1178200,
+          "calls": 300000,
+          "checksum": 17
+        },
+        {
+          "iteration": 17,
+          "elapsedNs": 1162700,
+          "calls": 300000,
+          "checksum": 18
+        },
+        {
+          "iteration": 18,
+          "elapsedNs": 1157400,
+          "calls": 300000,
+          "checksum": 19
+        },
+        {
+          "iteration": 19,
+          "elapsedNs": 1179800,
+          "calls": 300000,
+          "checksum": 20
+        }
+      ],
+      "direct": [
+        {
+          "iteration": 0,
+          "elapsedNs": 536200,
+          "calls": 300000,
+          "checksum": 1
+        },
+        {
+          "iteration": 1,
+          "elapsedNs": 799800,
+          "calls": 300000,
+          "checksum": 2
+        },
+        {
+          "iteration": 2,
+          "elapsedNs": 758700,
+          "calls": 300000,
+          "checksum": 3
+        },
+        {
+          "iteration": 3,
+          "elapsedNs": 704200,
+          "calls": 300000,
+          "checksum": 4
+        },
+        {
+          "iteration": 4,
+          "elapsedNs": 537600,
+          "calls": 300000,
+          "checksum": 5
+        },
+        {
+          "iteration": 5,
+          "elapsedNs": 813300,
+          "calls": 300000,
+          "checksum": 6
+        },
+        {
+          "iteration": 6,
+          "elapsedNs": 537000,
+          "calls": 300000,
+          "checksum": 7
+        },
+        {
+          "iteration": 7,
+          "elapsedNs": 637800,
+          "calls": 300000,
+          "checksum": 8
+        },
+        {
+          "iteration": 8,
+          "elapsedNs": 534500,
+          "calls": 300000,
+          "checksum": 9
+        },
+        {
+          "iteration": 9,
+          "elapsedNs": 936000,
+          "calls": 300000,
+          "checksum": 10
+        },
+        {
+          "iteration": 10,
+          "elapsedNs": 1179300,
+          "calls": 300000,
+          "checksum": 11
+        },
+        {
+          "iteration": 11,
+          "elapsedNs": 1090600,
+          "calls": 300000,
+          "checksum": 12
+        },
+        {
+          "iteration": 12,
+          "elapsedNs": 1169300,
+          "calls": 300000,
+          "checksum": 13
+        },
+        {
+          "iteration": 13,
+          "elapsedNs": 1331000,
+          "calls": 300000,
+          "checksum": 14
+        },
+        {
+          "iteration": 14,
+          "elapsedNs": 1155800,
+          "calls": 300000,
+          "checksum": 15
+        },
+        {
+          "iteration": 15,
+          "elapsedNs": 1101600,
+          "calls": 300000,
+          "checksum": 16
+        },
+        {
+          "iteration": 16,
+          "elapsedNs": 1118200,
+          "calls": 300000,
+          "checksum": 17
+        },
+        {
+          "iteration": 17,
+          "elapsedNs": 1123200,
+          "calls": 300000,
+          "checksum": 18
+        },
+        {
+          "iteration": 18,
+          "elapsedNs": 1081700,
+          "calls": 300000,
+          "checksum": 19
+        },
+        {
+          "iteration": 19,
+          "elapsedNs": 1471600,
+          "calls": 300000,
+          "checksum": 20
+        }
+      ],
+      "forge": [
+        {
+          "iteration": 0,
+          "elapsedNs": 636600,
+          "calls": 300000,
+          "checksum": 1
+        },
+        {
+          "iteration": 1,
+          "elapsedNs": 1101200,
+          "calls": 300000,
+          "checksum": 2
+        },
+        {
+          "iteration": 2,
+          "elapsedNs": 1150000,
+          "calls": 300000,
+          "checksum": 3
+        },
+        {
+          "iteration": 3,
+          "elapsedNs": 690900,
+          "calls": 300000,
+          "checksum": 4
+        },
+        {
+          "iteration": 4,
+          "elapsedNs": 640300,
+          "calls": 300000,
+          "checksum": 5
+        },
+        {
+          "iteration": 5,
+          "elapsedNs": 647800,
+          "calls": 300000,
+          "checksum": 6
+        },
+        {
+          "iteration": 6,
+          "elapsedNs": 634800,
+          "calls": 300000,
+          "checksum": 7
+        },
+        {
+          "iteration": 7,
+          "elapsedNs": 636600,
+          "calls": 300000,
+          "checksum": 8
+        },
+        {
+          "iteration": 8,
+          "elapsedNs": 640500,
+          "calls": 300000,
+          "checksum": 9
+        },
+        {
+          "iteration": 9,
+          "elapsedNs": 1111000,
+          "calls": 300000,
+          "checksum": 10
+        },
+        {
+          "iteration": 10,
+          "elapsedNs": 1259500,
+          "calls": 300000,
+          "checksum": 11
+        },
+        {
+          "iteration": 11,
+          "elapsedNs": 1243400,
+          "calls": 300000,
+          "checksum": 12
+        },
+        {
+          "iteration": 12,
+          "elapsedNs": 1181500,
+          "calls": 300000,
+          "checksum": 13
+        },
+        {
+          "iteration": 13,
+          "elapsedNs": 1169900,
+          "calls": 300000,
+          "checksum": 14
+        },
+        {
+          "iteration": 14,
+          "elapsedNs": 1205300,
+          "calls": 300000,
+          "checksum": 15
+        },
+        {
+          "iteration": 15,
+          "elapsedNs": 1207100,
+          "calls": 300000,
+          "checksum": 16
+        },
+        {
+          "iteration": 16,
+          "elapsedNs": 1186300,
+          "calls": 300000,
+          "checksum": 17
+        },
+        {
+          "iteration": 17,
+          "elapsedNs": 1151500,
+          "calls": 300000,
+          "checksum": 18
+        },
+        {
+          "iteration": 18,
+          "elapsedNs": 1161400,
+          "calls": 300000,
+          "checksum": 19
+        },
+        {
+          "iteration": 19,
+          "elapsedNs": 1219700,
+          "calls": 300000,
+          "checksum": 20
+        }
+      ]
+    },
+    "1": {
+      "core": [
+        {
+          "iteration": 0,
+          "elapsedNs": 992700,
+          "calls": 300000,
+          "checksum": -2635249181611149611
+        },
+        {
+          "iteration": 1,
+          "elapsedNs": 1315400,
+          "calls": 300000,
+          "checksum": -2635249168726247723
+        },
+        {
+          "iteration": 2,
+          "elapsedNs": 914400,
+          "calls": 300000,
+          "checksum": -2635249173021215019
+        },
+        {
+          "iteration": 3,
+          "elapsedNs": 918100,
+          "calls": 300000,
+          "checksum": -2635249194496051499
+        },
+        {
+          "iteration": 4,
+          "elapsedNs": 927400,
+          "calls": 300000,
+          "checksum": -2635249198791018795
+        },
+        {
+          "iteration": 5,
+          "elapsedNs": 1488700,
+          "calls": 300000,
+          "checksum": -2635249185906116907
+        },
+        {
+          "iteration": 6,
+          "elapsedNs": 1775100,
+          "calls": 300000,
+          "checksum": -2635249190201084203
+        },
+        {
+          "iteration": 7,
+          "elapsedNs": 1727600,
+          "calls": 300000,
+          "checksum": -2635249142956443947
+        },
+        {
+          "iteration": 8,
+          "elapsedNs": 1833300,
+          "calls": 300000,
+          "checksum": -2635249147251411243
+        },
+        {
+          "iteration": 9,
+          "elapsedNs": 1325400,
+          "calls": 300000,
+          "checksum": -2635249134366509355
+        },
+        {
+          "iteration": 10,
+          "elapsedNs": 921300,
+          "calls": 300000,
+          "checksum": -2635249138661476651
+        },
+        {
+          "iteration": 11,
+          "elapsedNs": 972800,
+          "calls": 300000,
+          "checksum": -2635249160136313131
+        },
+        {
+          "iteration": 12,
+          "elapsedNs": 924200,
+          "calls": 300000,
+          "checksum": -2635249164431280427
+        },
+        {
+          "iteration": 13,
+          "elapsedNs": 949900,
+          "calls": 300000,
+          "checksum": -2635249151546378539
+        },
+        {
+          "iteration": 14,
+          "elapsedNs": 1364000,
+          "calls": 300000,
+          "checksum": -2635249155841345835
+        },
+        {
+          "iteration": 15,
+          "elapsedNs": 1352000,
+          "calls": 300000,
+          "checksum": -2635249246035659051
+        },
+        {
+          "iteration": 16,
+          "elapsedNs": 920000,
+          "calls": 300000,
+          "checksum": -2635249250330626347
+        },
+        {
+          "iteration": 17,
+          "elapsedNs": 914700,
+          "calls": 300000,
+          "checksum": -2635249237445724459
+        },
+        {
+          "iteration": 18,
+          "elapsedNs": 924600,
+          "calls": 300000,
+          "checksum": -2635249241740691755
+        },
+        {
+          "iteration": 19,
+          "elapsedNs": 1564000,
+          "calls": 300000,
+          "checksum": -2635249263215528235
+        }
+      ],
+      "direct": [
+        {
+          "iteration": 0,
+          "elapsedNs": 1339400,
+          "calls": 300000,
+          "checksum": -2635249181611149611
+        },
+        {
+          "iteration": 1,
+          "elapsedNs": 1340100,
+          "calls": 300000,
+          "checksum": -2635249168726247723
+        },
+        {
+          "iteration": 2,
+          "elapsedNs": 1546100,
+          "calls": 300000,
+          "checksum": -2635249173021215019
+        },
+        {
+          "iteration": 3,
+          "elapsedNs": 904600,
+          "calls": 300000,
+          "checksum": -2635249194496051499
+        },
+        {
+          "iteration": 4,
+          "elapsedNs": 978200,
+          "calls": 300000,
+          "checksum": -2635249198791018795
+        },
+        {
+          "iteration": 5,
+          "elapsedNs": 1001300,
+          "calls": 300000,
+          "checksum": -2635249185906116907
+        },
+        {
+          "iteration": 6,
+          "elapsedNs": 1932900,
+          "calls": 300000,
+          "checksum": -2635249190201084203
+        },
+        {
+          "iteration": 7,
+          "elapsedNs": 1880800,
+          "calls": 300000,
+          "checksum": -2635249142956443947
+        },
+        {
+          "iteration": 8,
+          "elapsedNs": 1899200,
+          "calls": 300000,
+          "checksum": -2635249147251411243
+        },
+        {
+          "iteration": 9,
+          "elapsedNs": 939500,
+          "calls": 300000,
+          "checksum": -2635249134366509355
+        },
+        {
+          "iteration": 10,
+          "elapsedNs": 978800,
+          "calls": 300000,
+          "checksum": -2635249138661476651
+        },
+        {
+          "iteration": 11,
+          "elapsedNs": 1825200,
+          "calls": 300000,
+          "checksum": -2635249160136313131
+        },
+        {
+          "iteration": 12,
+          "elapsedNs": 903400,
+          "calls": 300000,
+          "checksum": -2635249164431280427
+        },
+        {
+          "iteration": 13,
+          "elapsedNs": 903100,
+          "calls": 300000,
+          "checksum": -2635249151546378539
+        },
+        {
+          "iteration": 14,
+          "elapsedNs": 1349900,
+          "calls": 300000,
+          "checksum": -2635249155841345835
+        },
+        {
+          "iteration": 15,
+          "elapsedNs": 917200,
+          "calls": 300000,
+          "checksum": -2635249246035659051
+        },
+        {
+          "iteration": 16,
+          "elapsedNs": 905500,
+          "calls": 300000,
+          "checksum": -2635249250330626347
+        },
+        {
+          "iteration": 17,
+          "elapsedNs": 904900,
+          "calls": 300000,
+          "checksum": -2635249237445724459
+        },
+        {
+          "iteration": 18,
+          "elapsedNs": 903400,
+          "calls": 300000,
+          "checksum": -2635249241740691755
+        },
+        {
+          "iteration": 19,
+          "elapsedNs": 891700,
+          "calls": 300000,
+          "checksum": -2635249263215528235
+        }
+      ],
+      "forge": [
+        {
+          "iteration": 0,
+          "elapsedNs": 1435900,
+          "calls": 300000,
+          "checksum": -2635249181611149611
+        },
+        {
+          "iteration": 1,
+          "elapsedNs": 1459100,
+          "calls": 300000,
+          "checksum": -2635249168726247723
+        },
+        {
+          "iteration": 2,
+          "elapsedNs": 1714700,
+          "calls": 300000,
+          "checksum": -2635249173021215019
+        },
+        {
+          "iteration": 3,
+          "elapsedNs": 972900,
+          "calls": 300000,
+          "checksum": -2635249194496051499
+        },
+        {
+          "iteration": 4,
+          "elapsedNs": 1318600,
+          "calls": 300000,
+          "checksum": -2635249198791018795
+        },
+        {
+          "iteration": 5,
+          "elapsedNs": 1434200,
+          "calls": 300000,
+          "checksum": -2635249185906116907
+        },
+        {
+          "iteration": 6,
+          "elapsedNs": 1795600,
+          "calls": 300000,
+          "checksum": -2635249190201084203
+        },
+        {
+          "iteration": 7,
+          "elapsedNs": 1798700,
+          "calls": 300000,
+          "checksum": -2635249142956443947
+        },
+        {
+          "iteration": 8,
+          "elapsedNs": 1836100,
+          "calls": 300000,
+          "checksum": -2635249147251411243
+        },
+        {
+          "iteration": 9,
+          "elapsedNs": 1471100,
+          "calls": 300000,
+          "checksum": -2635249134366509355
+        },
+        {
+          "iteration": 10,
+          "elapsedNs": 968800,
+          "calls": 300000,
+          "checksum": -2635249138661476651
+        },
+        {
+          "iteration": 11,
+          "elapsedNs": 1083400,
+          "calls": 300000,
+          "checksum": -2635249160136313131
+        },
+        {
+          "iteration": 12,
+          "elapsedNs": 961000,
+          "calls": 300000,
+          "checksum": -2635249164431280427
+        },
+        {
+          "iteration": 13,
+          "elapsedNs": 1272500,
+          "calls": 300000,
+          "checksum": -2635249151546378539
+        },
+        {
+          "iteration": 14,
+          "elapsedNs": 1411600,
+          "calls": 300000,
+          "checksum": -2635249155841345835
+        },
+        {
+          "iteration": 15,
+          "elapsedNs": 1407300,
+          "calls": 300000,
+          "checksum": -2635249246035659051
+        },
+        {
+          "iteration": 16,
+          "elapsedNs": 962400,
+          "calls": 300000,
+          "checksum": -2635249250330626347
+        },
+        {
+          "iteration": 17,
+          "elapsedNs": 963400,
+          "calls": 300000,
+          "checksum": -2635249237445724459
+        },
+        {
+          "iteration": 18,
+          "elapsedNs": 1120700,
+          "calls": 300000,
+          "checksum": -2635249241740691755
+        },
+        {
+          "iteration": 19,
+          "elapsedNs": 1122700,
+          "calls": 300000,
+          "checksum": -2635249263215528235
+        }
+      ]
+    },
+    "32": {
+      "core": [
+        {
+          "iteration": 0,
+          "elapsedNs": 7819500,
+          "calls": 300000,
+          "checksum": 1
+        },
+        {
+          "iteration": 1,
+          "elapsedNs": 9590800,
+          "calls": 300000,
+          "checksum": 2
+        },
+        {
+          "iteration": 2,
+          "elapsedNs": 12813600,
+          "calls": 300000,
+          "checksum": 3
+        },
+        {
+          "iteration": 3,
+          "elapsedNs": 8942300,
+          "calls": 300000,
+          "checksum": 4
+        },
+        {
+          "iteration": 4,
+          "elapsedNs": 9903400,
+          "calls": 300000,
+          "checksum": 5
+        },
+        {
+          "iteration": 5,
+          "elapsedNs": 11469600,
+          "calls": 300000,
+          "checksum": 6
+        },
+        {
+          "iteration": 6,
+          "elapsedNs": 8013500,
+          "calls": 300000,
+          "checksum": 7
+        },
+        {
+          "iteration": 7,
+          "elapsedNs": 11330800,
+          "calls": 300000,
+          "checksum": 8
+        },
+        {
+          "iteration": 8,
+          "elapsedNs": 13781400,
+          "calls": 300000,
+          "checksum": 9
+        },
+        {
+          "iteration": 9,
+          "elapsedNs": 8761500,
+          "calls": 300000,
+          "checksum": 10
+        },
+        {
+          "iteration": 10,
+          "elapsedNs": 14068200,
+          "calls": 300000,
+          "checksum": 11
+        },
+        {
+          "iteration": 11,
+          "elapsedNs": 11336200,
+          "calls": 300000,
+          "checksum": 12
+        },
+        {
+          "iteration": 12,
+          "elapsedNs": 8197600,
+          "calls": 300000,
+          "checksum": 13
+        },
+        {
+          "iteration": 13,
+          "elapsedNs": 12112200,
+          "calls": 300000,
+          "checksum": 14
+        },
+        {
+          "iteration": 14,
+          "elapsedNs": 15807500,
+          "calls": 300000,
+          "checksum": 15
+        },
+        {
+          "iteration": 15,
+          "elapsedNs": 11227800,
+          "calls": 300000,
+          "checksum": 16
+        },
+        {
+          "iteration": 16,
+          "elapsedNs": 8027200,
+          "calls": 300000,
+          "checksum": 17
+        },
+        {
+          "iteration": 17,
+          "elapsedNs": 8370000,
+          "calls": 300000,
+          "checksum": 18
+        },
+        {
+          "iteration": 18,
+          "elapsedNs": 8786100,
+          "calls": 300000,
+          "checksum": 19
+        },
+        {
+          "iteration": 19,
+          "elapsedNs": 13689400,
+          "calls": 300000,
+          "checksum": 20
+        }
+      ],
+      "direct": [
+        {
+          "iteration": 0,
+          "elapsedNs": 19484200,
+          "calls": 300000,
+          "checksum": 1
+        },
+        {
+          "iteration": 1,
+          "elapsedNs": 19159100,
+          "calls": 300000,
+          "checksum": 2
+        },
+        {
+          "iteration": 2,
+          "elapsedNs": 19638600,
+          "calls": 300000,
+          "checksum": 3
+        },
+        {
+          "iteration": 3,
+          "elapsedNs": 20524500,
+          "calls": 300000,
+          "checksum": 4
+        },
+        {
+          "iteration": 4,
+          "elapsedNs": 19865200,
+          "calls": 300000,
+          "checksum": 5
+        },
+        {
+          "iteration": 5,
+          "elapsedNs": 20799900,
+          "calls": 300000,
+          "checksum": 6
+        },
+        {
+          "iteration": 6,
+          "elapsedNs": 20174800,
+          "calls": 300000,
+          "checksum": 7
+        },
+        {
+          "iteration": 7,
+          "elapsedNs": 21189000,
+          "calls": 300000,
+          "checksum": 8
+        },
+        {
+          "iteration": 8,
+          "elapsedNs": 21354500,
+          "calls": 300000,
+          "checksum": 9
+        },
+        {
+          "iteration": 9,
+          "elapsedNs": 19654900,
+          "calls": 300000,
+          "checksum": 10
+        },
+        {
+          "iteration": 10,
+          "elapsedNs": 20181700,
+          "calls": 300000,
+          "checksum": 11
+        },
+        {
+          "iteration": 11,
+          "elapsedNs": 21125200,
+          "calls": 300000,
+          "checksum": 12
+        },
+        {
+          "iteration": 12,
+          "elapsedNs": 21115400,
+          "calls": 300000,
+          "checksum": 13
+        },
+        {
+          "iteration": 13,
+          "elapsedNs": 21352000,
+          "calls": 300000,
+          "checksum": 14
+        },
+        {
+          "iteration": 14,
+          "elapsedNs": 22434200,
+          "calls": 300000,
+          "checksum": 15
+        },
+        {
+          "iteration": 15,
+          "elapsedNs": 19806900,
+          "calls": 300000,
+          "checksum": 16
+        },
+        {
+          "iteration": 16,
+          "elapsedNs": 21205000,
+          "calls": 300000,
+          "checksum": 17
+        },
+        {
+          "iteration": 17,
+          "elapsedNs": 20247000,
+          "calls": 300000,
+          "checksum": 18
+        },
+        {
+          "iteration": 18,
+          "elapsedNs": 19984200,
+          "calls": 300000,
+          "checksum": 19
+        },
+        {
+          "iteration": 19,
+          "elapsedNs": 21190400,
+          "calls": 300000,
+          "checksum": 20
+        }
+      ],
+      "forge": [
+        {
+          "iteration": 0,
+          "elapsedNs": 9278700,
+          "calls": 300000,
+          "checksum": 1
+        },
+        {
+          "iteration": 1,
+          "elapsedNs": 11913900,
+          "calls": 300000,
+          "checksum": 2
+        },
+        {
+          "iteration": 2,
+          "elapsedNs": 9966900,
+          "calls": 300000,
+          "checksum": 3
+        },
+        {
+          "iteration": 3,
+          "elapsedNs": 9191900,
+          "calls": 300000,
+          "checksum": 4
+        },
+        {
+          "iteration": 4,
+          "elapsedNs": 14590800,
+          "calls": 300000,
+          "checksum": 5
+        },
+        {
+          "iteration": 5,
+          "elapsedNs": 10227600,
+          "calls": 300000,
+          "checksum": 6
+        },
+        {
+          "iteration": 6,
+          "elapsedNs": 10605800,
+          "calls": 300000,
+          "checksum": 7
+        },
+        {
+          "iteration": 7,
+          "elapsedNs": 11409600,
+          "calls": 300000,
+          "checksum": 8
+        },
+        {
+          "iteration": 8,
+          "elapsedNs": 10912800,
+          "calls": 300000,
+          "checksum": 9
+        },
+        {
+          "iteration": 9,
+          "elapsedNs": 12029400,
+          "calls": 300000,
+          "checksum": 10
+        },
+        {
+          "iteration": 10,
+          "elapsedNs": 9903000,
+          "calls": 300000,
+          "checksum": 11
+        },
+        {
+          "iteration": 11,
+          "elapsedNs": 10947300,
+          "calls": 300000,
+          "checksum": 12
+        },
+        {
+          "iteration": 12,
+          "elapsedNs": 10242600,
+          "calls": 300000,
+          "checksum": 13
+        },
+        {
+          "iteration": 13,
+          "elapsedNs": 14833400,
+          "calls": 300000,
+          "checksum": 14
+        },
+        {
+          "iteration": 14,
+          "elapsedNs": 18261000,
+          "calls": 300000,
+          "checksum": 15
+        },
+        {
+          "iteration": 15,
+          "elapsedNs": 10845600,
+          "calls": 300000,
+          "checksum": 16
+        },
+        {
+          "iteration": 16,
+          "elapsedNs": 10655100,
+          "calls": 300000,
+          "checksum": 17
+        },
+        {
+          "iteration": 17,
+          "elapsedNs": 13792100,
+          "calls": 300000,
+          "checksum": 18
+        },
+        {
+          "iteration": 18,
+          "elapsedNs": 10110200,
+          "calls": 300000,
+          "checksum": 19
+        },
+        {
+          "iteration": 19,
+          "elapsedNs": 24782000,
+          "calls": 300000,
+          "checksum": 20
+        }
+      ]
+    },
+    "8": {
+      "core": [
+        {
+          "iteration": 0,
+          "elapsedNs": 3014800,
+          "calls": 300000,
+          "checksum": 1
+        },
+        {
+          "iteration": 1,
+          "elapsedNs": 3705200,
+          "calls": 300000,
+          "checksum": 2
+        },
+        {
+          "iteration": 2,
+          "elapsedNs": 2731500,
+          "calls": 300000,
+          "checksum": 3
+        },
+        {
+          "iteration": 3,
+          "elapsedNs": 2967700,
+          "calls": 300000,
+          "checksum": 4
+        },
+        {
+          "iteration": 4,
+          "elapsedNs": 3462900,
+          "calls": 300000,
+          "checksum": 5
+        },
+        {
+          "iteration": 5,
+          "elapsedNs": 2925900,
+          "calls": 300000,
+          "checksum": 6
+        },
+        {
+          "iteration": 6,
+          "elapsedNs": 2640700,
+          "calls": 300000,
+          "checksum": 7
+        },
+        {
+          "iteration": 7,
+          "elapsedNs": 2731500,
+          "calls": 300000,
+          "checksum": 8
+        },
+        {
+          "iteration": 8,
+          "elapsedNs": 2774500,
+          "calls": 300000,
+          "checksum": 9
+        },
+        {
+          "iteration": 9,
+          "elapsedNs": 2740800,
+          "calls": 300000,
+          "checksum": 10
+        },
+        {
+          "iteration": 10,
+          "elapsedNs": 4439700,
+          "calls": 300000,
+          "checksum": 11
+        },
+        {
+          "iteration": 11,
+          "elapsedNs": 3898200,
+          "calls": 300000,
+          "checksum": 12
+        },
+        {
+          "iteration": 12,
+          "elapsedNs": 3805400,
+          "calls": 300000,
+          "checksum": 13
+        },
+        {
+          "iteration": 13,
+          "elapsedNs": 3760500,
+          "calls": 300000,
+          "checksum": 14
+        },
+        {
+          "iteration": 14,
+          "elapsedNs": 3227300,
+          "calls": 300000,
+          "checksum": 15
+        },
+        {
+          "iteration": 15,
+          "elapsedNs": 3184000,
+          "calls": 300000,
+          "checksum": 16
+        },
+        {
+          "iteration": 16,
+          "elapsedNs": 2952100,
+          "calls": 300000,
+          "checksum": 17
+        },
+        {
+          "iteration": 17,
+          "elapsedNs": 3089400,
+          "calls": 300000,
+          "checksum": 18
+        },
+        {
+          "iteration": 18,
+          "elapsedNs": 2974300,
+          "calls": 300000,
+          "checksum": 19
+        },
+        {
+          "iteration": 19,
+          "elapsedNs": 3527400,
+          "calls": 300000,
+          "checksum": 20
+        }
+      ],
+      "direct": [
+        {
+          "iteration": 0,
+          "elapsedNs": 4743600,
+          "calls": 300000,
+          "checksum": 1
+        },
+        {
+          "iteration": 1,
+          "elapsedNs": 4746300,
+          "calls": 300000,
+          "checksum": 2
+        },
+        {
+          "iteration": 2,
+          "elapsedNs": 4740600,
+          "calls": 300000,
+          "checksum": 3
+        },
+        {
+          "iteration": 3,
+          "elapsedNs": 4748900,
+          "calls": 300000,
+          "checksum": 4
+        },
+        {
+          "iteration": 4,
+          "elapsedNs": 4749600,
+          "calls": 300000,
+          "checksum": 5
+        },
+        {
+          "iteration": 5,
+          "elapsedNs": 4968900,
+          "calls": 300000,
+          "checksum": 6
+        },
+        {
+          "iteration": 6,
+          "elapsedNs": 4548100,
+          "calls": 300000,
+          "checksum": 7
+        },
+        {
+          "iteration": 7,
+          "elapsedNs": 4700100,
+          "calls": 300000,
+          "checksum": 8
+        },
+        {
+          "iteration": 8,
+          "elapsedNs": 4740000,
+          "calls": 300000,
+          "checksum": 9
+        },
+        {
+          "iteration": 9,
+          "elapsedNs": 4805700,
+          "calls": 300000,
+          "checksum": 10
+        },
+        {
+          "iteration": 10,
+          "elapsedNs": 4902900,
+          "calls": 300000,
+          "checksum": 11
+        },
+        {
+          "iteration": 11,
+          "elapsedNs": 5478500,
+          "calls": 300000,
+          "checksum": 12
+        },
+        {
+          "iteration": 12,
+          "elapsedNs": 5004400,
+          "calls": 300000,
+          "checksum": 13
+        },
+        {
+          "iteration": 13,
+          "elapsedNs": 5026300,
+          "calls": 300000,
+          "checksum": 14
+        },
+        {
+          "iteration": 14,
+          "elapsedNs": 4978000,
+          "calls": 300000,
+          "checksum": 15
+        },
+        {
+          "iteration": 15,
+          "elapsedNs": 5315800,
+          "calls": 300000,
+          "checksum": 16
+        },
+        {
+          "iteration": 16,
+          "elapsedNs": 5152800,
+          "calls": 300000,
+          "checksum": 17
+        },
+        {
+          "iteration": 17,
+          "elapsedNs": 5198700,
+          "calls": 300000,
+          "checksum": 18
+        },
+        {
+          "iteration": 18,
+          "elapsedNs": 5094900,
+          "calls": 300000,
+          "checksum": 19
+        },
+        {
+          "iteration": 19,
+          "elapsedNs": 5018000,
+          "calls": 300000,
+          "checksum": 20
+        }
+      ],
+      "forge": [
+        {
+          "iteration": 0,
+          "elapsedNs": 3047300,
+          "calls": 300000,
+          "checksum": 1
+        },
+        {
+          "iteration": 1,
+          "elapsedNs": 3036400,
+          "calls": 300000,
+          "checksum": 2
+        },
+        {
+          "iteration": 2,
+          "elapsedNs": 2866800,
+          "calls": 300000,
+          "checksum": 3
+        },
+        {
+          "iteration": 3,
+          "elapsedNs": 3046500,
+          "calls": 300000,
+          "checksum": 4
+        },
+        {
+          "iteration": 4,
+          "elapsedNs": 4104500,
+          "calls": 300000,
+          "checksum": 5
+        },
+        {
+          "iteration": 5,
+          "elapsedNs": 4116400,
+          "calls": 300000,
+          "checksum": 6
+        },
+        {
+          "iteration": 6,
+          "elapsedNs": 2758300,
+          "calls": 300000,
+          "checksum": 7
+        },
+        {
+          "iteration": 7,
+          "elapsedNs": 2873700,
+          "calls": 300000,
+          "checksum": 8
+        },
+        {
+          "iteration": 8,
+          "elapsedNs": 2870400,
+          "calls": 300000,
+          "checksum": 9
+        },
+        {
+          "iteration": 9,
+          "elapsedNs": 2874200,
+          "calls": 300000,
+          "checksum": 10
+        },
+        {
+          "iteration": 10,
+          "elapsedNs": 3488000,
+          "calls": 300000,
+          "checksum": 11
+        },
+        {
+          "iteration": 11,
+          "elapsedNs": 3709200,
+          "calls": 300000,
+          "checksum": 12
+        },
+        {
+          "iteration": 12,
+          "elapsedNs": 3797600,
+          "calls": 300000,
+          "checksum": 13
+        },
+        {
+          "iteration": 13,
+          "elapsedNs": 4023500,
+          "calls": 300000,
+          "checksum": 14
+        },
+        {
+          "iteration": 14,
+          "elapsedNs": 3525100,
+          "calls": 300000,
+          "checksum": 15
+        },
+        {
+          "iteration": 15,
+          "elapsedNs": 4117900,
+          "calls": 300000,
+          "checksum": 16
+        },
+        {
+          "iteration": 16,
+          "elapsedNs": 3164100,
+          "calls": 300000,
+          "checksum": 17
+        },
+        {
+          "iteration": 17,
+          "elapsedNs": 3584000,
+          "calls": 300000,
+          "checksum": 18
+        },
+        {
+          "iteration": 18,
+          "elapsedNs": 3289600,
+          "calls": 300000,
+          "checksum": 19
+        },
+        {
+          "iteration": 19,
+          "elapsedNs": 3796600,
+          "calls": 300000,
+          "checksum": 20
+        }
+      ]
+    }
+  },
+  "units": "elapsedNs per batch; divide by calls for nanoseconds per dispatch"
+}

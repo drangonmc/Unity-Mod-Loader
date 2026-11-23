@@ -1,0 +1,12 @@
+/.work/
+/cache/
+/instance/
+/client-instance/
+/standalone-instance/
+/standalone-client/
+/logs/
+/artifacts/
+/versions/state.lock
+/versions/*/*.zip*
+__pycache__/
+*.pyc

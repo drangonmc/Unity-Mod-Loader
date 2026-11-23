@@ -1,0 +1,10 @@
+BasedOnStyle: LLVM
+Language: Java
+IndentWidth: 4
+ContinuationIndentWidth: 4
+ColumnLimit: 110
+SortIncludes: Never
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: Empty

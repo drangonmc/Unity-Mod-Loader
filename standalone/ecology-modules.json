@@ -1,0 +1,38 @@
+[
+  {
+    "id": "fabric-loot-api-v3",
+    "filename": "fabric-loot-api-v3-3.0.17+06488ac19c.jar",
+    "version": "3.0.17+06488ac19c",
+    "sha512": "91cb7721c23bf51b4132b2d74f8379afeb3ad07ec72c83b9750789b75301e9fc42a87f126f4afa97e065e45809a0391c5ab498b0cc5c432023088b8be09cd1e0",
+    "source": "net.fabricmc.fabric-api:fabric-api:0.152.1+26.2",
+    "member": "META-INF/jars/fabric-loot-api-v3-3.0.17+06488ac19c.jar",
+    "size": 32691
+  },
+  {
+    "id": "fabric-api-lookup-api-v1",
+    "filename": "fabric-api-lookup-api-v1-2.0.17+11e1c9a39c.jar",
+    "version": "2.0.17+11e1c9a39c",
+    "sha512": "f818668bae32ac7e882e4ad097a52bd2277cece3d817c6b00e599ef77136f2b7c9f67bc002e481418704d03325a1e2c63cd4eebc19065a4681e9f1485e75eb7a",
+    "source": "net.fabricmc.fabric-api:fabric-api:0.152.1+26.2",
+    "member": "META-INF/jars/fabric-api-lookup-api-v1-2.0.17+11e1c9a39c.jar",
+    "size": 47784
+  },
+  {
+    "id": "fabric-rendering-fluids-v1",
+    "filename": "fabric-rendering-fluids-v1-6.0.4+06488ac19c.jar",
+    "version": "6.0.4+06488ac19c",
+    "sha512": "ab2ca4b15eef0fe5ed374a4f9cec9e8a280b47cf0c56b511aa2b8097c1b860979faf920b1d5d851bfb637912f41162d328d1c7f6f8f6b68c683ba2e19431a968",
+    "source": "net.fabricmc.fabric-api:fabric-api:0.152.1+26.2",
+    "member": "META-INF/jars/fabric-rendering-fluids-v1-6.0.4+06488ac19c.jar",
+    "size": 22062
+  },
+  {
+    "id": "fabric-transfer-api-v1",
+    "filename": "fabric-transfer-api-v1-8.0.11+39b5a3929c.jar",
+    "version": "8.0.11+39b5a3929c",
+    "sha512": "90c85866741eed8f0a22762aaf9c5cb228875751cbf7a5ae539f707289e1078f995b05df8200f1815ae2c6f53f4b418d79d3e02ce347aa2d0c632b99bc33a083",
+    "source": "net.fabricmc.fabric-api:fabric-api:0.152.1+26.2",
+    "member": "META-INF/jars/fabric-transfer-api-v1-8.0.11+39b5a3929c.jar",
+    "size": 192608
+  }
+]

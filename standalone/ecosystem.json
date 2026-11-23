@@ -1,0 +1,115 @@
+[
+  {
+    "slug": "crop-harvest-mc",
+    "version": "2.0.0",
+    "version_id": "OLJJcHj1",
+    "project_id": "9J2wRApA",
+    "filename": "crop-harvest-1.0.0+26.2-forge.jar",
+    "size": 21373,
+    "url": "https://cdn.modrinth.com/data/9J2wRApA/versions/OLJJcHj1/crop-harvest-1.0.0%2B26.2-forge.jar",
+    "sha512": "86c25378f81f13635ab88561369f1e8eb39bb28a38d7e8f53106e58b2f6acb19fb118fd34063bc359effdaa3a3d0ba3bfd52b4b5984590734900428b79ac490d",
+    "loader": "forge",
+    "game_versions": [
+      "26.2"
+    ],
+    "release_page": "https://modrinth.com/mod/crop-harvest-mc/version/OLJJcHj1"
+  },
+  {
+    "slug": "server-tree-feller",
+    "version": "1.1.0+26.2-forge",
+    "version_id": "SkedpK1k",
+    "project_id": "HYmhPLQD",
+    "filename": "treefeller-mc26.2-forge-1.2.0.jar",
+    "size": 12528,
+    "url": "https://cdn.modrinth.com/data/HYmhPLQD/versions/SkedpK1k/treefeller-mc26.2-forge-1.2.0.jar",
+    "sha512": "1f40fb3dc2e58c5a1a81083585b9ee309ca3d2729d3e3af3d2736bdec5a2151c5ce8b853503c8ddd4d9a3bd0ce08fa9cfeccf47a272e0ad66f3920b828701582",
+    "loader": "forge",
+    "game_versions": [
+      "26.2"
+    ],
+    "release_page": "https://modrinth.com/mod/server-tree-feller/version/SkedpK1k"
+  },
+  {
+    "slug": "pvpcontrol",
+    "version": "2.0.0+forge-26.2",
+    "version_id": "TshsF9oN",
+    "project_id": "D44U32Px",
+    "filename": "PvPControl-Forge-2.0.0+26.2.jar",
+    "size": 80742,
+    "url": "https://cdn.modrinth.com/data/D44U32Px/versions/TshsF9oN/PvPControl-Forge-2.0.0%2B26.2.jar",
+    "sha512": "3f702873f07eabca91f52e45f36d03db73035c6f13c10d52eeb9aa80f88f5c08567c43a99d3883f9174cc5ef49f18c4a22229d8614fb8cba6fcdbed193df5b68",
+    "loader": "forge",
+    "game_versions": [
+      "26.2"
+    ],
+    "release_page": "https://modrinth.com/mod/pvpcontrol/version/TshsF9oN"
+  },
+  {
+    "slug": "back-command",
+    "version": "1.0.1",
+    "version_id": "zYg29ASn",
+    "project_id": "dF4kxxVM",
+    "filename": "back-command-1.0.1.jar",
+    "size": 16408,
+    "url": "https://cdn.modrinth.com/data/dF4kxxVM/versions/zYg29ASn/back-command-1.0.1.jar",
+    "sha512": "a583379a9f3e7e8f6cc6643a93e71daba8af4178c695cd7510795378119cad9ecd6aca0999c53b0c9a816ad50dc4b7d21a321f9cc0f7212e93d3aa1f2d8c4802",
+    "loader": "fabric",
+    "game_versions": [
+      "26.2"
+    ],
+    "release_page": "https://modrinth.com/mod/back-command/version/zYg29ASn"
+  },
+  {
+    "slug": "commandsspy",
+    "version": "1.8.0+mc26.x-26.3",
+    "version_id": "aqZ611TQ",
+    "project_id": "ZeMREG8v",
+    "filename": "commandsspy-1.8.0+mc26.x.jar",
+    "size": 27253,
+    "url": "https://cdn.modrinth.com/data/ZeMREG8v/versions/aqZ611TQ/commandsspy-1.8.0%2Bmc26.x.jar",
+    "sha512": "945c7acdc8d0fc5f7cf09045ae3102eb779ad74d3f38bff363869b3d237cc44905fa87b88f870a4f012898737b6ae7b0cac0abf673c931b5d2b1e5456aae8d0f",
+    "loader": "fabric",
+    "game_versions": [
+      "26.1",
+      "26.1.1",
+      "26.1.2",
+      "26.2",
+      "26.3"
+    ],
+    "release_page": "https://modrinth.com/mod/commandsspy/version/aqZ611TQ"
+  },
+  {
+    "slug": "always-shield",
+    "version": "1.2.2+mc2x.x-NeoForge",
+    "version_id": "2jHvV4To",
+    "project_id": "f5J5N4a3",
+    "filename": "AlwaysShield-1.2.2+mc26.3-NeoForge.jar",
+    "size": 84456,
+    "url": "https://cdn.modrinth.com/data/f5J5N4a3/versions/2jHvV4To/AlwaysShield-1.2.2%2Bmc26.3-NeoForge.jar",
+    "sha512": "c042f0112f1ab5b22747a82ccbb2ab51325edf646bd8dfb8b9a67e80a41f3c0d8e29bc7fd9add81a09247e05756423352497855712dd4fec655fd091aba4da5f",
+    "loader": "neoforge",
+    "game_versions": [
+      "26.1",
+      "26.1.1",
+      "26.1.2",
+      "26.2",
+      "26.3"
+    ],
+    "release_page": "https://modrinth.com/mod/always-shield/version/2jHvV4To"
+  },
+  {
+    "slug": "skc",
+    "version": "2.1.0+neoforge.26.2",
+    "version_id": "huscYSca",
+    "project_id": "U1CZnOWi",
+    "filename": "SimpleKillCommand-NeoForge-mc26.2-2.1.0.jar",
+    "size": 14189,
+    "url": "https://cdn.modrinth.com/data/U1CZnOWi/versions/huscYSca/SimpleKillCommand-NeoForge-mc26.2-2.1.0.jar",
+    "sha512": "d1c5cffad8be39dfcefbe65f595834bac2d00ce34f0a2504dc5c7bbd31eda8c8c19ce5d54a35f9243d11f5c64adb1adf27299c981ed96d29a7203db4ac35440a",
+    "loader": "neoforge",
+    "game_versions": [
+      "26.2"
+    ],
+    "release_page": "https://modrinth.com/mod/skc/version/huscYSca"
+  }
+]

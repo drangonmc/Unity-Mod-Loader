@@ -1,0 +1,13 @@
+{
+  "project": "mBxlsHOB",
+  "slug": "alexs-craftable-trident",
+  "version": "Nr9PFA1w",
+  "platform": "forge",
+  "filename": "alexs-craftable-trident-1.0.0+1.20.2-expensive.jar",
+  "sha512": "706ba2fb18fb14bb8c2fd58c8b977d3fc3652f9d4983f2225190569ca28f821b3ee47b4621091fb4fc8562724e4e44dd6b4183e5d97c2b7d907d1ecab5a08f30",
+  "url": "https://cdn.modrinth.com/data/mBxlsHOB/versions/Nr9PFA1w/alexs-craftable-trident-1.0.0%2B1.20.2-expensive.jar",
+  "classes": 0,
+  "size": 64095,
+  "modId": "mr_alexs_craftabletrident",
+  "recipe": "craftable_trident:trident"
+}

@@ -1,0 +1,20 @@
+[
+  {
+    "slug": "repair-commands",
+    "filename": "repair-commands-1.0.3-forge-26.1-26.2.jar",
+    "version": "1.0.3",
+    "version_id": "RaFN5Set",
+    "url": "https://cdn.modrinth.com/data/MalxXFS7/versions/RaFN5Set/repair-commands-1.0.3-forge-26.1-26.2.jar",
+    "size": 2998,
+    "sha512": "8149d4d14a416294eb9445e83b0643fefb1e920b5e46016230d4e9a63e177231d404d5155e1b0eb1786ed7d615194b61cfde255f2adef3df69145cc3e71918c7"
+  },
+  {
+    "slug": "random-items-cmd",
+    "filename": "randomitem-1.1-forge-26.2.jar",
+    "version": "1.1-forge-26.2",
+    "version_id": "PFeApyaj",
+    "url": "https://cdn.modrinth.com/data/BmBsXMuV/versions/PFeApyaj/randomitem-1.1-forge-26.2.jar",
+    "size": 5634,
+    "sha512": "ce97d9fe06456fc62b33ec6ef4d8b401238a13741e4c15b1ff1458af54bf4419da58b63aee5cadf585d6b641ad9ddf575dd105d7c1fca180ea82d31175c8df02"
+  }
+]

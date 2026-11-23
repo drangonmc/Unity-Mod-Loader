@@ -1,0 +1,78 @@
+[
+  {
+    "slug": "bedrock-crafter",
+    "version": "1.3.5-MC26.2-Fabric",
+    "version_id": "6YpE9O2t",
+    "project_id": "khexi0GO",
+    "filename": "BedrockCrafter-1.3.5-MC26.2-Fabric.jar",
+    "size": 397536,
+    "url": "https://cdn.modrinth.com/data/khexi0GO/versions/6YpE9O2t/BedrockCrafter-1.3.5-MC26.2-Fabric.jar",
+    "sha512": "8d869430b290136e18bbe69eff2c247014d5a816bdddf5dd249a89e11b498dd7d07891fc9eeb7b6590e61118932f904186e441ccc150d488fdd1d03fb63049f0",
+    "loader": "fabric",
+    "game_versions": [
+      "26.2"
+    ],
+    "release_page": "https://modrinth.com/mod/bedrock-crafter/version/6YpE9O2t",
+    "mod_id": "bedrockcrafter-fabric",
+    "tested_block": "bedrockcrafter:bedrock_lamp",
+    "texture": "bedrockcrafter:textures/block/bedrock_lamp.png",
+    "texture_sha256": "add209282d366927bfafd884fc84491cce8cb523b08d438943322d84cc8dc641"
+  },
+  {
+    "slug": "extra-more-blocks",
+    "version": "1.0.1",
+    "version_id": "S1G3wuzi",
+    "project_id": "Siqx9wiO",
+    "filename": "extra-more-blocks-1.0.1.jar",
+    "size": 1284929,
+    "url": "https://cdn.modrinth.com/data/Siqx9wiO/versions/S1G3wuzi/extra-more-blocks-1.0.1.jar",
+    "sha512": "7a043d1ad63b04211153e8b4d7a956a9669744a5d253bf608182224bcf8278a0a983636fea7defe26f13ad7c4b045703ea165b8e1ec8274bef2fe9f8d6f99392",
+    "loader": "fabric",
+    "game_versions": [
+      "26.2"
+    ],
+    "release_page": "https://modrinth.com/mod/extra-more-blocks/version/S1G3wuzi",
+    "mod_id": "verticalslabs",
+    "tested_block": "verticalslabs:blue_stained_glass_door",
+    "texture": "verticalslabs:textures/item/blue_stained_glass_door.png",
+    "texture_sha256": "605a9f8c4b2f45339af52b0473f4a50d0cd233faca2364bade44bee7fc9142f8"
+  },
+  {
+    "slug": "morebricks",
+    "version": "2.0.0+26.2-neoforge",
+    "version_id": "7Gck4fiE",
+    "project_id": "28Z4jb8Q",
+    "filename": "morebricks-neoforge-2.0.0+26.2.jar",
+    "size": 75525,
+    "url": "https://cdn.modrinth.com/data/28Z4jb8Q/versions/7Gck4fiE/morebricks-neoforge-2.0.0%2B26.2.jar",
+    "sha512": "87e9c46431a6e9fb1953b0277135709110d2a27a6b1c8377dac14be421189cc05f94e1bcc2ca3300f6dab7220fd401f38605c72d2a934669aa429c3d9d9121e7",
+    "loader": "neoforge",
+    "game_versions": [
+      "26.2"
+    ],
+    "release_page": "https://modrinth.com/mod/morebricks/version/7Gck4fiE",
+    "mod_id": "morebricks",
+    "tested_block": "morebricks:granite_bricks",
+    "texture": "morebricks:textures/block/granite_bricks.png",
+    "texture_sha256": "84d84212e51dce246dd1d26a04b44658bb80b91de44ef088fc021694455d8692"
+  },
+  {
+    "slug": "macaws-fences-and-walls",
+    "version": "1.2.1",
+    "version_id": "j11V8ma4",
+    "project_id": "GmwLse2I",
+    "filename": "mcw-fences-1.2.1-mc26.2neoforge.jar",
+    "size": 697795,
+    "url": "https://cdn.modrinth.com/data/GmwLse2I/versions/j11V8ma4/mcw-fences-1.2.1-mc26.2neoforge.jar",
+    "sha512": "c84b214c5cc324d1812fa1b69a9e01231a4352dc3159eb5e77158084385f6e78462d6ca385a4ef8058580acd0fe6ee18285ff483004f208d76ef86a96fe277d1",
+    "loader": "neoforge",
+    "game_versions": [
+      "26.2"
+    ],
+    "release_page": "https://modrinth.com/mod/macaws-fences-and-walls/version/j11V8ma4",
+    "mod_id": "mcwfences",
+    "tested_block": "mcwfences:acorn_metal_fence",
+    "texture": "mcwfences:textures/block/acorn_fence_bottom.png",
+    "texture_sha256": "4cd10526836a63d529806fdf6db5f65c773a8d2973588f38daf060bdfee5685d"
+  }
+]

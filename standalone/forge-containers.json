@@ -1,0 +1,29 @@
+[
+  {
+    "slug": "storage-delight",
+    "version": "26.07.01-26.2-forge",
+    "version_id": "TrGOmL0g",
+    "filename": "storagedelight-26.07.01-26.2-forge.jar",
+    "size": 963850,
+    "url": "https://cdn.modrinth.com/data/LTTvOp5L/versions/TrGOmL0g/storagedelight-26.07.01-26.2-forge.jar",
+    "sha512": "c8ae1a1cbcaa52ae140b3235eb9afa46cfabb50709d0cc3cec1065bd7d1f74ad5043d013f449ee63673396d66a0196e1fca92678f458a8e6d00038dcac4f7055"
+  },
+  {
+    "slug": "inventory-storages",
+    "version": "1.0.3",
+    "version_id": "vjpAR64q",
+    "filename": "inventorystorages-forge-26.2-1.0.3.jar",
+    "size": 207366,
+    "url": "https://cdn.modrinth.com/data/hiaKnuWP/versions/vjpAR64q/inventorystorages-forge-26.2-1.0.3.jar",
+    "sha512": "4a8a498c8facecaea8456f13004e5c47fca9227c299eb278e769fc735903d73e0ecbfe9bfe4e911fd95800606d491a1338032540d130cfb3b6cec89352b73759"
+  },
+  {
+    "slug": "laserblade-tools",
+    "version": "2.0.0+26.2-forge",
+    "version_id": "wwfZjLAZ",
+    "filename": "laserbladetools-forge-2.0.0+26.2.jar",
+    "size": 102363,
+    "url": "https://cdn.modrinth.com/data/HgBGKYvz/versions/wwfZjLAZ/laserbladetools-forge-2.0.0%2B26.2.jar",
+    "sha512": "9b8c1b16a0c7580cb6ea4a56c826ff6232379b87d2d516d620505512e831f8765f38085f9afcd5d4f02bca82409ff6d821340415789433ca623c08e940cfcd03"
+  }
+]

@@ -1,0 +1,38 @@
+{
+  "fabric-loader": {
+    "url": "https://maven.fabricmc.net/net/fabricmc/fabric-loader/0.19.3/fabric-loader-0.19.3.jar",
+    "sha256": "73eed8c34bbad0320a2a3cba5346351e822f74f82b3f3c060574068474132958"
+  },
+  "neo": {
+    "url": "https://maven.neoforged.net/releases/net/neoforged/neoforge/26.2.0.93/neoforge-26.2.0.93-universal.jar",
+    "sha256": "c9ce1b3ab2fc182b35a0a81f29720d194eda0a55f846d228432a533945bec85c"
+  },
+  "neo-bus": {
+    "url": "https://maven.neoforged.net/releases/net/neoforged/bus/8.0.5/bus-8.0.5.jar",
+    "sha256": "705e24f37752809499a5cd0c7dd31eaabf3d933c5d3b2060168e94e9ef62593a"
+  },
+  "neo-loader": {
+    "url": "https://maven.neoforged.net/releases/net/neoforged/fancymodloader/loader/11.0.16/loader-11.0.16.jar",
+    "sha256": "73a5cc860b452e80cf0a9789f32ae08a43be180221819b7d339b84391e1e5a97"
+  },
+  "bus": {
+    "url": "https://maven.minecraftforge.net/net/minecraftforge/eventbus/7.0.5/eventbus-7.0.5.jar",
+    "sha256": "529c651f7c5d24f98d82322f169ae17084676ee814df4d9f7f72a53c2f598709"
+  },
+  "forge": {
+    "url": "https://maven.minecraftforge.net/net/minecraftforge/forge/26.2-65.1.5/forge-26.2-65.1.5-universal.jar",
+    "sha256": "92437f25b6eb531b0db000f17b6bff70dec40aceab2370682b7f7e5744aa8a0b"
+  },
+  "javafmllanguage": {
+    "url": "https://maven.minecraftforge.net/net/minecraftforge/javafmllanguage/26.2-65.1.5/javafmllanguage-26.2-65.1.5.jar",
+    "sha256": "277d6a93b81c07300e0683c67278a7450f4a88cb342609c04d8d67fbe7ec4259"
+  },
+  "fmlcore": {
+    "url": "https://maven.minecraftforge.net/net/minecraftforge/fmlcore/26.2-65.1.5/fmlcore-26.2-65.1.5.jar",
+    "sha256": "8585b57c9c8101ae6c85c9b38f506d8bd4f6a50f20fecb9beb7e07254d326308"
+  },
+  "fmlloader": {
+    "url": "https://maven.minecraftforge.net/net/minecraftforge/fmlloader/26.2-65.1.5/fmlloader-26.2-65.1.5.jar",
+    "sha256": "cc83c6645791d6019b0cfd4be4e9e843db1d96f14668de0d86f3d4891d132093"
+  }
+}

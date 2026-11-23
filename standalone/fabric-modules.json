@@ -1,0 +1,27 @@
+{
+  "umbrella": "0.152.1+26.2",
+  "modules": {
+    "fabric-lifecycle-events-v1": {
+      "version": "4.1.3+4575b05f9c",
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-lifecycle-events-v1/4.1.3+4575b05f9c/fabric-lifecycle-events-v1-4.1.3+4575b05f9c.jar",
+      "sha256": "1fc939ef019b78f21527fb468c63127218269bd92334b268bf9396a03d140200"
+    },
+    "fabric-entity-events-v1": {
+      "version": "5.0.5+06488ac19c",
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-entity-events-v1/5.0.5+06488ac19c/fabric-entity-events-v1-5.0.5+06488ac19c.jar",
+      "sha256": "5114572a128698304f421456b368a6c178f8e7db698ded15efdfdedc64d01788"
+    },
+    "fabric-creative-tab-api-v1": {
+      "version": "5.0.14+d871b99e9c",
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-creative-tab-api-v1/5.0.14+d871b99e9c/fabric-creative-tab-api-v1-5.0.14+d871b99e9c.jar",
+      "sha256": "982b68ea456a5e755a6ec257c2f5ec164510ebb50d9a9ace17b768c7408f35b5"
+    },
+    "fabric-transitive-access-wideners-v1": {
+      "version": "8.1.3+e098252d9c",
+      "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-transitive-access-wideners-v1/8.1.3+e098252d9c/fabric-transitive-access-wideners-v1-8.1.3+e098252d9c.jar",
+      "sha256": "22c78b8340e201c3edb5b6f3561ac01078a27c3b65a2efd3bea464dd4504f2b1"
+    }
+  },
+  "accessFile": "META-INF/unity/content-registration.aw",
+  "accessSHA256": "cd3dae3c80b3f2985a36549e0cc2380380baeb8881b3f3932561d25d52344852"
+}
