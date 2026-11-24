@@ -20,6 +20,39 @@ public final class GameLoader extends URLClassLoader {
     private boolean mixinStarted;
     private static final String PUZZLES_SHA =
         "643643086780874780e7586e10b08c16cb14965c0fef18088bd1ee1b07e3cc95";
+    private static final String FABRIC_API_SHA =
+        "1083ce79231f9d358d7b172dd43553234e2f3834993a3ae42a1ec976af5ce418";
+    private static final Set<String> upstreamFabricModules = moduleHashes();
+    private boolean fullFabricApi;
+    private Map<Path, Path> containers = Map.of();
+    public Path vanillaPath() {
+        return Path.of(vanilla.getName());
+    }
+    public Map<Path, Path> containers() {
+        return containers;
+    }
+    public static Set<String> clientEntries(JarFile jar) throws IOException {
+        var mf = jar.getManifest();
+        if (mf == null)
+            return Set.of();
+        var value = mf.getMainAttributes().getValue("Fabric-Loom-Client-Only-Entries");
+        return value == null ? Set.of() : new HashSet<>(Arrays.asList(value.split(";")));
+    }
+    public boolean fullFabricApi() {
+        return fullFabricApi;
+    }
+    private static Set<String> moduleHashes() {
+        try (var in = Objects.requireNonNull(
+                 GameLoader.class.getResourceAsStream("/META-INF/unity/fabric-api-modules.sha256"));
+             var reader =
+                 new BufferedReader(new InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8))) {
+            return reader.lines()
+                .map(row -> row.split(" ", 2)[0])
+                .collect(java.util.stream.Collectors.toUnmodifiableSet());
+        } catch (IOException ex) {
+            throw new ExceptionInInitializerError(ex);
+        }
+    }
     private Path puzzles;
     private java.util.function.UnaryOperator<byte[]> puzzlesGuard;
     public boolean usesPuzzlesSpi(Path file) {
@@ -94,10 +127,19 @@ public final class GameLoader extends URLClassLoader {
             var resolver = Class.forName("mc.unity.adapter.common.NestedArchives", true, this);
             nested = (AutoCloseable)resolver.getMethod("resolve", Path.class, boolean.class)
                          .invoke(null, game.resolve("mods"), client);
+            containers = (Map<Path, Path>)resolver.getMethod("containers").invoke(nested);
             plainLibraries = (Set<Path>)resolver.getMethod("plainLibraries").invoke(nested);
             dependencyStamps = (Map<Path, String>)resolver.getMethod("fingerprints").invoke(nested);
             {
-                for (var file : (List<Path>)resolver.getMethod("files").invoke(nested)) {
+                var selected = (List<Path>)resolver.getMethod("files").invoke(nested);
+                for (Path candidate : selected) {
+                    if (Files.size(candidate) == 2501570 &&
+                        FABRIC_API_SHA.equals(VanillaBundle.hash(candidate))) {
+                        fullFabricApi = true;
+                        break;
+                    }
+                }
+                for (var file : selected) {
                     var jar = new JarFile(file.toFile(), true, JarFile.OPEN_READ, Runtime.version());
                     mods.put(file, jar);
                     if (jar.getEntry("META-INF/services/fuzs.puzzleslib.common.impl.core.proxy.ProxyImpl") !=
@@ -111,7 +153,10 @@ public final class GameLoader extends URLClassLoader {
                         jar.close();
                         continue;
                     }
+                    var omitted = client ? Set.<String>of() : clientEntries(jar);
                     for (var name : list) {
+                        if (omitted.contains(name))
+                            continue;
                         if (jar.getJarEntry(name) == null || !configs.add(name))
                             throw new IOException("Missing or duplicate Mixin configuration " + name +
                                                   " in " + file.getFileName() + ", previous " +
@@ -121,23 +166,30 @@ public final class GameLoader extends URLClassLoader {
                     for (var entries = jar.versionedStream().iterator(); entries.hasNext();) {
                         var entry = entries.next();
                         String n = entry.getName();
-                        if (entry.isDirectory() || n.startsWith("META-INF/versions/") ||
-                            n.equals("module-info.class") || n.equals("META-INF/MANIFEST.MF"))
+                        if (entry.isDirectory() || omitted.contains(n) ||
+                            n.startsWith("META-INF/versions/") || n.equals("module-info.class") ||
+                            n.equals("META-INF/MANIFEST.MF"))
                             continue;
                         boolean fabricClass = n.endsWith(".class") && n.startsWith("net/fabricmc/fabric/");
                         if (fabricClass && fabricModule == null)
-                            fabricModule = jar.getEntry("fabric.mod.json") != null &&
-                                           trustedFabricModules.contains(VanillaBundle.hash(file));
+                            fabricModule =
+                                jar.getEntry("fabric.mod.json") != null &&
+                                (trustedFabricModules.contains(VanillaBundle.hash(file)) ||
+                                 fullFabricApi && upstreamFabricModules.contains(VanillaBundle.hash(file)));
                         if (n.endsWith(".class") &&
                             ((reserved(n) && !(fabricClass && Boolean.TRUE.equals(fabricModule))) ||
-                             index.containsKey(n) || super.findResource(n) != null))
+                             index.containsKey(n) ||
+                             super.findResource(n) != null &&
+                                 !(fullFabricApi && fabricClass && Boolean.TRUE.equals(fabricModule) &&
+                                   findLoadedClass(n.substring(0, n.length() - 6).replace('/', '.')) ==
+                                       null)))
                             throw new IOException("Duplicate or reserved mod class " + n + " in " + file);
                         index.computeIfAbsent(n, k -> new ArrayList<>()).add(jar);
                     }
                 }
             }
             for (String config : configs)
-                if (index.get(config).size() != 1 || super.findResource(config) != null)
+                if (index.getOrDefault(config, List.of()).size() != 1 || super.findResource(config) != null)
                     throw new IOException("Ambiguous config " + config);
             index.replaceAll((n, owners) -> List.copyOf(owners));
             resources = Map.copyOf(index);
@@ -209,6 +261,8 @@ public final class GameLoader extends URLClassLoader {
         resources = Map.of();
         mixinOwners.clear();
         mounted = null;
+        fullFabricApi = false;
+        containers = Map.of();
         puzzles = null;
         puzzlesGuard = null;
         plainLibraries = Set.of();
@@ -282,6 +336,15 @@ public final class GameLoader extends URLClassLoader {
     }
     @Override
     public URL findResource(String name) {
+        if (fullFabricApi && name.startsWith("net/fabricmc/fabric/") && name.endsWith(".class")) {
+            var owners = resources.get(name);
+            if (owners != null)
+                try {
+                    return url(owners.getFirst(), name);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+        }
         var base = super.findResource(name);
         if (base != null || privateService(name))
             return base;
@@ -373,6 +436,8 @@ public final class GameLoader extends URLClassLoader {
             if (mixin != null) {
                 try {
                     bytes = mixin.apply(name, bytes);
+                    if (fullFabricApi)
+                        bytes = ContentPatches.routeLogin(this, key, bytes);
                 } catch (RuntimeException | Error e) {
                     if (e instanceof VirtualMachineError || e instanceof ThreadDeath)
                         throw e;

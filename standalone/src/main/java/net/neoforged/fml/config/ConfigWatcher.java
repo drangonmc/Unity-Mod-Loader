@@ -6,82 +6,139 @@ import java.nio.file.*;
 import java.util.*;
 import static java.nio.file.StandardWatchEventKinds.*;
 
-/** Notifications are consumed on the owning game thread, including atomic file replacements. */
+/** Drain filesystem events under the monitor, then invoke mod code on the owning game thread. */
 final class ConfigWatcher {
     private WatchService watcher;
     private final Map<Path, ModConfig> files = new LinkedHashMap<>();
-    synchronized void watch(Collection<ModConfig> configs) {
-        close();
-        if (configs.isEmpty())
-            return;
-        try {
-            watcher = FileSystems.getDefault().newWatchService();
-            Set<Path> directories = new HashSet<>();
-            for (var config : configs) {
-                var file = config.getFullPath().toAbsolutePath().normalize();
-                if (directories.add(file.getParent()))
-                    file.getParent().register(watcher, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
-                files.put(file, config);
-            }
-            // Catch an edit between the initial parse and registering the directory.
-            var registered = watcher;
-            for (var c : configs) {
-                if (watcher != registered)
-                    break;
-                c.reload();
-            }
-        } catch (IOException | RuntimeException | Error e) {
+    private final Map<Thread, Integer> running = new IdentityHashMap<>();
+
+    void watch(Collection<ModConfig> configs) {
+        WatchService generation;
+        List<ModConfig> snapshot = List.copyOf(configs);
+        synchronized (this) {
+            close();
+            if (snapshot.isEmpty())
+                return;
             try {
-                close();
-            } catch (RuntimeException cleanup) {
-                e.addSuppressed(cleanup);
+                generation = watcher = FileSystems.getDefault().newWatchService();
+                var directories = new HashSet<Path>();
+                for (var config : snapshot) {
+                    Path file = config.getFullPath().toAbsolutePath().normalize();
+                    if (directories.add(file.getParent()))
+                        file.getParent().register(watcher, ENTRY_CREATE, ENTRY_MODIFY, ENTRY_DELETE);
+                    files.put(file, config);
+                }
+            } catch (IOException | RuntimeException | Error e) {
+                closeAfterFailure(e);
+                if (e instanceof IOException io)
+                    throw new UncheckedIOException(io);
+                if (e instanceof RuntimeException runtime)
+                    throw runtime;
+                throw (Error)e;
             }
-            if (e instanceof IOException io)
-                throw new UncheckedIOException(io);
-            if (e instanceof RuntimeException runtime)
-                throw runtime;
-            throw (Error)e;
+        }
+        try {
+            reload(generation, snapshot);
+        } catch (RuntimeException | Error failure) {
+            synchronized (this) {
+                if (watcher == generation)
+                    closeAfterFailure(failure);
+            }
+            throw failure;
         }
     }
-    synchronized boolean poll() {
-        if (watcher == null)
-            return false;
+
+    private void closeAfterFailure(Throwable failure) {
+        try {
+            close();
+        } catch (RuntimeException cleanup) {
+            failure.addSuppressed(cleanup);
+        }
+    }
+
+    boolean poll() {
+        WatchService generation;
         Set<ModConfig> dirty = new LinkedHashSet<>();
-        WatchKey key;
-        while ((key = watcher.poll()) != null) {
-            Path directory = (Path)key.watchable();
-            for (var event : key.pollEvents()) {
-                if (event.kind() == OVERFLOW)
-                    dirty.addAll(files.values());
-                else {
-                    var config =
-                        files.get(directory.resolve((Path)event.context()).toAbsolutePath().normalize());
-                    if (config != null)
-                        dirty.add(config);
+        synchronized (this) {
+            if (watcher == null)
+                return false;
+            generation = watcher;
+            WatchKey key;
+            while ((key = watcher.poll()) != null) {
+                Path directory = (Path)key.watchable();
+                for (var event : key.pollEvents()) {
+                    if (event.kind() == OVERFLOW)
+                        dirty.addAll(files.values());
+                    else {
+                        var config =
+                            files.get(directory.resolve((Path)event.context()).toAbsolutePath().normalize());
+                        if (config != null)
+                            dirty.add(config);
+                    }
                 }
+                if (!key.reset())
+                    System.err.println("[Unity] 配置目录已移除 " + directory);
             }
-            if (!key.reset())
-                System.err.println("[Unity] 配置目录已移除 " + directory);
+        }
+        return !dirty.isEmpty() && reload(generation, dirty);
+    }
+
+    private boolean reload(WatchService generation, Collection<ModConfig> configs) {
+        Thread owner = Thread.currentThread();
+        synchronized (this) {
+            if (watcher != generation)
+                return false;
+            running.merge(owner, 1, Integer::sum);
         }
         boolean changed = false;
-        var registered = watcher;
-        for (var config : dirty) {
-            if (watcher != registered)
-                break;
-            changed |= config.reload();
+        try {
+            for (var config : configs) {
+                synchronized (this) {
+                    if (watcher != generation)
+                        break;
+                }
+                changed |= config.reload();
+            }
+            return changed;
+        } finally {
+            synchronized (this) {
+                if (running.get(owner) == 1)
+                    running.remove(owner);
+                else
+                    running.put(owner, running.get(owner) - 1);
+                notifyAll();
+            }
         }
-        return changed;
     }
+
     synchronized void close() {
         files.clear();
-        if (watcher != null) {
+        var old = watcher;
+        watcher = null;
+        if (old != null) {
             try {
-                watcher.close();
+                old.close();
             } catch (IOException e) {
                 throw new UncheckedIOException(e);
-            } finally {
-                watcher = null;
             }
+        }
+    }
+
+    /** Use before unloading the configs. wait releases the monitor so callbacks can finish. */
+    synchronized void stopAndDrain() {
+        close();
+        boolean interrupted = false;
+        try {
+            while (running.size() > (running.containsKey(Thread.currentThread()) ? 1 : 0)) {
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                    interrupted = true;
+                }
+            }
+        } finally {
+            if (interrupted)
+                Thread.currentThread().interrupt();
         }
     }
 }

@@ -11,6 +11,7 @@ import zipfile
 from beta20 import evidence as beta20_evidence
 from beta21 import evidence as beta21_evidence
 from beta22 import evidence as beta22_evidence
+from beta23 import evidence as beta23_evidence
 from unity import DIST, JAR, ROOT, VERSION, beta_samples
 
 EVIDENCE = ROOT / "evidence" / VERSION
@@ -284,7 +285,7 @@ def world_evidence():
     return paths
 
 def inputs():
-    beta = gameplay_evidence() + world_evidence() + beta20_evidence(ROOT,EVIDENCE,JAR) + beta21_evidence(ROOT,EVIDENCE,JAR) + beta22_evidence(ROOT,EVIDENCE,JAR)
+    beta = gameplay_evidence() + world_evidence() + beta20_evidence(ROOT,EVIDENCE,JAR) + beta21_evidence(ROOT,EVIDENCE,JAR) + beta22_evidence(ROOT,EVIDENCE,JAR) + beta23_evidence(ROOT,EVIDENCE,JAR)
     report = json.loads((EVIDENCE / "acceptance.json").read_bytes())
     checked((report["version"], report["minecraft"]) == (VERSION, "26.2"), "Wrong acceptance version")
     files = [JAR, DIST / "unity-world-marker.jar", DIST / "unity-client-witness.jar"]
@@ -354,9 +355,9 @@ def inputs():
 def distribution_bytes(path):
     data = path.read_bytes()
     if path in LAUNCHERS:
-        if b"0.2.1-Beta" not in data and VERSION.encode() not in data:
+        if b"0.2.2-Beta" not in data and VERSION.encode() not in data:
             raise ValueError("Unexpected launch script version: " + str(path))
-        return data.replace(b"0.2.1-Beta", VERSION.encode())
+        return data.replace(b"0.2.2-Beta", VERSION.encode())
     return data
 
 
@@ -415,8 +416,9 @@ def activate():
         content+=beta_samples(ROOT)+json.loads((ROOT/"standalone/ecology-modules.json").read_bytes())
         for side,specs in (("standalone-instance",content+commands),("standalone-client",content)):
             checked(unpacked["installedSamples"][side]=={m["filename"]:m["sha512"] for m in specs},"Packaged original samples: "+side)
-        checked(unpacked["clientApiRebuildSHA256"]==sha(ROOT/"standalone/lib/unity-client-api-0.2.2.jar"),"Client model and renderer API source rebuild")
-        checked(unpacked["newAdapterRebuild"]=={name:sha(ROOT/"standalone/lib"/name) for name in ("unity-transfer-adapter-0.2.2.jar","unity-biome-adapter-0.2.2.jar")},"Ecology and transfer adapter source rebuild")
+        checked(unpacked["installedFabricApi"]==json.loads((ROOT/"standalone/beta-gameplay.json").read_bytes())["fabricApi"]["sha512"],"Offline official Fabric API install")
+        checked(unpacked["clientApiRebuildSHA256"]==sha(ROOT/"standalone/lib/unity-client-api-0.2.3.jar"),"Client model and renderer API source rebuild")
+        checked(unpacked["newAdapterRebuild"]=={name:sha(ROOT/"standalone/lib"/name) for name in ("unity-transfer-adapter-0.2.3.jar","unity-biome-adapter-0.2.3.jar")},"Ecology and transfer adapter source rebuild")
         fixtures=ROOT/"standalone/tests/worlds/fixtures"
         checked(unpacked["worldFixtureRebuild"]=={f.relative_to(fixtures).as_posix():sha(f) for f in fixtures.rglob("*.jar")},"Offline fixture rebuild")
         checked(unpacked["adapterRebuildSHA256"]==sha(ROOT/"standalone/lib/unity-puzzles-platform-26.2.5.jar"),"Adapter source rebuild")
@@ -434,7 +436,7 @@ def activate():
         path = ROOT / "versions/state.json"
         state = json.loads(path.read_bytes()) if path.exists() else {"active": None, "pending": []}
         previous = state.get("active") or {}
-        if previous and (previous.get("version") not in ("0.2.1-Beta",VERSION) or previous.get("mode")!="standalone"):
+        if previous and (previous.get("version") not in ("0.2.2-Beta",VERSION) or previous.get("mode")!="standalone"):
             raise ValueError("Unrecognized release: "+str(previous.get("version")))
         state.pop("compatibility",None)
         if package_file != ARCHIVE:

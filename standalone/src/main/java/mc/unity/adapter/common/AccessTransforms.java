@@ -13,7 +13,7 @@ public final class AccessTransforms {
                         int changeFinal, boolean widen, String source) {}
     private static final int VIS = ACC_PUBLIC | ACC_PROTECTED | ACC_PRIVATE;
     private static final Pattern AT = Pattern.compile("(public|protected|private|default)([+-]f)?");
-    private final Map<String, Set<String>> interfaces = new LinkedHashMap<>();
+    private final Map<String, Map<String, String>> interfaces = new LinkedHashMap<>();
     private final List<Rule> rules = new ArrayList<>();
     private static String read(JarFile jar, String name) throws IOException {
         if (name.startsWith("/") || name.contains("\\") || name.contains(".."))
@@ -48,9 +48,20 @@ public final class AccessTransforms {
                 if (aw) {
                     String op = t[0].replaceFirst("^transitive-", "");
                     if (op.equals("inject-interface")) {
-                        if (t.length != 3 || !t[2].matches("[a-zA-Z0-9_$/]+"))
+                        if (t.length != 3)
                             throw new IllegalArgumentException("Invalid interface target");
-                        interfaces.computeIfAbsent(t[1], k -> new LinkedHashSet<>()).add(t[2]);
+                        String value = t[2], binaryName = value.split("<", 2)[0],
+                               signature = "L" + value + ";";
+                        if (!binaryName.matches("[a-zA-Z0-9_$/]+"))
+                            throw new IllegalArgumentException("Invalid interface " + value);
+                        var parsed = java.lang.classfile.Signature.parseFrom(signature);
+                        if (!(parsed instanceof java.lang.classfile.Signature.ClassTypeSig) ||
+                            !parsed.signatureString().equals(signature))
+                            throw new IllegalArgumentException("Invalid interface signature " + value);
+                        var previous = interfaces.computeIfAbsent(t[1], k -> new LinkedHashMap<>())
+                                           .putIfAbsent(binaryName, signature);
+                        if (previous != null && !previous.equals(signature))
+                            throw new IllegalArgumentException("Conflicting generic interface " + binaryName);
                         continue;
                     }
                     var target = Target.valueOf(t[1].toUpperCase(Locale.ROOT));
@@ -159,11 +170,6 @@ public final class AccessTransforms {
         var nested = new HashMap<String, List<Rule>>();
         for (var addition : interfaces.entrySet()) {
             owners.put(addition.getKey(), new ArrayList<>());
-            for (var name : addition.getValue())
-                try (var in = domain.getResourceAsStream(name + ".class")) {
-                    if (in == null || (new ClassReader(in).getAccess() & ACC_INTERFACE) == 0)
-                        throw new IOException("Missing injected interface " + name);
-                }
         }
         for (var r : rules) {
             owners.computeIfAbsent(r.owner, k -> new ArrayList<>()).add(r);
@@ -193,6 +199,12 @@ public final class AccessTransforms {
                         continue;
                     throw new IOException("Missing access target " + owner + " " + applies);
                 }
+                for (var name : interfaces.getOrDefault(owner, Map.of()).keySet())
+                    try (var faceBytes = domain.getResourceAsStream(name + ".class")) {
+                        if (faceBytes == null ||
+                            (new ClassReader(faceBytes).getAccess() & ACC_INTERFACE) == 0)
+                            throw new IOException("Missing injected interface " + name);
+                    }
                 inputs.put(owner, in.readAllBytes());
                 plan.addBytes(owner, 400, "Mod access rules", "visibility and final", (cf, input) -> {
                     var reader = new ClassReader(input);
@@ -224,19 +236,25 @@ public final class AccessTransforms {
                                     (adjusted & ~VIS) | ((adjusted & ACC_PROTECTED) != 0 ? ACC_PUBLIC : 0);
                             var merged = new LinkedHashSet<>(Arrays.asList(faces));
                             var added = new ArrayList<String>();
-                            for (var extra : interfaces.getOrDefault(n, Set.of()))
+                            var additions = interfaces.getOrDefault(n, Map.of());
+                            for (var extra : additions.keySet())
                                 if (merged.add(extra))
-                                    added.add(extra);
-                            if (sig != null && !added.isEmpty()) {
+                                    added.add(additions.get(extra));
+                            if (!added.isEmpty() &&
+                                (sig != null || added.stream().anyMatch(s -> s.contains("<")))) {
                                 var signature = new org.objectweb.asm.signature.SignatureWriter();
-                                new org.objectweb.asm.signature.SignatureReader(sig).accept(signature);
-                                for (var extra : added) {
-                                    // A raw nested interface has a binary name. '$' is also legal in
-                                    // top-level names.
-                                    var face = signature.visitInterface();
-                                    face.visitClassType(extra);
-                                    face.visitEnd();
+                                if (sig != null)
+                                    new org.objectweb.asm.signature.SignatureReader(sig).accept(signature);
+                                else {
+                                    new org.objectweb.asm.signature.SignatureReader("L" + sup + ";")
+                                        .acceptType(signature.visitSuperclass());
+                                    for (var face : faces)
+                                        new org.objectweb.asm.signature.SignatureReader("L" + face + ";")
+                                            .acceptType(signature.visitInterface());
                                 }
+                                for (var extra : added)
+                                    new org.objectweb.asm.signature.SignatureReader(extra).acceptType(
+                                        signature.visitInterface());
                                 sig = signature.toString();
                             }
                             super.visit(v, adjusted, n, sig, sup, merged.toArray(String[] ::new));

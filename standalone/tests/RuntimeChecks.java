@@ -422,8 +422,8 @@ class RuntimeChecks {
     }
     public static void main(String[] args) throws Exception {
         Path root = Path.of(args[0]).toRealPath(), temp = Path.of(args[1]).toRealPath();
-        var core = root.resolve("versions/0.2.2-Beta/unity-loader-0.2.2-Beta.jar");
-        Path runtime = root.resolve("cache/0.2.2-Beta");
+        var core = root.resolve("versions/0.2.3-Beta/unity-loader-0.2.3-Beta.jar");
+        Path runtime = root.resolve("cache/0.2.3-Beta");
         var files = new ArrayList<Path>(List.of(core, runtime.resolve("versions/26.2/server-26.2.jar")));
         try (var paths = Files.walk(runtime.resolve("libraries"))) {
             files.addAll(paths.filter(p -> p.toString().endsWith(".jar")).toList());

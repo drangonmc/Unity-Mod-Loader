@@ -233,6 +233,7 @@ public class FabricEcologyProbe implements ModInitializer {
         }
     }
     public void onInitialize() {
+        FabricPlayProbe.bind();
         FabricPhase.bind();
         var itemKey = ResourceKey.create(Registries.ITEM, Identifier.parse("qa_fabric_ecology:currency"));
         currency =

@@ -10,27 +10,33 @@ import static net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier.Afte
 
 public final class Models {
     private static final List<ModelLoadingPlugin> plugins = new CopyOnWriteArrayList<>();
-    public static void register(ModelLoadingPlugin p) { plugins.add(Objects.requireNonNull(p)); }
-    public static List<ModelLoadingPlugin> plugins() { return List.copyOf(plugins); }
+    public static void register(ModelLoadingPlugin p) {
+        plugins.add(Objects.requireNonNull(p));
+    }
+    public static List<ModelLoadingPlugin> plugins() {
+        return List.copyOf(plugins);
+    }
     public interface Owner {
         AfterBakeBlock unity$modifier();
     }
     public static AfterBakeBlock begin() {
         if (plugins.isEmpty())
             return null;
-        Event<AfterBakeBlock> e = EventFactory.createArrayBacked(AfterBakeBlock.class, list -> (model, ctx) -> {
-            for (var callback : list)
-                model = Objects.requireNonNull(callback.modifyModelAfterBake(model, ctx), "null baked model");
-            return model;
-        });
+        Event<AfterBakeBlock> e =
+            EventFactory.createArrayBacked(AfterBakeBlock.class, list -> (model, ctx) -> {
+                for (var callback : list)
+                    model =
+                        Objects.requireNonNull(callback.modifyModelAfterBake(model, ctx), "null baked model");
+                return model;
+            });
         for (var plugin : plugins)
             plugin.initialize(() -> e);
         return e.invoker();
     }
     private record Context(BlockState state, BlockStateModel.UnbakedRoot sourceModel, ModelBaker baker)
         implements AfterBakeBlock.Context {}
-    public static BlockStateModel bake(BlockStateModel.UnbakedRoot source, BlockState state, ModelBaker baker) {
-        var model = source.bake(state, baker);
+    public static BlockStateModel afterBake(BlockStateModel model, BlockStateModel.UnbakedRoot source,
+                                            BlockState state, ModelBaker baker) {
         var callback = ((Owner)baker).unity$modifier();
         if (callback != null)
             model = callback.modifyModelAfterBake(model, new Context(state, source, baker));

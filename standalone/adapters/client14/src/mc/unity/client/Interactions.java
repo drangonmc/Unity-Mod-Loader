@@ -12,16 +12,18 @@ public final class Interactions {
     private static final MethodHandle predict;
     static {
         try {
-            predict =
-                MethodHandles.privateLookupIn(MultiPlayerGameMode.class, MethodHandles.lookup())
-                    .findVirtual(MultiPlayerGameMode.class, "startPrediction",
-                                 MethodType.methodType(void.class, ClientLevel.class, PredictiveAction.class));
+            predict = MethodHandles.privateLookupIn(MultiPlayerGameMode.class, MethodHandles.lookup())
+                          .findVirtual(
+                              MultiPlayerGameMode.class, "startPrediction",
+                              MethodType.methodType(void.class, ClientLevel.class, PredictiveAction.class));
         } catch (ReflectiveOperationException e) {
             throw new ExceptionInInitializerError(e);
         }
     }
     public static InteractionResult use(MultiPlayerGameMode mode, Player player, InteractionHand hand,
                                         BlockHitResult hit) {
+        if (mc.unity.adapter.fabric.LoaderView.upstream())
+            return null;
         if (!((mc.unity.adapter.fabric.SessionEvent<?>)(hit == null ? UseItemCallback.EVENT
                                                                     : UseBlockCallback.EVENT))
                  .subscribed())

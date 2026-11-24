@@ -11,6 +11,7 @@ public final class LoginSync {
     public static final int TX = 0x554e4954;
     private static final Map<Connection, Pending> waiting = new IdentityHashMap<>();
     private static final Set<Connection> matched = Collections.newSetFromMap(new WeakHashMap<>());
+    private static final Set<Connection> verified = Collections.newSetFromMap(new WeakHashMap<>());
     private static final class Pending {
         final Runnable resume;
         boolean consumed;
@@ -30,11 +31,13 @@ public final class LoginSync {
     }
     public static synchronized void clear() {
         waiting.clear();
+        verified.clear();
         matched.clear();
     }
     public static synchronized void forget(Connection c) {
         waiting.remove(c);
         matched.remove(c);
+        verified.remove(c);
     }
     private static final int MAX_PLAY = 256;
     private static final String LEGACY_CONFIGURATION = "0bda8cf7e29e4514b67cf34451c991bf";
@@ -45,8 +48,8 @@ public final class LoginSync {
             if (play.size() > MAX_PLAY)
                 throw new IllegalArgumentException("Too many Play channels");
         }
-        static Offer local() {
-            return new Offer(PlayNetwork.offers(), ConfigurationNetwork.enabled());
+        static Offer local(net.minecraft.network.protocol.PacketFlow incoming) {
+            return new Offer(PlayNetwork.offers(incoming), ConfigurationNetwork.enabled());
         }
         boolean extended() {
             return configuration && play.size() == MAX_PLAY || play.contains(LEGACY_CONFIGURATION);
@@ -139,18 +142,19 @@ public final class LoginSync {
     }
     public static synchronized boolean ready(Connection connection, Resume listener,
                                              net.minecraft.server.MinecraftServer server) {
-        if (connection.isMemoryConnection())
-            return true;
-        String digest = Content.digest();
-        var offer = Offer.local();
-        if (digest.isEmpty() && offer.play.isEmpty() && !offer.configuration)
+        if (connection.isMemoryConnection() || verified.contains(connection))
             return true;
         if (waiting.containsKey(connection))
             return false;
+        String digest = Content.digest();
+        var offer = Offer.local(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
+        if (digest.isEmpty() && offer.play.isEmpty() && !offer.configuration)
+            return true;
         var entry = new Pending(() -> server.execute(() -> {
             synchronized (LoginSync.class) {
                 if (waiting.remove(connection) == null || !connection.isConnected())
                     return;
+                verified.add(connection);
             }
             listener.unity$resume();
         }));
@@ -172,11 +176,18 @@ public final class LoginSync {
             entry.resume.run();
             return true;
         }
-        if (!(packet.payload() instanceof Reply reply) || !wireDigest().equals(reply.registry()) ||
+        var reply = packet.payload() instanceof Reply decoded ? decoded : null;
+        if (reply == null || !wireDigest().equals(reply.registry()) ||
             (reply.extended() != entry.offer.extended() ||
              reply.configuration() && !entry.offer.configuration ||
              !reply.configuration() && ConfigurationNetwork.required() ||
              !entry.offer.play.containsAll(reply.optional()))) {
+            System.out.println("[Unity] Registry handshake rejected: payload=" +
+                               (packet.payload() == null ? "absent" : packet.payload().getClass().getName()) +
+                               " decoded=" + (reply != null) +
+                               " digestMatch=" + (reply != null && wireDigest().equals(reply.registry())) +
+                               " config=" + (reply != null && reply.configuration()) +
+                               " required=" + ConfigurationNetwork.required());
             forget(connection);
             listener.disconnect(Component.literal("Unity: content registry mismatch"));
             return true;
@@ -205,7 +216,8 @@ public final class LoginSync {
         if (packet.transactionId() != TX || !id.getNamespace().equals("unity") ||
             !id.getPath().startsWith("registry/"))
             return false;
-        var reply = negotiate(id.getPath(), wireDigest(), Offer.local());
+        var reply = negotiate(id.getPath(), wireDigest(),
+                              Offer.local(net.minecraft.network.protocol.PacketFlow.CLIENTBOUND));
         if (reply != null) {
             PlayNetwork.agree(connection, reply.optional());
             ConfigurationNetwork.agree(connection, reply.configuration());

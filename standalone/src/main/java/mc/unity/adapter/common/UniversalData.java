@@ -6,6 +6,10 @@ import com.google.gson.JsonObject;
 
 /** Recognize the same declarative data pack offered through multiple platform descriptors. */
 public final class UniversalData {
+    public static boolean hasAssets(JarFile jar) {
+        return jar.stream().anyMatch(
+            e -> !e.isDirectory() && (e.getName().startsWith("assets/") || e.getName().contains("/assets/")));
+    }
     public static boolean matches(JarFile jar) throws IOException {
         boolean forge = jar.getJarEntry("META-INF/mods.toml") != null,
                 neo = jar.getJarEntry("META-INF/neoforge.mods.toml") != null;
@@ -21,9 +25,8 @@ public final class UniversalData {
                 .filter(e -> !e.isDirectory())
                 .map(e -> e.getName())
                 .anyMatch(n
-                          -> n.endsWith(".class") || n.endsWith(".jar") || n.startsWith("assets/") ||
-                                 n.contains("/assets/") || n.startsWith("META-INF/services/") ||
-                                 n.equals("META-INF/coremods.json") ||
+                          -> n.endsWith(".class") || n.endsWith(".jar") ||
+                                 n.startsWith("META-INF/services/") || n.equals("META-INF/coremods.json") ||
                                  n.equals("META-INF/accesstransformer.cfg") ||
                                  n.equals("META-INF/jarjar/metadata.json")))
             return false;
@@ -42,7 +45,7 @@ public final class UniversalData {
             if (mods.size() != 1 ||
                 !fabric.get("id").getAsString().equals(FmlDescriptor.string(mods.getFirst(), "modId", "")) ||
                 !fabric.get("version").getAsString().equals(
-                    FmlDescriptor.string(mods.getFirst(), "version", "")))
+                    FmlDescriptor.version(mods.getFirst(), FmlDescriptor.implementationVersion(jar))))
                 return false;
         }
         return jar.stream().anyMatch(e -> !e.isDirectory() && e.getName().startsWith("data/"));

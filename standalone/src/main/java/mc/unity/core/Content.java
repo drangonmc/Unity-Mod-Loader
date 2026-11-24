@@ -231,25 +231,29 @@ public final class Content {
         }
     }
     private static final Set<Path> dataArchives = new HashSet<>();
-    public static void dataArchive(String id, Path file) {
+    private static final Set<Path> assetArchives = new HashSet<>();
+    public static void dataArchive(String id, Path file, boolean assets) {
+        if (assets)
+            assetArchives.add(file);
         source(id, file, true);
         localResources(id);
         dataArchives.add(file);
     }
     public static void packs(Map<String, Pack> target, Set<RepositorySource> sources) {
-        if (sources.stream().anyMatch(ServerPacksSource.class ::isInstance)) {
-            for (var e : packs.entrySet())
-                if (dataArchives.contains(e.getValue())) {
-                    String name = "unity/" + e.getKey();
-                    var title = Component.literal(e.getKey());
-                    var pack = Pack.readMetaAndCreate(
-                        new PackLocationInfo(name, title, MOD_SOURCE, Optional.empty()),
-                        new FilePackResources.FileResourcesSupplier(e.getValue()), PackType.SERVER_DATA,
-                        new PackSelectionConfig(true, Pack.Position.TOP, false));
-                    if (pack == null || target.putIfAbsent(name, pack) != null)
-                        throw new IllegalStateException("Invalid or duplicate data pack " + name);
-                }
-        }
+        var type = sources.stream().anyMatch(ServerPacksSource.class ::isInstance)
+                       ? PackType.SERVER_DATA
+                       : PackType.CLIENT_RESOURCES;
+        for (var e : packs.entrySet())
+            if ((type == PackType.SERVER_DATA ? dataArchives : assetArchives).contains(e.getValue())) {
+                String name = "unity/" + e.getKey();
+                var title = Component.literal(e.getKey());
+                var pack =
+                    Pack.readMetaAndCreate(new PackLocationInfo(name, title, MOD_SOURCE, Optional.empty()),
+                                           new FilePackResources.FileResourcesSupplier(e.getValue()), type,
+                                           new PackSelectionConfig(true, Pack.Position.TOP, false));
+                if (pack == null || target.putIfAbsent(name, pack) != null)
+                    throw new IllegalStateException("Invalid or duplicate data pack " + name);
+            }
         packs(target);
     }
     public static void packs(Map<String, Pack> target) {
@@ -292,6 +296,7 @@ public final class Content {
         EntityAttributes.clear();
         packs.clear();
         dataArchives.clear();
+        assetArchives.clear();
         localResourcePacks.clear();
         dependencyStamps = Map.of();
         frozen = false;

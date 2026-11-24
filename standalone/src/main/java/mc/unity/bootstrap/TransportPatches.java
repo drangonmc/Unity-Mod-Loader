@@ -28,73 +28,81 @@ final class TransportPatches {
                    field = incoming ? "STREAM_CODEC" : "GAMEPLAY_STREAM_CODEC";
             plan.add(packet, 310, "Unity play", field, (cf, m) -> {
                 int[] hits = {0};
-                byte[] bytes = cf.transformClass(m,
-                    ClassTransform.transformingMethodBodies(
-                        method -> method.methodName().equalsString("<clinit>"), (b, e) -> {
-                            if (!incoming && e instanceof FieldInstruction cfg && cfg.opcode()==Opcode.PUTSTATIC
-                                && cfg.name().equalsString("CONFIG_STREAM_CODEC")) {
-                                b.invokestatic(ClassDesc.of("net.neoforged.fml.config.ConfigSync"), "configurationCodec",
-                                    mt("(L" + CODEC + ";)L" + CODEC + ";"));
-                                b.invokestatic(ConfigurationPatches.NETWORK,"clientbound",mt("(L"+CODEC+";)L"+CODEC+";"));
-                                hits[0]++;
-                            }
-                            if (e instanceof FieldInstruction f && f.opcode() == Opcode.PUTSTATIC
-                                && f.name().equalsString(field)) {
-                                hits[0]++;
-                                if(incoming)b.invokestatic(ConfigurationPatches.NETWORK,"serverbound",mt("(L"+CODEC+";)L"+CODEC+";"));
-                                b.invokestatic(NETWORK, incoming ? "serverbound" : "clientbound",
-                                    mt("(L" + CODEC + ";)L" + CODEC + ";"));
-                            }
-                            b.with(e);
-                        }));
+                byte[] bytes = cf.transformClass(
+                    m, ClassTransform.transformingMethodBodies(
+                           method -> method.methodName().equalsString("<clinit>"), (b, e) -> {
+                               if (!incoming && e instanceof FieldInstruction cfg &&
+                                   cfg.opcode() == Opcode.PUTSTATIC &&
+                                   cfg.name().equalsString("CONFIG_STREAM_CODEC")) {
+                                   b.invokestatic(ClassDesc.of("net.neoforged.fml.config.ConfigSync"),
+                                                  "configurationCodec",
+                                                  mt("(L" + CODEC + ";)L" + CODEC + ";"));
+                                   b.invokestatic(ConfigurationPatches.NETWORK, "clientbound",
+                                                  mt("(L" + CODEC + ";)L" + CODEC + ";"));
+                                   hits[0]++;
+                               }
+                               if (e instanceof FieldInstruction f && f.opcode() == Opcode.PUTSTATIC &&
+                                   f.name().equalsString(field)) {
+                                   hits[0]++;
+                                   if (incoming)
+                                       b.invokestatic(ConfigurationPatches.NETWORK, "serverbound",
+                                                      mt("(L" + CODEC + ";)L" + CODEC + ";"));
+                                   b.invokestatic(NETWORK, incoming ? "serverbound" : "clientbound",
+                                                  mt("(L" + CODEC + ";)L" + CODEC + ";"));
+                               }
+                               b.with(e);
+                           }));
                 if (hits[0] != (incoming ? 1 : 2))
                     throw new IllegalStateException("Missing packet codec " + packet);
                 return bytes;
             });
         }
-        handler(plan,false);
-        if(client) handler(plan,true);
+        handler(plan, false);
+        if (client)
+            handler(plan, true);
         {
             String listener = "net/minecraft/server/network/ServerLoginPacketListenerImpl",
                    profile = "com/mojang/authlib/GameProfile", desc = "(L" + profile + ";)V";
             plan.add(listener, 315, "Unity login", "verifyLoginAndFinishConnectionSetup",
-                (cf, m) -> cf.transformClass(m, (b, e) -> {
-                    if (e instanceof java.lang.classfile.Interfaces i) {
-                        var list = new ArrayList<>(i.interfaces());
-                        list.add(b.constantPool().classEntry(RESUME));
-                        b.withInterfaces(list);
-                    } else if (e instanceof MethodModel method
-                        && method.methodName().equalsString("verifyLoginAndFinishConnectionSetup")
-                        && method.methodType().equalsString(desc)) {
-                        b.withMethod("unity$verify", mt(desc), ClassFile.ACC_PRIVATE,
-                            mb -> mb.with(method.code().orElseThrow()));
-                        b.withMethodBody("unity$resume", mt("()V"), ClassFile.ACC_PUBLIC,
-                            cb
-                            -> cb.aload(0)
-                                .aload(0)
-                                .getfield(cls(listener), "authenticatedProfile", cls(profile))
-                                .invokespecial(cls(listener), "unity$verify", mt(desc))
-                                .return_());
-                        b.withMethodBody(
-                            method.methodName(), method.methodType(), method.flags().flagsMask(), cb -> {
-                                var done = cb.newLabel();
-                                cb.aload(0)
-                                    .getfield(cls(listener), "connection", cls(CONN))
-                                    .aload(0)
-                                    .aload(0)
-                                    .getfield(cls(listener), "server", cls(SERVER))
-                                    .invokestatic(LOGIN, "ready",
-                                        mt("(L" + CONN + ";Lmc/unity/core/LoginSync$Resume;L" + SERVER + ";)Z"))
-                                    .ifeq(done)
-                                    .aload(0)
-                                    .aload(1)
-                                    .invokespecial(cls(listener), "unity$verify", mt(desc))
-                                    .labelBinding(done)
-                                    .return_();
-                            });
-                    } else
-                        b.with(e);
-                }));
+                     (cf, m) -> cf.transformClass(m, (b, e) -> {
+                         if (e instanceof java.lang.classfile.Interfaces i) {
+                             var list = new ArrayList<>(i.interfaces());
+                             list.add(b.constantPool().classEntry(RESUME));
+                             b.withInterfaces(list);
+                         } else if (e instanceof MethodModel method &&
+                                    method.methodName().equalsString("verifyLoginAndFinishConnectionSetup") &&
+                                    method.methodType().equalsString(desc)) {
+                             b.withMethodBody(
+                                 "unity$resume", mt("()V"), ClassFile.ACC_PUBLIC,
+                                 cb
+                                 -> cb.aload(0)
+                                        .aload(0)
+                                        .getfield(cls(listener), "authenticatedProfile", cls(profile))
+                                        .invokespecial(cls(listener), "verifyLoginAndFinishConnectionSetup",
+                                                       mt(desc))
+                                        .return_());
+                             b.transformMethod(method, MethodTransform.transformingCode(new CodeTransform() {
+                                 public void atStart(CodeBuilder cb) {
+                                     var accepted = cb.newLabel();
+                                     cb.aload(0)
+                                         .getfield(cls(listener), "connection", cls(CONN))
+                                         .aload(0)
+                                         .aload(0)
+                                         .getfield(cls(listener), "server", cls(SERVER))
+                                         .invokestatic(LOGIN, "ready",
+                                                       mt("(L" + CONN + ";Lmc/unity/core/LoginSync$Resume;L" +
+                                                          SERVER + ";)Z"))
+                                         .ifne(accepted)
+                                         .return_()
+                                         .labelBinding(accepted);
+                                 }
+                                 public void accept(CodeBuilder cb, CodeElement element) {
+                                     cb.with(element);
+                                 }
+                             }));
+                         } else
+                             b.with(e);
+                     }));
         }
     }
     private static void handler(TransformPlan plan, boolean client) {
@@ -103,38 +111,39 @@ final class TransportPatches {
         String type = client ? PAYLOAD : PACKET + "ServerboundCustomPayloadPacket";
         plan.add(handler, 310, "Unity play", "handleCustomPayload", (cf, m) -> {
             int[] hits = {0};
-            var bytes = cf.transformClass(m,
-                ClassTransform.transformingMethodBodies(method
-                    -> method.methodName().equalsString("handleCustomPayload")
-                        && method.methodType().equalsString("(L" + type + ";)V"),
-                    (b, e) -> {
-                        if (hits[0] == 0 && e instanceof Instruction) {
-                            hits[0]++;
-                            b.aload(1);
-                            if (!client)
-                                b.invokevirtual(cls(type), "payload", mt("()L" + PAYLOAD + ";"));
-                            b.aload(0).getfield(cls(handler), "connection", cls(CONN));
-                            if (client)
-                                b.aconst_null().aload(0).getfield(
-                                    cls(handler), "minecraft", cls("net/minecraft/client/Minecraft"));
-                            else
-                                b.aload(0)
-                                    .getfield(cls(handler), "player", cls(PLAYER))
-                                    .aload(0)
-                                    .getfield(cls(handler), "server", cls(SERVER));
-                            var next = b.newLabel();
-                            b.invokestatic(NETWORK, "dispatch",
-                                 mt("(L" + PAYLOAD + ";L" + CONN + ";L" + PLAYER + ";L" + EXEC + ";)Z"))
-                                .ifeq(next)
-                                .return_()
-                                .labelBinding(next);
-                        }
-                        b.with(e);
-                    }));
+            var bytes = cf.transformClass(
+                m, ClassTransform.transformingMethodBodies(
+                       method
+                       -> method.methodName().equalsString("handleCustomPayload") &&
+                              method.methodType().equalsString("(L" + type + ";)V"),
+                       (b, e) -> {
+                           if (hits[0] == 0 && e instanceof Instruction) {
+                               hits[0]++;
+                               b.aload(1);
+                               if (!client)
+                                   b.invokevirtual(cls(type), "payload", mt("()L" + PAYLOAD + ";"));
+                               b.aload(0).getfield(cls(handler), "connection", cls(CONN));
+                               if (client)
+                                   b.aconst_null().aload(0).getfield(cls(handler), "minecraft",
+                                                                     cls("net/minecraft/client/Minecraft"));
+                               else
+                                   b.aload(0)
+                                       .getfield(cls(handler), "player", cls(PLAYER))
+                                       .aload(0)
+                                       .getfield(cls(handler), "server", cls(SERVER));
+                               var next = b.newLabel();
+                               b.invokestatic(
+                                    NETWORK, "dispatch",
+                                    mt("(L" + PAYLOAD + ";L" + CONN + ";L" + PLAYER + ";L" + EXEC + ";)Z"))
+                                   .ifeq(next)
+                                   .return_()
+                                   .labelBinding(next);
+                           }
+                           b.with(e);
+                       }));
             if (hits[0] != 1)
                 throw new IllegalStateException("Missing play handler " + handler);
             return bytes;
         });
     }
-
 }

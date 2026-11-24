@@ -43,6 +43,36 @@ def phase_receipt(server_log,client_logs):
     if any(clients["ConfigA"][p]==clients["ConfigB"][p] for p in ("NEO","FABRIC")):raise AssertionError("Challenge reused between concurrent sessions")
     return clients
 
+def asset_fixture(path):
+    metadata={"schemaVersion":1,"id":"qa23_pack","version":"1.2.3","name":"Unity resource test"}
+    pack={"pack":{"description":"Unity resource test","min_format":88,"max_format":[107,1]},
+          "overlays":{"entries":[{"min_format":88,"max_format":88,"directory":"client26"}]}}
+    toml='modLoader="lowcodefml"\nlicense="MIT"\n[[mods]]\nmodId="qa23_pack"\nversion="${file.jarVersion}"\n'
+    files={"fabric.mod.json":json.dumps(metadata),"META-INF/mods.toml":toml,"META-INF/neoforge.mods.toml":toml,
+           "META-INF/MANIFEST.MF":"Manifest-Version: 1.0\r\nImplementation-Version: 1.2.3\r\n\r\n",
+           "pack.mcmeta":json.dumps(pack),"assets/qa23_pack/lang/en_us.json":json.dumps({"qa23.pack.value":"base"}),
+           "client26/assets/qa23_pack/lang/en_us.json":json.dumps({"qa23.pack.value":"Unity pack overlay 88"}),
+           "data/qa23_pack/function/check.mcfunction":"say QA23_DATA_FUNCTION\n"}
+    with zipfile.ZipFile(path,"w") as out:
+        for name,text in files.items():out.writestr(zipfile.ZipInfo(name),text)
+
+def verify_play(server,server_log,clients,logs,status):
+    checks=[]
+    for game,log,player in zip(clients,logs,status):
+        uid=player["uuid"]
+        response=line(log,"QA23 PLAY CLIENT "+uid+"/").split("QA23 PLAY CLIENT ")[1].strip()
+        server_line=line(server_log,"QA23 PLAY SERVER "+response)
+        checks.append({"uuid":uid,"echo":response,"serverEcho":server_line,"asset":line(log,"QA23 ASSET translated overlay 88")})
+    for i,(game,log,player) in enumerate(zip(clients,logs,status)):
+        name="Config"+game.name
+        condition='entity @a[name='+name+',nbt={active_effects:[{id:"minecraft:night_vision"}]}]'
+        for mode in ("enable","clear"):
+            (game/("config/qa23-"+mode)).touch()
+            line(log,"QA23 VISION CLIENT "+mode+" "+player["uuid"])
+            marker="QA23_SERVER_"+mode+"_"+name
+            checks[i][mode]=server.send("execute "+("if" if mode=="enable" else "unless")+" "+condition+" run say "+marker,r"\[Server\] "+marker)
+    return checks
+
 def run(o):
     label=o.label
     if not re.fullmatch(r"[a-z0-9-]+",label):raise ValueError(label)
@@ -142,7 +172,23 @@ def run(o):
                 candidate.replace(raw)
         if digest(raw,"sha512")!=data_lock["sha512"]:raise ValueError("Changed author data pack")
         shutil.copy2(raw,srv/"mods")
-        report={"dataArchive":data_lock["filename"],"loader":digest(jar),"probe":digest(probe),"forgeProbe":digest(forge),"samples":{p.name:digest(p,"sha512") for p in sorted((srv/"mods").glob("*.jar")) if p.name not in {probe.name,forge.name,fabric.name}}}
+        lock23=json.loads((ROOT/"standalone/fabric-play-sample.json").read_bytes())
+        mod=cache/"fabric-play-sample"/lock23["filename"]
+        if not mod.exists():
+            import urllib.request
+            mod.parent.mkdir(exist_ok=True)
+            with tempfile.TemporaryDirectory(dir=mod.parent) as stage:
+                candidate=Path(stage)/mod.name
+                with urllib.request.urlopen(lock23["url"],timeout=75) as response:candidate.write_bytes(response.read(lock23["size"]+1))
+                if digest(candidate,"sha512")!=lock23["sha512"]:raise ValueError("Changed Fabric Play sample")
+                candidate.replace(mod)
+        if digest(mod,"sha512")!=lock23["sha512"]:raise ValueError("Changed Fabric Play sample")
+        pack23=root/"qa23-resource.jar";asset_fixture(pack23)
+        for g in [srv,*clients]:
+            shutil.copy2(pack23,g/"mods");shutil.copy2(mod,g/"mods")
+            (g/"config").mkdir(exist_ok=True)
+            (g/"config/qa23-play").touch()
+        report={"dataArchive":data_lock["filename"],"loader":digest(jar),"probe":digest(probe),"forgeProbe":digest(forge),"samples":{p.name:digest(p,"sha512") for p in sorted((srv/"mods").glob("*.jar")) if p.name not in {probe.name,forge.name,fabric.name,pack23.name}}}
         logs=[EVIDENCE/(f"{label}-{g.name}-client.log") for g in clients]
         if o.fabric_refs:
             report["fabricProbe"]=digest(fabric)
@@ -192,6 +238,8 @@ def run(o):
             status=[win.act("status",timeout=180) for win in windows]
             assert all(s["remote"] and s["gpu"] and not s["visible"] for s in status)
             report["status"]=status
+            report["fabricPlay"]=verify_play(server,EVIDENCE/(label+".log"),clients,logs,status)
+            report["assetFunction"]=server.send("function qa23_pack:check",r"\[Server\] QA23_DATA_FUNCTION")
             report["archiveRecipe"]=server.send("qa_craft_archive",r"QA22 UNIVERSAL recipe=craftable_trident:trident result=minecraft:trident count=1")
             report["clientFallback"]=[line(log,"QA22 CLIENT ACTIONS vanillaBreak=true vanillaHarvest=1") for log in logs]
             report["modelBake"]=[line(log,"QA_MODEL custom layer baked") for log in logs]
@@ -249,6 +297,7 @@ def run(o):
                         w=Window(home,g,label+"-restart-"+g.name,port,profile,"Config"+g.name);peers.callback(exited,w);reopened.append(w)
                         logs.append(EVIDENCE/(label+"-restart-"+g.name+"-client.log"))
                     report["reconnected"]=[w.act("status",timeout=180) for w in reopened]
+                    report["restartFabricPlay"]=verify_play(second,EVIDENCE/(label+"-restart.log"),clients,logs[2:4],report["reconnected"])
                     if [p["uuid"] for p in report["status"]]!=[p["uuid"] for p in report["reconnected"]]:raise AssertionError("Player identity changed")
                     for i,g in enumerate(clients):
                         observed(second,f'data entity Config{g.name} Inventory[{{Slot:8b,id:"minecraft:lapis_lazuli",count:{6+3*i}}}]',"QA_SAVED_BAG_"+g.name)

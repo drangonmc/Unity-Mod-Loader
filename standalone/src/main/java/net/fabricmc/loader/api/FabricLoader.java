@@ -13,4 +13,13 @@ public interface FabricLoader {
     boolean isModLoaded(String id);
     Optional<ModContainer> getModContainer(String id);
     Collection<ModContainer> getAllMods();
+    MappingResolver getMappingResolver();
+    <T> List<net.fabricmc.loader.api.entrypoint.EntrypointContainer<T>>
+    getEntrypointContainers(String key, Class<T> type);
+    default<T> List<T> getEntrypoints(String key, Class<T> type) {
+        return getEntrypointContainers(key, type)
+            .stream()
+            .map(net.fabricmc.loader.api.entrypoint.EntrypointContainer::getEntrypoint)
+            .toList();
+    }
 }

@@ -1,0 +1,489 @@
+[Unity] Access transforms [net/minecraft/data/worldgen/ProcessorLists, net/minecraft/data/worldgen/biome/EndBiomes, net/minecraft/data/worldgen/biome/NetherBiomes, net/minecraft/data/worldgen/biome/OverworldBiomes, net/minecraft/network/chat/TextColor, net/minecraft/network/chat/contents/TranslatableContents, net/minecraft/server/level/ServerLevel, net/minecraft/sounds/SoundEvent, net/minecraft/world/SimpleContainer, net/minecraft/world/damagesource/DamageSources, net/minecraft/world/entity/Display, net/minecraft/world/entity/Display$BlockDisplay, net/minecraft/world/entity/Display$ItemDisplay, net/minecraft/world/entity/Display$TextDisplay, net/minecraft/world/entity/Interaction, net/minecraft/world/entity/LivingEntity, net/minecraft/world/entity/SpawnPlacements, net/minecraft/world/entity/ai/sensing/SensorType, net/minecraft/world/entity/npc/villager/VillagerType, net/minecraft/world/entity/projectile/FishingHook, net/minecraft/world/entity/projectile/Projectile, net/minecraft/world/entity/schedule/Activity, net/minecraft/world/inventory/MenuType, net/minecraft/world/inventory/MenuType$MenuSupplier, net/minecraft/world/item/Item, net/minecraft/world/item/Item$Properties, net/minecraft/world/item/context/BlockPlaceContext, net/minecraft/world/item/context/UseOnContext, net/minecraft/world/item/enchantment/Enchantment, net/minecraft/world/item/enchantment/Enchantment$FloatAction, net/minecraft/world/item/enchantment/Enchantment$GenericAction, net/minecraft/world/item/enchantment/EnchantmentHelper, net/minecraft/world/item/enchantment/EnchantmentHelper$EnchantmentInSlotVisitor, net/minecraft/world/item/enchantment/EnchantmentHelper$EnchantmentVisitor, net/minecraft/world/item/equipment/ArmorMaterials, net/minecraft/world/level/block/AttachedStemBlock, net/minecraft/world/level/block/AzaleaBlock, net/minecraft/world/level/block/BarrierBlock, net/minecraft/world/level/block/BaseCoralFanBlock, net/minecraft/world/level/block/BaseCoralPlantBlock, net/minecraft/world/level/block/BaseCoralWallFanBlock, net/minecraft/world/level/block/BigDripleafBlock, net/minecraft/world/level/block/BigDripleafStemBlock, net/minecraft/world/level/block/BlastFurnaceBlock, net/minecraft/world/level/block/Blocks, net/minecraft/world/level/block/BushBlock, net/minecraft/world/level/block/ButtonBlock, net/minecraft/world/level/block/CactusBlock, net/minecraft/world/level/block/CakeBlock, net/minecraft/world/level/block/CandleCakeBlock, net/minecraft/world/level/block/CartographyTableBlock, net/minecraft/world/level/block/CarvedPumpkinBlock, net/minecraft/world/level/block/ChestBlock, net/minecraft/world/level/block/ChorusFlowerBlock, net/minecraft/world/level/block/ChorusPlantBlock, net/minecraft/world/level/block/CoralFanBlock, net/minecraft/world/level/block/CoralPlantBlock, net/minecraft/world/level/block/CoralWallFanBlock, net/minecraft/world/level/block/CraftingTableBlock, net/minecraft/world/level/block/CreakingHeartBlock, net/minecraft/world/level/block/CropBlock, net/minecraft/world/level/block/DecoratedPotBlock, net/minecraft/world/level/block/DirtPathBlock, net/minecraft/world/level/block/DispenserBlock, net/minecraft/world/level/block/DoorBlock, net/minecraft/world/level/block/DryVegetationBlock, net/minecraft/world/level/block/EnchantingTableBlock, net/minecraft/world/level/block/EndGatewayBlock, net/minecraft/world/level/block/EndPortalBlock, net/minecraft/world/level/block/EndRodBlock, net/minecraft/world/level/block/EnderChestBlock, net/minecraft/world/level/block/FarmlandBlock, net/minecraft/world/level/block/FlowerBedBlock, net/minecraft/world/level/block/FurnaceBlock, net/minecraft/world/level/block/GrindstoneBlock, net/minecraft/world/level/block/HalfTransparentBlock, net/minecraft/world/level/block/HangingRootsBlock, net/minecraft/world/level/block/IronBarsBlock, net/minecraft/world/level/block/JigsawBlock, net/minecraft/world/level/block/JukeboxBlock, net/minecraft/world/level/block/KelpBlock, net/minecraft/world/level/block/KelpPlantBlock, net/minecraft/world/level/block/LadderBlock, net/minecraft/world/level/block/LecternBlock, net/minecraft/world/level/block/LeverBlock, net/minecraft/world/level/block/LilyPadBlock, net/minecraft/world/level/block/LiquidBlock, net/minecraft/world/level/block/LoomBlock, net/minecraft/world/level/block/MangroveRootsBlock, net/minecraft/world/level/block/NetherFungusBlock, net/minecraft/world/level/block/NetherRootsBlock, net/minecraft/world/level/block/NetherWartBlock, net/minecraft/world/level/block/NyliumBlock, net/minecraft/world/level/block/PlayerHeadBlock, net/minecraft/world/level/block/PlayerWallHeadBlock, net/minecraft/world/level/block/PoweredRailBlock, net/minecraft/world/level/block/PressurePlateBlock, net/minecraft/world/level/block/PumpkinBlock, net/minecraft/world/level/block/RailBlock, net/minecraft/world/level/block/RedstoneTorchBlock, net/minecraft/world/level/block/RedstoneWallTorchBlock, net/minecraft/world/level/block/RepeaterBlock, net/minecraft/world/level/block/SaplingBlock, net/minecraft/world/level/block/ScaffoldingBlock, net/minecraft/world/level/block/SeaPickleBlock, net/minecraft/world/level/block/SeagrassBlock, net/minecraft/world/level/block/ShortDryGrassBlock, net/minecraft/world/level/block/SkullBlock, net/minecraft/world/level/block/SmithingTableBlock, net/minecraft/world/level/block/SmokerBlock, net/minecraft/world/level/block/SnowLayerBlock, net/minecraft/world/level/block/SnowyBlock, net/minecraft/world/level/block/SpawnerBlock, net/minecraft/world/level/block/SpongeBlock, net/minecraft/world/level/block/StairBlock, net/minecraft/world/level/block/StemBlock, net/minecraft/world/level/block/StructureBlock, net/minecraft/world/level/block/StructureVoidBlock, net/minecraft/world/level/block/SugarCaneBlock, net/minecraft/world/level/block/TallDryGrassBlock, net/minecraft/world/level/block/TallGrassBlock, net/minecraft/world/level/block/TorchBlock, net/minecraft/world/level/block/TransparentBlock, net/minecraft/world/level/block/TrapDoorBlock, net/minecraft/world/level/block/WallSkullBlock, net/minecraft/world/level/block/WallTorchBlock, net/minecraft/world/level/block/WaterloggedTransparentBlock, net/minecraft/world/level/block/WeatheringCopperBarsBlock, net/minecraft/world/level/block/WeatheringCopperChainBlock, net/minecraft/world/level/block/WeatheringCopperDoorBlock, net/minecraft/world/level/block/WeatheringCopperGrateBlock, net/minecraft/world/level/block/WeatheringCopperTrapDoorBlock, net/minecraft/world/level/block/WeatheringLanternBlock, net/minecraft/world/level/block/WeatheringLightningRodBlock, net/minecraft/world/level/block/WeightedPressurePlateBlock, net/minecraft/world/level/block/WetSpongeBlock, net/minecraft/world/level/block/WitherSkullBlock, net/minecraft/world/level/block/WitherWallSkullBlock, net/minecraft/world/level/block/WoolCarpetBlock, net/minecraft/world/level/levelgen/NoiseRouterData, net/minecraft/world/level/levelgen/feature/foliageplacers/FoliagePlacerType, net/minecraft/world/level/levelgen/feature/rootplacers/RootPlacerType, net/minecraft/world/level/levelgen/feature/stateproviders/BlockStateProviderType, net/minecraft/world/level/levelgen/feature/treedecorators/TreeDecoratorType, net/minecraft/world/level/levelgen/feature/trunkplacers/TrunkPlacerType, net/minecraft/world/level/storage/loot/LootPool, net/minecraft/world/scores/criteria/ObjectiveCriteria]
+[Unity] Mixin configurations [alwaysshield.mixins.json, back-command.mixins.json, commandsspy.mixins.json, inventorystorages.mixins.json, inventorystorages.forge.mixins.json, laserbladetools.mixins.json, laserbladetools.forge.mixins.json]
+[Unity] 0.2.3-Beta standalone | Minecraft 26.2 | Mojang libraries: 39
+[Unity] Discovered native mods [world-marker]; platform mods [alwaysshield, back-command, commandsspy, cratedelight, crop_harvest, inventorystorages, laserbladetools, moreberryuses, pvpcontrol, randomitem, repair_commands, simplekillcommand, stackedblocks, storagedelight, treefeller, unity_cancel_fixture]
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by com.sun.jna.Native in an unnamed module (file:/D:/测试/Unity/cache/0.2.3-Beta/libraries/net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+[21:00:29] [main/ERROR]: Unable to locate English counter names in registry Perflib 009. Counters may need to be rebuilt: 
+com.sun.jna.platform.win32.Win32Exception: 参数错误。
+	at Unity Minecraft 26.2//com.sun.jna.platform.win32.Advapi32Util.registryGetStringArray(Advapi32Util.java:921)
+	at Unity Minecraft 26.2//com.sun.jna.platform.win32.Advapi32Util.registryGetStringArray(Advapi32Util.java:898)
+	at Unity Minecraft 26.2//oshi.driver.windows.registry.HkeyPerformanceDataUtil.mapCounterIndicesFromRegistry(HkeyPerformanceDataUtil.java:274)
+	at Unity Minecraft 26.2//oshi.driver.windows.registry.HkeyPerformanceDataUtil.<clinit>(HkeyPerformanceDataUtil.java:51)
+	at Unity Minecraft 26.2//oshi.driver.windows.registry.ProcessPerformanceData.buildProcessMapFromRegistry(ProcessPerformanceData.java:45)
+	at Unity Minecraft 26.2//oshi.software.os.windows.WindowsOperatingSystem.queryProcessMapFromRegistry(WindowsOperatingSystem.java:328)
+	at Unity Minecraft 26.2//oshi.util.Memoizer$1.get(Memoizer.java:65)
+	at Unity Minecraft 26.2//oshi.software.os.windows.WindowsOperatingSystem.processMapToList(WindowsOperatingSystem.java:298)
+	at Unity Minecraft 26.2//oshi.software.os.windows.WindowsOperatingSystem.getProcess(WindowsOperatingSystem.java:292)
+	at Unity Minecraft 26.2//oshi.software.os.OperatingSystem.getCurrentProcess(OperatingSystem.java:246)
+	at Unity Minecraft 26.2//net.minecraft.SystemReport.lambda$putSoftware$0(SystemReport.java:116)
+	at Unity Minecraft 26.2//net.minecraft.SystemReport.ignoreErrors(SystemReport.java:121)
+	at Unity Minecraft 26.2//net.minecraft.SystemReport.putSoftware(SystemReport.java:116)
+	at Unity Minecraft 26.2//net.minecraft.SystemReport.lambda$new$7(SystemReport.java:68)
+	at Unity Minecraft 26.2//net.minecraft.SystemReport.ignoreErrors(SystemReport.java:121)
+	at Unity Minecraft 26.2//net.minecraft.SystemReport.<init>(SystemReport.java:68)
+	at Unity Minecraft 26.2//net.minecraft.CrashReport.<init>(CrashReport.java:35)
+	at Unity Minecraft 26.2//net.minecraft.CrashReport.preload(CrashReport.java:252)
+	at Unity Minecraft 26.2//net.minecraft.server.Main.main(Main.java:104)
+	at Unity Minecraft 26.2//mc.unity.runtime.Dedicated.launch(Dedicated.java:28)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at mc.unity.bootstrap.Main.main(Main.java:59)
+[21:00:29] [main/WARN]: Unable to locate English counter names in registry Perflib 009. Assuming English counters. Error 0x80070057. See https://support.microsoft.com/en-us/help/300956/how-to-manually-rebuild-performance-counter-library-values
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by org.joml.MemUtil$MemUtilUnsafe (file:/D:/测试/Unity/cache/0.2.3-Beta/libraries/org/joml/joml/1.10.8/joml-1.10.8.jar)
+WARNING: Please consider reporting this to the maintainers of class org.joml.MemUtil$MemUtilUnsafe
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+[21:00:32] [main/INFO]: Back Command version 1.0.1 initialized.
+[21:00:32] [main/INFO]: Loading CommandsSpy by Ultra_MC.
+[21:00:32] [main/INFO]: Crate Delight loaded
+[21:00:32] [main/INFO]: PvPControl 2.0.0 enabled on Forge 26.2 (language: en)
+[21:00:32] [main/INFO]: Stacked Blocks loaded
+[21:00:32] [main/INFO]: Storage Delight loaded
+[Unity] Registered content [back-command, commandsspy, cratedelight, crop_harvest, inventorystorages, laserbladetools, moreberryuses, stackedblocks, storagedelight] registry 928d45ddd14c84a0c7a4d956651c1d165b52d1ee69f2180266752331e6befcd5
+[21:00:32] [main/INFO]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, profilesHost=https://api.mojang.com, name=PROD]
+[21:00:32] [main/INFO]: Found new data pack unity/back-command, loading it automatically
+[21:00:32] [main/INFO]: Found new data pack unity/commandsspy, loading it automatically
+[21:00:32] [main/INFO]: Found new data pack unity/cratedelight, loading it automatically
+[21:00:32] [main/INFO]: Found new data pack unity/crop_harvest, loading it automatically
+[21:00:32] [main/INFO]: Found new data pack unity/inventorystorages, loading it automatically
+[21:00:32] [main/INFO]: Found new data pack unity/laserbladetools, loading it automatically
+[21:00:32] [main/INFO]: Found new data pack unity/moreberryuses, loading it automatically
+[21:00:32] [main/INFO]: Found new data pack unity/stackedblocks, loading it automatically
+[21:00:32] [main/INFO]: Found new data pack unity/storagedelight, loading it automatically
+[21:00:32] [main/INFO]: Found new data pack unity_common_tags, loading it automatically
+[21:00:33] [Worker-Main-2/INFO]: No existing world data, creating new world
+[21:00:33] [main/INFO]: Loaded 1951 recipes
+[21:00:33] [main/INFO]: Loaded 1996 advancements
+[21:00:33] [Server thread/INFO]: Starting minecraft server version 26.2
+[21:00:33] [Server thread/INFO]: Loading properties
+[21:00:33] [Server thread/INFO]: Default game type: SURVIVAL
+[21:00:33] [Server thread/INFO]: Generating keypair
+[21:00:33] [Server thread/INFO]: Starting Minecraft server on 127.0.0.1:3585
+[21:00:33] [Server thread/WARN]: **** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!
+[21:00:33] [Server thread/WARN]: The server will make no attempt to authenticate usernames. Beware.
+[21:00:33] [Server thread/WARN]: While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.
+[21:00:33] [Server thread/WARN]: To change this, set "online-mode" to "true" in the server.properties file.
+[21:00:33] [Server thread/INFO]: Preparing level "world"
+[21:00:34] [Server thread/INFO]: Selecting global world spawn...
+[21:00:35] [Server thread/INFO]: Loading 0 persistent chunks...
+[21:00:35] [Server thread/INFO]: Preparing spawn area: 100%
+[21:00:35] [Server thread/INFO]: Time elapsed: 1783 ms
+[21:00:35] [Server thread/INFO]: Done (1.945s)! For help, type "help"
+[21:00:35] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[21:00:36] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[21:00:36] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[21:00:37] [Server thread/INFO]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[21:00:37] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[21:00:37] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[21:00:37] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved
+[21:00:37] [Server thread/INFO]: [STDOUT]: [Unity] Standalone ready; native [world-marker]
+[21:00:37] [Server thread/INFO]: [CommandsSpy] [Server] unity
+[21:00:37] [Server thread/INFO]: Unity 0.2.3-Beta standalone | MC 26.2 | native [world-marker] | platform mods [alwaysshield, back-command, commandsspy, cratedelight, crop_harvest, inventorystorages, laserbladetools, moreberryuses, pvpcontrol, randomitem, repair_commands, simplekillcommand, stackedblocks, storagedelight, treefeller, unity_cancel_fixture]
+[21:00:52] [Netty NIO IO #1/INFO]: [STDOUT]: [Unity] Login capabilities play=0 configuration=false extended=false
+[21:00:52] [Netty NIO IO #1/INFO]: [STDOUT]: [Unity] Verified client content registry 928d45ddd14c84a0c7a4d956651c1d165b52d1ee69f2180266752331e6befcd5
+[21:00:54] [Server thread/INFO]: UnityGuardA[/127.0.0.1:3621] logged in with entity id 8 at (-1.5, 65.0, -6.5)
+[21:00:54] [Server thread/INFO]: UnityGuardA joined the game
+[21:01:09] [Netty NIO IO #2/INFO]: [STDOUT]: [Unity] Login capabilities play=0 configuration=false extended=false
+[21:01:09] [Netty NIO IO #2/INFO]: [STDOUT]: [Unity] Verified client content registry 928d45ddd14c84a0c7a4d956651c1d165b52d1ee69f2180266752331e6befcd5
+[21:01:09] [Server thread/INFO]: UnityGuardB[/127.0.0.1:3642] logged in with entity id 246 at (5.5, 71.0, 6.5)
+[21:01:09] [Server thread/INFO]: UnityGuardB joined the game
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] forceload
+[21:01:10] [Server thread/INFO]: Marked 4 chunks in minecraft:overworld from [1, 0] to [2, 1] to be force loaded
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:10] [Server thread/INFO]: [Not Secure] [Server] LOADED_16_12
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:10] [Server thread/INFO]: [Not Secure] [Server] LOADED_16_27
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:10] [Server thread/INFO]: [Not Secure] [Server] LOADED_47_12
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:10] [Server thread/INFO]: [Not Secure] [Server] LOADED_47_27
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] fill
+[21:01:10] [Server thread/INFO]: Successfully filled 512 block(s)
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] fill
+[21:01:10] [Server thread/INFO]: No blocks were filled
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] gamerule
+[21:01:10] [Server thread/INFO]: Gamerule random_tick_speed is now set to: 0
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] difficulty
+[21:01:10] [Server thread/INFO]: The difficulty has been set to Normal
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] time
+[21:01:10] [Server thread/INFO]: Set minecraft:overworld to time marker minecraft:noon
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] weather
+[21:01:10] [Server thread/INFO]: Set the weather to clear
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] gamerule
+[21:01:10] [Server thread/INFO]: Gamerule keep_inventory is now set to: true
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] gamerule
+[21:01:10] [Server thread/INFO]: Gamerule natural_health_regeneration is now set to: false
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] spawnpoint
+[21:01:10] [Server thread/INFO]: Set spawn point to 18, 201, 20 [0.0, 0.0] in minecraft:overworld for UnityGuardA
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] spawnpoint
+[21:01:10] [Server thread/INFO]: Set spawn point to 18, 201, 20 [0.0, 0.0] in minecraft:overworld for UnityGuardB
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] clear
+[21:01:10] [Server thread/INFO]: No items were found on player UnityGuardA
+[21:01:10] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:10] [Server thread/INFO]: Teleported UnityGuardA to 22.500000, 201.000000, 15.800000
+[21:01:11] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:11] [Server thread/INFO]: [CommandsSpy] [Server] clear
+[21:01:11] [Server thread/INFO]: No items were found on player UnityGuardB
+[21:01:11] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:11] [Server thread/INFO]: Teleported UnityGuardB to 22.500000, 201.000000, 20.900000
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] setblock
+[21:01:12] [Server thread/INFO]: Changed the block at 39, 201, 18
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] setblock
+[21:01:12] [Server thread/INFO]: Changed the block at 26, 201, 18
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] setblock
+[21:01:12] [Server thread/INFO]: Changed the block at 28, 201, 18
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] setblock
+[21:01:12] [Server thread/INFO]: Changed the block at 32, 200, 18
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] setblock
+[21:01:12] [Server thread/INFO]: Changed the block at 32, 201, 18
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] setblock
+[21:01:12] [Server thread/INFO]: Changed the block at 32, 200, 19
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] fill
+[21:01:12] [Server thread/INFO]: Successfully filled 3 block(s)
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] item
+[21:01:12] [Server thread/INFO]: Replaced a slot on UnityGuardA with [Barrel]
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] item
+[21:01:12] [Server thread/INFO]: Replaced a slot on UnityGuardA with [Oak Door]
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] item
+[21:01:12] [Server thread/INFO]: Replaced a slot on UnityGuardA with [Diamond Pickaxe]
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] item
+[21:01:12] [Server thread/INFO]: Replaced a slot on UnityGuardA with [Iron Axe]
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] item
+[21:01:12] [Server thread/INFO]: Replaced a slot on UnityGuardA with [Oak Log]
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] item
+[21:01:12] [Server thread/INFO]: Replaced a slot on UnityGuardA with [Shield]
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] item
+[21:01:12] [Server thread/INFO]: Replaced a slot on UnityGuardA with [Wooden Sword]
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] item
+[21:01:12] [Server thread/INFO]: Replaced a slot on UnityGuardA with [Wheat Seeds]
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] item
+[21:01:12] [Server thread/INFO]: Replaced a slot on UnityGuardA with [Snowball]
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] item
+[21:01:12] [Server thread/INFO]: Replaced a slot on UnityGuardB with [Amethyst Shard]
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] item
+[21:01:12] [Server thread/INFO]: Replaced a slot on UnityGuardB with [Iron Nugget]
+[21:01:12] [Server thread/INFO]: [CommandsSpy] [Server] unitycanceltest
+[21:01:12] [Server thread/INFO]: [STDOUT]: CHECK ARMED none
+[21:01:15] [Server thread/INFO]: [CommandsSpy] [Player: UnityGuardA] fixturedeath
+[21:01:15] [Server thread/INFO]: UnityGuardA was killed
+[21:01:15] [Server thread/INFO]: Saved /back location for UnityGuardA at 22.5, 201.0, 15.8
+[21:01:17] [Server thread/INFO]: [CommandsSpy] [Player: UnityGuardA] back
+[21:01:17] [Server thread/INFO]: [CommandsSpy] [Player: UnityGuardA] unityactionbarrier
+[21:01:17] [Server thread/INFO]: [STDOUT]: CHECK BARRIER UnityGuardA
+[21:01:17] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:17] [Server thread/INFO]: UnityGuardA has the following entity data: [{count: 3, Slot: 0b, id: "minecraft:barrel"}, {count: 2, Slot: 1b, id: "minecraft:oak_door"}, {components: {"minecraft:damage": 3}, count: 1, Slot: 2b, id: "minecraft:diamond_pickaxe"}, {count: 1, Slot: 3b, id: "minecraft:iron_axe"}, {count: 2, Slot: 4b, id: "minecraft:oak_log"}, {count: 1, Slot: 5b, id: "minecraft:shield"}, {count: 1, Slot: 6b, id: "minecraft:wooden_sword"}, {count: 6, Slot: 7b, id: "minecraft:wheat_seeds"}, {count: 4, Slot: 8b, id: "minecraft:snowball"}]
+[21:01:18] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:18] [Server thread/INFO]: [STDOUT]: CHECK AUTH_BAG UnityGuardA {"0":"minecraft:barrel*3@0","1":"minecraft:oak_door*2@0","2":"minecraft:diamond_pickaxe*1@3","3":"minecraft:iron_axe*1@0","4":"minecraft:oak_log*2@0","5":"minecraft:shield*1@0","6":"minecraft:wooden_sword*1@0","7":"minecraft:wheat_seeds*6@0","8":"minecraft:snowball*4@0"}
+[21:01:18] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:18] [Server thread/INFO]: UnityGuardB has the following entity data: [{count: 5, Slot: 0b, id: "minecraft:amethyst_shard"}, {count: 11, Slot: 19b, id: "minecraft:iron_nugget"}]
+[21:01:18] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:18] [Server thread/INFO]: [STDOUT]: CHECK AUTH_BAG UnityGuardB {"0":"minecraft:amethyst_shard*5@0","19":"minecraft:iron_nugget*11@0"}
+[21:01:18] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:18] [Server thread/INFO]: Teleported UnityGuardA to 22.500000, 201.000000, 15.800000
+[21:01:19] [Server thread/INFO]: [STDOUT]: CHECK PLACE HIGH
+[21:01:19] [Server thread/INFO]: [STDOUT]: CHECK PLACE RULE
+[21:01:19] [Server thread/INFO]: [STDOUT]: CHECK PLACE MONITOR true
+[21:01:19] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:19] [Server thread/INFO]: [Not Secure] [Server] WORLD_22_201_air
+[21:01:19] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:19] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:19] [Server thread/INFO]: [Not Secure] [Server] SLOT_MATCH
+[21:01:19] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:19] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:19] [Server thread/INFO]: UnityGuardA has the following entity data: {count: 3, Slot: 0b, id: "minecraft:barrel"}
+[21:01:20] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:20] [Server thread/INFO]: Teleported UnityGuardA to 24.500000, 201.000000, 15.800000
+[21:01:21] [Server thread/INFO]: [STDOUT]: CHECK MULTI HIGH
+[21:01:21] [Server thread/INFO]: [STDOUT]: CHECK MULTI RULE
+[21:01:21] [Server thread/INFO]: [STDOUT]: CHECK MULTI MONITOR true
+[21:01:21] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:21] [Server thread/INFO]: [Not Secure] [Server] WORLD_24_201_air
+[21:01:21] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:21] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:21] [Server thread/INFO]: [Not Secure] [Server] SLOT_MATCH
+[21:01:21] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:21] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:21] [Server thread/INFO]: UnityGuardA has the following entity data: {count: 2, Slot: 1b, id: "minecraft:oak_door"}
+[21:01:22] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:22] [Server thread/INFO]: [Not Secure] [Server] WORLD_24_202_air
+[21:01:22] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:22] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:22] [Server thread/INFO]: Teleported UnityGuardA to 26.500000, 201.000000, 15.800000
+[21:01:23] [Server thread/INFO]: [STDOUT]: CHECK BREAK HIGH
+[21:01:23] [Server thread/INFO]: [STDOUT]: CHECK BREAK RULE
+[21:01:23] [Server thread/INFO]: [STDOUT]: CHECK BREAK MONITOR true
+[21:01:23] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:23] [Server thread/INFO]: [Not Secure] [Server] WORLD_26_201_stone
+[21:01:23] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:24] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:24] [Server thread/INFO]: [Not Secure] [Server] SLOT_MATCH
+[21:01:24] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:24] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:24] [Server thread/INFO]: UnityGuardA has the following entity data: {components: {"minecraft:damage": 3}, count: 1, Slot: 2b, id: "minecraft:diamond_pickaxe"}
+[21:01:25] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:25] [Server thread/INFO]: Teleported UnityGuardA to 28.500000, 201.000000, 15.800000
+[21:01:25] [Server thread/INFO]: [STDOUT]: CHECK USE HIGH
+[21:01:25] [Server thread/INFO]: [STDOUT]: CHECK USE RULE
+[21:01:25] [Server thread/INFO]: [STDOUT]: CHECK USE MONITOR true
+[21:01:25] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:25] [Server thread/INFO]: [Not Secure] [Server] WORLD_28_201_lever
+[21:01:25] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:26] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:26] [Server thread/INFO]: Teleported UnityGuardA to 30.500000, 201.000000, 15.800000
+[21:01:26] [Server thread/INFO]: [STDOUT]: CHECK ITEM HIGH
+[21:01:26] [Server thread/INFO]: [STDOUT]: CHECK ITEM RULE
+[21:01:26] [Server thread/INFO]: [STDOUT]: CHECK ITEM MONITOR true
+[21:01:26] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:26] [Server thread/INFO]: [Not Secure] [Server] SLOT_MATCH
+[21:01:26] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:26] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:26] [Server thread/INFO]: UnityGuardA has the following entity data: {count: 4, Slot: 8b, id: "minecraft:snowball"}
+[21:01:27] [Server thread/INFO]: [CommandsSpy] [Server] summon
+[21:01:27] [Server thread/INFO]: Summoned new Armor Stand
+[21:01:28] [Server thread/INFO]: [STDOUT]: CHECK ENTITY_USE HIGH
+[21:01:28] [Server thread/INFO]: [STDOUT]: CHECK ENTITY_USE RULE
+[21:01:28] [Server thread/INFO]: [STDOUT]: CHECK ENTITY_USE MONITOR true
+[21:01:28] [Server thread/INFO]: [STDOUT]: CHECK ENTITY_ATTACK HIGH
+[21:01:28] [Server thread/INFO]: [STDOUT]: CHECK ENTITY_ATTACK RULE
+[21:01:28] [Server thread/INFO]: [STDOUT]: CHECK ENTITY_ATTACK MONITOR true
+[21:01:28] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:28] [Server thread/INFO]: [Not Secure] [Server] STAND_ALIVE
+[21:01:28] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:28] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:28] [Server thread/INFO]: UnityGuardA has the following entity data: [{count: 3, Slot: 0b, id: "minecraft:barrel"}, {count: 2, Slot: 1b, id: "minecraft:oak_door"}, {components: {"minecraft:damage": 3}, count: 1, Slot: 2b, id: "minecraft:diamond_pickaxe"}, {count: 1, Slot: 3b, id: "minecraft:iron_axe"}, {count: 2, Slot: 4b, id: "minecraft:oak_log"}, {count: 1, Slot: 5b, id: "minecraft:shield"}, {count: 1, Slot: 6b, id: "minecraft:wooden_sword"}, {count: 6, Slot: 7b, id: "minecraft:wheat_seeds"}, {count: 4, Slot: 8b, id: "minecraft:snowball"}]
+[21:01:28] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:28] [Server thread/INFO]: [STDOUT]: CHECK AUTH_BAG UnityGuardA {"0":"minecraft:barrel*3@0","1":"minecraft:oak_door*2@0","2":"minecraft:diamond_pickaxe*1@3","3":"minecraft:iron_axe*1@0","4":"minecraft:oak_log*2@0","5":"minecraft:shield*1@0","6":"minecraft:wooden_sword*1@0","7":"minecraft:wheat_seeds*6@0","8":"minecraft:snowball*4@0"}
+[21:01:28] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:28] [Server thread/INFO]: UnityGuardB has the following entity data: [{count: 5, Slot: 0b, id: "minecraft:amethyst_shard"}, {count: 11, Slot: 19b, id: "minecraft:iron_nugget"}]
+[21:01:28] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:28] [Server thread/INFO]: [STDOUT]: CHECK AUTH_BAG UnityGuardB {"0":"minecraft:amethyst_shard*5@0","19":"minecraft:iron_nugget*11@0"}
+[21:01:28] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:28] [Server thread/INFO]: [Not Secure] [Server] NO_CANCELLED_BARREL
+[21:01:28] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:28] [Server thread/INFO]: [CommandsSpy] [Server] unitycanceltest
+[21:01:28] [Server thread/INFO]: [STDOUT]: CHECK ARMED off
+[21:01:29] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:29] [Server thread/INFO]: [Not Secure] [Server] WORLD_28_201_lever
+[21:01:29] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:29] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:29] [Server thread/INFO]: [Not Secure] [Server] WORLD_28_201_lever
+[21:01:29] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:30] [Server thread/INFO]: [CommandsSpy] [Server] unitycanceltest
+[21:01:30] [Server thread/INFO]: [STDOUT]: CHECK ARMED none
+[21:01:30] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:30] [Server thread/INFO]: Teleported UnityGuardA to 32.500000, 201.000000, 15.800000
+[21:01:30] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:30] [Server thread/INFO]: [Not Secure] [Server] WORLD_32_201_wheat
+[21:01:30] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:31] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:31] [Server thread/INFO]: Teleported UnityGuardA to 35.500000, 201.000000, 15.800000
+[21:01:32] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:32] [Server thread/INFO]: [Not Secure] [Server] WORLD_35_201_oak_log
+[21:01:32] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:32] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:32] [Server thread/INFO]: Teleported UnityGuardA to 34.500000, 201.000000, 15.800000
+[21:01:34] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:34] [Server thread/INFO]: [Not Secure] [Server] WORLD_34_201_air
+[21:01:34] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:34] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:34] [Server thread/INFO]: [Not Secure] [Server] WORLD_34_202_air
+[21:01:34] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:35] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:35] [Server thread/INFO]: [Not Secure] [Server] WORLD_34_203_air
+[21:01:35] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:35] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:35] [Server thread/INFO]: [Not Secure] [Server] WORLD_35_201_oak_log
+[21:01:35] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:35] [Server thread/INFO]: [CommandsSpy] [Server] experience
+[21:01:35] [Server thread/INFO]: Set 0 experience levels on UnityGuardA
+[21:01:35] [Server thread/INFO]: [CommandsSpy] [Server] experience
+[21:01:35] [Server thread/INFO]: Set 0 experience points on UnityGuardA
+[21:01:35] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:35] [Server thread/INFO]: Teleported UnityGuardA to 39.500000, 201.000000, 15.800000
+[21:01:36] [Server thread/INFO]: [STDOUT]: CHECK XP 0 -> 7
+[21:01:36] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:36] [Server thread/INFO]: [Not Secure] [Server] WORLD_39_201_air
+[21:01:36] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:37] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:37] [Server thread/INFO]: Teleported UnityGuardA to 39.500000, 201.000000, 18.500000
+[21:01:37] [Server thread/INFO]: UnityGuardA has made the advancement [Stone Age]
+[21:01:37] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:37] [Server thread/INFO]: [Not Secure] [Server] SEVEN_XP
+[21:01:37] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:38] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:38] [Server thread/INFO]: Teleported UnityGuardA to 36.500000, 201.000000, 16.500000
+[21:01:38] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:38] [Server thread/INFO]: Teleported UnityGuardB to 36.500000, 201.000000, 18.500000
+[21:01:39] [Server thread/INFO]: [CommandsSpy] [Player: UnityGuardB] pvp
+[21:01:40] [Server thread/INFO]: [CommandsSpy] [Player: UnityGuardB] unityactionbarrier
+[21:01:40] [Server thread/INFO]: [STDOUT]: CHECK BARRIER UnityGuardB
+[21:01:40] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:40] [Server thread/INFO]: UnityGuardB has the following entity data: 20.0f
+[21:01:42] [Server thread/INFO]: [STDOUT]: CHECK ATTACK HIGH
+[21:01:42] [Server thread/INFO]: [STDOUT]: CHECK ATTACK RULE
+[21:01:42] [Server thread/INFO]: [STDOUT]: CHECK ATTACK MONITOR true
+[21:01:42] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:42] [Server thread/INFO]: UnityGuardB has the following entity data: 20.0f
+[21:01:43] [Server thread/INFO]: [CommandsSpy] [Player: UnityGuardB] pvp
+[21:01:43] [Server thread/INFO]: [CommandsSpy] [Player: UnityGuardB] unityactionbarrier
+[21:01:43] [Server thread/INFO]: [STDOUT]: CHECK BARRIER UnityGuardB
+[21:01:43] [Server thread/INFO]: [CommandsSpy] [Server] unitycanceltest
+[21:01:43] [Server thread/INFO]: [STDOUT]: CHECK ARMED hurt
+[21:01:44] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:44] [Server thread/INFO]: Teleported UnityGuardA to 36.500000, 201.000000, 16.500000
+[21:01:44] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:44] [Server thread/INFO]: Teleported UnityGuardB to 36.500000, 201.000000, 18.500000
+[21:01:45] [Server thread/INFO]: [STDOUT]: CHECK ATTACK HIGH
+[21:01:45] [Server thread/INFO]: [STDOUT]: CHECK ATTACK RULE
+[21:01:45] [Server thread/INFO]: [STDOUT]: CHECK ATTACK LOW
+[21:01:45] [Server thread/INFO]: [STDOUT]: CHECK ATTACK MONITOR false
+[21:01:45] [Server thread/INFO]: [STDOUT]: CHECK HURT HIGH
+[21:01:45] [Server thread/INFO]: [STDOUT]: CHECK HURT RULE
+[21:01:45] [Server thread/INFO]: [STDOUT]: CHECK HURT MONITOR true
+[21:01:45] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:45] [Server thread/INFO]: UnityGuardB has the following entity data: 20.0f
+[21:01:45] [Server thread/INFO]: [CommandsSpy] [Server] unitycanceltest
+[21:01:45] [Server thread/INFO]: [STDOUT]: CHECK ARMED damage
+[21:01:47] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:47] [Server thread/INFO]: Teleported UnityGuardA to 36.500000, 201.000000, 16.500000
+[21:01:47] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:47] [Server thread/INFO]: Teleported UnityGuardB to 36.500000, 201.000000, 18.500000
+[21:01:47] [Server thread/INFO]: [STDOUT]: CHECK ATTACK HIGH
+[21:01:47] [Server thread/INFO]: [STDOUT]: CHECK ATTACK RULE
+[21:01:47] [Server thread/INFO]: [STDOUT]: CHECK ATTACK LOW
+[21:01:47] [Server thread/INFO]: [STDOUT]: CHECK ATTACK MONITOR false
+[21:01:47] [Server thread/INFO]: [STDOUT]: CHECK HURT HIGH
+[21:01:47] [Server thread/INFO]: [STDOUT]: CHECK HURT RULE
+[21:01:47] [Server thread/INFO]: [STDOUT]: CHECK HURT LOW
+[21:01:47] [Server thread/INFO]: [STDOUT]: CHECK HURT MONITOR false
+[21:01:47] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE HIGH
+[21:01:47] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE RULE
+[21:01:47] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE MONITOR true
+[21:01:47] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:47] [Server thread/INFO]: UnityGuardB has the following entity data: 20.0f
+[21:01:48] [Server thread/INFO]: [CommandsSpy] [Server] unitycanceltest
+[21:01:48] [Server thread/INFO]: [STDOUT]: CHECK ARMED none
+[21:01:49] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:49] [Server thread/INFO]: Teleported UnityGuardA to 36.500000, 201.000000, 16.500000
+[21:01:49] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:49] [Server thread/INFO]: Teleported UnityGuardB to 36.500000, 201.000000, 18.500000
+[21:01:50] [Server thread/INFO]: [STDOUT]: CHECK ATTACK HIGH
+[21:01:50] [Server thread/INFO]: [STDOUT]: CHECK ATTACK RULE
+[21:01:50] [Server thread/INFO]: [STDOUT]: CHECK ATTACK LOW
+[21:01:50] [Server thread/INFO]: [STDOUT]: CHECK ATTACK MONITOR false
+[21:01:50] [Server thread/INFO]: [STDOUT]: CHECK HURT HIGH
+[21:01:50] [Server thread/INFO]: [STDOUT]: CHECK HURT RULE
+[21:01:50] [Server thread/INFO]: [STDOUT]: CHECK HURT LOW
+[21:01:50] [Server thread/INFO]: [STDOUT]: CHECK HURT MONITOR false
+[21:01:50] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE HIGH
+[21:01:50] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE RULE
+[21:01:50] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE LOW
+[21:01:50] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE MONITOR false
+[21:01:50] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:50] [Server thread/INFO]: UnityGuardB has the following entity data: 16.0f
+[21:01:50] [Server thread/INFO]: [CommandsSpy] [Server] effect
+[21:01:50] [Server thread/INFO]: Applied effect Absorption to UnityGuardB
+[21:01:50] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:50] [Server thread/INFO]: [STDOUT]: CHECK ABSORBED 0 8.0
+[21:01:50] [Server thread/INFO]: [CommandsSpy] [Server] unitycanceltest
+[21:01:50] [Server thread/INFO]: [STDOUT]: CHECK ARMED damage
+[21:01:51] [Server thread/INFO]: [CommandsSpy] [Server] damage
+[21:01:51] [Server thread/INFO]: [STDOUT]: CHECK ATTACK HIGH
+[21:01:51] [Server thread/INFO]: [STDOUT]: CHECK ATTACK RULE
+[21:01:51] [Server thread/INFO]: [STDOUT]: CHECK ATTACK LOW
+[21:01:51] [Server thread/INFO]: [STDOUT]: CHECK ATTACK MONITOR false
+[21:01:51] [Server thread/INFO]: [STDOUT]: CHECK HURT HIGH
+[21:01:51] [Server thread/INFO]: [STDOUT]: CHECK HURT RULE
+[21:01:51] [Server thread/INFO]: [STDOUT]: CHECK HURT LOW
+[21:01:51] [Server thread/INFO]: [STDOUT]: CHECK HURT MONITOR false
+[21:01:51] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE HIGH
+[21:01:51] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE RULE
+[21:01:51] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE MONITOR true
+[21:01:51] [Server thread/INFO]: Applied 2.0 damage to UnityGuardB
+[21:01:51] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:51] [Server thread/INFO]: [STDOUT]: CHECK ABSORBED 0 6.0
+[21:01:52] [Server thread/INFO]: [CommandsSpy] [Server] unitycanceltest
+[21:01:52] [Server thread/INFO]: [STDOUT]: CHECK ARMED none
+[21:01:53] [Server thread/INFO]: [CommandsSpy] [Server] damage
+[21:01:53] [Server thread/INFO]: [STDOUT]: CHECK ATTACK HIGH
+[21:01:53] [Server thread/INFO]: [STDOUT]: CHECK ATTACK RULE
+[21:01:53] [Server thread/INFO]: [STDOUT]: CHECK ATTACK LOW
+[21:01:53] [Server thread/INFO]: [STDOUT]: CHECK ATTACK MONITOR false
+[21:01:53] [Server thread/INFO]: [STDOUT]: CHECK HURT HIGH
+[21:01:53] [Server thread/INFO]: [STDOUT]: CHECK HURT RULE
+[21:01:53] [Server thread/INFO]: [STDOUT]: CHECK HURT LOW
+[21:01:53] [Server thread/INFO]: [STDOUT]: CHECK HURT MONITOR false
+[21:01:53] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE HIGH
+[21:01:53] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE RULE
+[21:01:53] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE LOW
+[21:01:53] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE MONITOR false
+[21:01:53] [Server thread/INFO]: Applied 2.0 damage to UnityGuardB
+[21:01:53] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:53] [Server thread/INFO]: [STDOUT]: CHECK ABSORBED 20 4.0
+[21:01:53] [Server thread/INFO]: [CommandsSpy] [Server] effect
+[21:01:53] [Server thread/INFO]: Removed effect Absorption from UnityGuardB
+[21:01:53] [Server thread/INFO]: [CommandsSpy] [Server] unitycanceltest
+[21:01:53] [Server thread/INFO]: [STDOUT]: CHECK ARMED damage
+[21:01:54] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:54] [Server thread/INFO]: Teleported UnityGuardA to 36.500000, 201.000000, 16.500000
+[21:01:54] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:54] [Server thread/INFO]: Teleported UnityGuardB to 36.500000, 201.000000, 18.500000
+[21:01:55] [Server thread/INFO]: [STDOUT]: CHECK ATTACK HIGH
+[21:01:55] [Server thread/INFO]: [STDOUT]: CHECK ATTACK RULE
+[21:01:55] [Server thread/INFO]: [STDOUT]: CHECK ATTACK LOW
+[21:01:55] [Server thread/INFO]: [STDOUT]: CHECK ATTACK MONITOR false
+[21:01:55] [Server thread/INFO]: [STDOUT]: CHECK HURT HIGH
+[21:01:55] [Server thread/INFO]: [STDOUT]: CHECK HURT RULE
+[21:01:55] [Server thread/INFO]: [STDOUT]: CHECK HURT LOW
+[21:01:55] [Server thread/INFO]: [STDOUT]: CHECK HURT MONITOR false
+[21:01:55] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE HIGH
+[21:01:55] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE RULE
+[21:01:55] [Server thread/INFO]: [STDOUT]: CHECK DAMAGE MONITOR true
+[21:01:55] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:55] [Server thread/INFO]: UnityGuardB has the following entity data: 16.0f
+[21:01:55] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:55] [Server thread/INFO]: Teleported UnityGuardA to 44.500000, 201.000000, 16.500000
+[21:01:55] [Server thread/INFO]: [CommandsSpy] [Server] tp
+[21:01:55] [Server thread/INFO]: Teleported UnityGuardB to 44.500000, 201.000000, 18.500000
+[21:01:56] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:56] [Server thread/INFO]: UnityGuardA has the following entity data: [{count: 3, Slot: 0b, id: "minecraft:barrel"}, {count: 2, Slot: 1b, id: "minecraft:oak_door"}, {components: {"minecraft:damage": 4}, count: 1, Slot: 2b, id: "minecraft:diamond_pickaxe"}, {components: {"minecraft:damage": 1}, count: 1, Slot: 3b, id: "minecraft:iron_axe"}, {count: 1, Slot: 4b, id: "minecraft:oak_log"}, {count: 1, Slot: 5b, id: "minecraft:shield"}, {components: {"minecraft:damage": 4}, count: 1, Slot: 6b, id: "minecraft:wooden_sword"}, {count: 5, Slot: 7b, id: "minecraft:wheat_seeds"}, {count: 4, Slot: 8b, id: "minecraft:snowball"}, {count: 1, Slot: 9b, id: "minecraft:cobblestone"}]
+[21:01:56] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:56] [Server thread/INFO]: [STDOUT]: CHECK AUTH_BAG UnityGuardA {"0":"minecraft:barrel*3@0","1":"minecraft:oak_door*2@0","2":"minecraft:diamond_pickaxe*1@4","3":"minecraft:iron_axe*1@1","4":"minecraft:oak_log*1@0","5":"minecraft:shield*1@0","6":"minecraft:wooden_sword*1@4","7":"minecraft:wheat_seeds*5@0","8":"minecraft:snowball*4@0","9":"minecraft:cobblestone*1@0"}
+[21:01:56] [Server thread/INFO]: [CommandsSpy] [Server] data
+[21:01:56] [Server thread/INFO]: UnityGuardB has the following entity data: [{count: 5, Slot: 0b, id: "minecraft:amethyst_shard"}, {count: 1, Slot: 1b, id: "minecraft:oak_log"}, {count: 11, Slot: 19b, id: "minecraft:iron_nugget"}]
+[21:01:56] [Server thread/INFO]: [CommandsSpy] [Server] execute
+[21:01:56] [Server thread/INFO]: [STDOUT]: CHECK AUTH_BAG UnityGuardB {"0":"minecraft:amethyst_shard*5@0","1":"minecraft:oak_log*1@0","19":"minecraft:iron_nugget*11@0"}
+[21:01:57] [Server thread/INFO]: UnityGuardB lost connection: Disconnected
+[21:01:57] [Server thread/INFO]: UnityGuardB left the game
+[21:01:58] [Server thread/INFO]: UnityGuardA lost connection: Disconnected
+[21:01:58] [Server thread/INFO]: UnityGuardA left the game
+[21:01:58] [Server thread/INFO]: [CommandsSpy] [Server] save-all
+[21:01:58] [Server thread/INFO]: Saving the game (this may take a moment!)
+[21:02:00] [Server thread/INFO]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[21:02:00] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[21:02:00] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[21:02:00] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved
+[21:02:00] [Server thread/INFO]: Saved the game
+[21:02:00] [Server thread/WARN]: Can't keep up! Is the server overloaded? Running 2536ms or 50 ticks behind
+[21:02:00] [Server thread/INFO]: [CommandsSpy] [Server] stop
+[21:02:00] [Server thread/INFO]: Stopping the server
+[21:02:00] [Server thread/INFO]: Stopping server
+[21:02:00] [Server thread/INFO]: Saving players
+[21:02:00] [Server thread/INFO]: Saving worlds
+[21:02:00] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[21:02:35] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[21:02:36] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[21:02:36] [Server thread/INFO]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[21:02:36] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[21:02:36] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[21:02:36] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved
+[21:02:37] [Server thread/INFO]: [STDOUT]: [Unity] Standalone stopped

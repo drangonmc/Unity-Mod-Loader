@@ -37,6 +37,10 @@ public final class NestedArchives implements AutoCloseable {
     public Map<Path, String> origins() {
         return Map.copyOf(origins);
     }
+    private final Map<Path, Path> containers = new LinkedHashMap<>();
+    public Map<Path, Path> containers() {
+        return Map.copyOf(containers);
+    }
     private final List<Path> selected = new ArrayList<>();
     private Path tmp;
     private long remaining = 512L << 20;
@@ -70,6 +74,11 @@ public final class NestedArchives implements AutoCloseable {
             all.addAll(solution.values().stream().map(Selection::node).toList());
             for (var n : all) {
                 result.selected.add(n.file);
+                for (var edge : n.deps) {
+                    var member = solution.get(edge.key).node;
+                    if (!result.roots.contains(member))
+                        result.containers.putIfAbsent(member.file, n.file);
+                }
                 if (n.mod)
                     result.provided.get(n.file).forEach(
                         (id, version)

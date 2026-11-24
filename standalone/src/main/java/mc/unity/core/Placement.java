@@ -125,26 +125,49 @@ public final class Placement {
         if (!capturing(level))
             state.onPlace(level, pos, old, moved);
     }
-    public static InteractionResult use(Item item, UseOnContext context) {
+    public static final class Use {
+        final UseOnContext context;
+        final ItemStack before;
+        final Capture capture;
+        Use(UseOnContext context) {
+            this.context = context;
+            before = context.getItemInHand().copy();
+            capture = new Capture(context.getLevel());
+        }
+    }
+    public static Use begin(Item item, UseOnContext context) {
+        if (!(context.getLevel() instanceof ServerLevel) || context.getPlayer() == null ||
+            item instanceof BucketItem || active.get() != null)
+            return null;
+        var use = new Use(context);
+        active.set(use.capture);
+        return use;
+    }
+    public static void abortUse(Use use) {
+        if (use == null)
+            return;
+        active.remove();
+        try {
+            rollback(use.capture.changes);
+        } finally {
+            use.context.getPlayer().setItemInHand(use.context.getHand(), use.before);
+            sync(use.context.getPlayer(), use.capture.changes);
+        }
+    }
+    public static InteractionResult finish(InteractionResult result, Use use) {
+        if (use == null)
+            return result;
+        active.remove();
+        var context = use.context;
         var level = context.getLevel();
         var player = context.getPlayer();
-        if (!(level instanceof ServerLevel) || player == null || item instanceof BucketItem ||
-            active.get() != null)
-            return item.useOn(context);
         var hand = context.getHand();
-        var before = context.getItemInHand().copy();
-        var capture = new Capture(level);
+        var before = use.before;
+        var capture = use.capture;
         var changes = capture.changes;
-        InteractionResult result;
         List<Transition> commits;
         boolean accepted = false;
         try {
-            active.set(capture);
-            try {
-                result = item.useOn(context);
-            } finally {
-                active.remove();
-            }
             if (changes.isEmpty()) {
                 accepted = true;
                 return result;

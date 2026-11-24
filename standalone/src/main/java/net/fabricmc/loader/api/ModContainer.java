@@ -13,4 +13,6 @@ public interface ModContainer {
         }
         return Optional.empty();
     }
+    Optional<ModContainer> getContainingMod();
+    Collection<ModContainer> getContainedMods();
 }

@@ -127,6 +127,52 @@ final class ContentPatches {
             }
         }
     }
+    /**
+     * The Fabric login decoder owns unknown transactions. Route Unity's reserved ID before either
+     * receiver consumes the packet. Other transactions still execute the entire transformed method.
+     */
+    static byte[] routeLogin(GameLoader loader, String owner, byte[] bytes) {
+        String packet = LOGIN + "ServerboundCustomQueryAnswerPacket";
+        Rule route;
+        if (owner.equals(packet)) {
+            route = new Rule("readPayload",
+                             "(ILnet/minecraft/network/FriendlyByteBuf;)L" + LOGIN +
+                                 "custom/CustomQueryAnswerPayload;",
+                             null, false, b -> {
+                                 var other = b.newLabel();
+                                 b.iload(0)
+                                     .ldc(0x554e4954)
+                                     .if_icmpne(other)
+                                     .aload(1)
+                                     .invokestatic(SYNC, "readReply",
+                                                   mt("(Lnet/minecraft/network/FriendlyByteBuf;)L" + LOGIN +
+                                                      "custom/CustomQueryAnswerPayload;"))
+                                     .areturn()
+                                     .labelBinding(other);
+                             });
+        } else if (owner.equals(SERVER))
+            route = guard(SERVER, "handleCustomQueryPacket", packet, "answer", true);
+        else if (owner.equals(CLIENT))
+            route =
+                guard(CLIENT, "handleCustomQuery", LOGIN + "ClientboundCustomQueryPacket", "query", false);
+        else
+            return bytes;
+        var file = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(
+            ClassHierarchyResolver.ofResourceParsing(loader).cached()));
+        var def = file.parse(bytes);
+        return file.transformClass(def, ClassTransform.transformingMethodBodies(
+                                            m
+                                            -> m.methodName().equalsString(route.method) &&
+                                                   m.methodType().equalsString(route.descriptor),
+                                            new CodeTransform() {
+                                                public void atStart(CodeBuilder b) {
+                                                    route.emit.accept(b);
+                                                }
+                                                public void accept(CodeBuilder b, CodeElement e) {
+                                                    b.with(e);
+                                                }
+                                            }));
+    }
     private static MethodTypeDesc mt(String s) {
         return MethodTypeDesc.ofDescriptor(s);
     }

@@ -7,14 +7,16 @@ import net.minecraft.world.item.CreativeModeTab;
 
 public final class Events {
     public static final class TickSignal {
-        private final CopyOnWriteArrayList<java.util.function.BiConsumer<net.minecraft.server.MinecraftServer,
-            java.util.function.BooleanSupplier>> callbacks = new CopyOnWriteArrayList<>();
+        private final CopyOnWriteArrayList<java.util.function.BiConsumer<
+            net.minecraft.server.MinecraftServer, java.util.function.BooleanSupplier>> callbacks =
+            new CopyOnWriteArrayList<>();
         public void listen(java.util.function.BiConsumer<net.minecraft.server.MinecraftServer,
-            java.util.function.BooleanSupplier> listener) {
+                                                         java.util.function.BooleanSupplier> listener) {
             callbacks.add(listener);
         }
         public void post(net.minecraft.server.MinecraftServer s, java.util.function.BooleanSupplier t) {
-            for (var cb : callbacks) cb.accept(s, t);
+            for (var cb : callbacks)
+                cb.accept(s, t);
         }
         void clear() {
             callbacks.clear();
@@ -25,16 +27,21 @@ public final class Events {
                                                                      SERVER_STARTED = new Signal<>(),
                                                                      SERVER_STOPPING = new Signal<>(),
                                                                      SERVER_STOPPED = new Signal<>();
-    public static final Signal<net.minecraft.server.level.ServerLevel> LEVEL_LOAD=new Signal<>(), LEVEL_UNLOAD=new Signal<>(),
-        LEVEL_TICK_PRE=new Signal<>(),LEVEL_TICK_POST=new Signal<>();
-    public static Object insertLevel(java.util.Map<Object,Object> levels,Object key,Object value) {
-        Object previous=levels.put(key,value);
+    public static final Signal<net.minecraft.server.level.ServerLevel> LEVEL_LOAD = new Signal<>(),
+                                                                       LEVEL_UNLOAD = new Signal<>(),
+                                                                       LEVEL_TICK_PRE = new Signal<>(),
+                                                                       LEVEL_TICK_POST = new Signal<>();
+    public static void loadLevel(Object value) {
         LEVEL_LOAD.post((net.minecraft.server.level.ServerLevel)value);
-        return previous;
     }
-    public static void unloadLevel(net.minecraft.server.level.ServerLevel level){LEVEL_UNLOAD.post(level);}
-    public static void tickLevel(net.minecraft.server.level.ServerLevel level,java.util.function.BooleanSupplier time){
-        LEVEL_TICK_PRE.post(level);level.tick(time);LEVEL_TICK_POST.post(level);
+    public static void unloadLevel(net.minecraft.server.level.ServerLevel value) {
+        LEVEL_UNLOAD.post(value);
+    }
+    public static void beforeLevelTick(net.minecraft.server.level.ServerLevel value) {
+        LEVEL_TICK_PRE.post(value);
+    }
+    public static void afterLevelTick(net.minecraft.server.level.ServerLevel value) {
+        LEVEL_TICK_POST.post(value);
     }
     public static final TickSignal SERVER_TICK_PRE = new TickSignal(), SERVER_TICK_POST = new TickSignal();
     public static final Signal<Void> CLIENT_TICK_PRE = new Signal<>(), CLIENT_TICK_POST = new Signal<>();
@@ -55,12 +62,12 @@ public final class Events {
     public static void stopped(net.minecraft.server.MinecraftServer s) {
         SERVER_STOPPED.post(s);
     }
-    public static void tickPre(
-        net.minecraft.server.MinecraftServer s, java.util.function.BooleanSupplier time) {
+    public static void tickPre(net.minecraft.server.MinecraftServer s,
+                               java.util.function.BooleanSupplier time) {
         SERVER_TICK_PRE.post(s, time);
     }
-    public static void tickPost(
-        net.minecraft.server.MinecraftServer s, java.util.function.BooleanSupplier time) {
+    public static void tickPost(net.minecraft.server.MinecraftServer s,
+                                java.util.function.BooleanSupplier time) {
         SERVER_TICK_POST.post(s, time);
     }
     public static void clientPre() {
@@ -75,35 +82,45 @@ public final class Events {
     public static void left(net.minecraft.server.level.ServerPlayer p) {
         PLAYER_LOGOUT.post(p);
     }
-    public record BlockEntityChange(net.minecraft.world.level.block.entity.BlockEntity entity,net.minecraft.server.level.ServerLevel level) {}
-    public static final Signal<BlockEntityChange> BLOCK_ENTITY_LOAD=new Signal<>(),BLOCK_ENTITY_UNLOAD=new Signal<>();
-    public static void loadBlockEntity(Object old,net.minecraft.world.level.block.entity.BlockEntity next){
-        if(next!=old && next.getLevel() instanceof net.minecraft.server.level.ServerLevel level)
-            BLOCK_ENTITY_LOAD.post(new BlockEntityChange(next,level));
+    public record BlockEntityChange(net.minecraft.world.level.block.entity.BlockEntity entity,
+                                    net.minecraft.server.level.ServerLevel level) {}
+    public static final Signal<BlockEntityChange> BLOCK_ENTITY_LOAD = new Signal<>(), BLOCK_ENTITY_UNLOAD =
+                                                                                          new Signal<>();
+    public static void loadBlockEntity(Object old, net.minecraft.world.level.block.entity.BlockEntity next) {
+        if (next != old && next.getLevel() instanceof net.minecraft.server.level.ServerLevel level)
+            BLOCK_ENTITY_LOAD.post(new BlockEntityChange(next, level));
     }
-    public static void unloadBlockEntity(Object old){
-        if(old instanceof net.minecraft.world.level.block.entity.BlockEntity be && be.getLevel() instanceof net.minecraft.server.level.ServerLevel level)
-            BLOCK_ENTITY_UNLOAD.post(new BlockEntityChange(be,level));
+    public static void unloadBlockEntity(Object old) {
+        if (old instanceof net.minecraft.world.level.block.entity.BlockEntity be &&
+            be.getLevel() instanceof net.minecraft.server.level.ServerLevel level)
+            BLOCK_ENTITY_UNLOAD.post(new BlockEntityChange(be, level));
     }
-    public record Death(
-        net.minecraft.world.entity.LivingEntity entity, net.minecraft.world.damagesource.DamageSource source) {}
+    public record Death(net.minecraft.world.entity.LivingEntity entity,
+                        net.minecraft.world.damagesource.DamageSource source) {}
     public static final Signal<Death> AFTER_DEATH = new Signal<>();
-    public static void died(
-        net.minecraft.world.entity.LivingEntity entity, net.minecraft.world.damagesource.DamageSource source) {
+    public static void died(net.minecraft.world.entity.LivingEntity entity,
+                            net.minecraft.world.damagesource.DamageSource source) {
         if (!entity.level().isClientSide() && !AFTER_DEATH.empty())
             AFTER_DEATH.post(new Death(entity, source));
     }
     public static final Signal<Void> CLIENT_BEFORE_OPTIONS = new Signal<>();
-    public static void clientBeforeOptions() { CLIENT_BEFORE_OPTIONS.post(null); }
+    public static void clientBeforeOptions() {
+        CLIENT_BEFORE_OPTIONS.post(null);
+    }
     public static final Signal<Void> PLAY_REGISTRATION = new Signal<>();
     public record CommandsReady(CommandDispatcher<CommandSourceStack> dispatcher,
-        Commands.CommandSelection selection, CommandBuildContext context) {}
-    public record Tooltip(net.minecraft.world.item.ItemStack stack, net.minecraft.world.item.Item.TooltipContext context,
-        net.minecraft.world.item.TooltipFlag flag, java.util.List<net.minecraft.network.chat.Component> lines) {}
+                                Commands.CommandSelection selection, CommandBuildContext context) {}
+    public record Tooltip(net.minecraft.world.item.ItemStack stack,
+                          net.minecraft.world.item.Item.TooltipContext context,
+                          net.minecraft.world.item.TooltipFlag flag,
+                          java.util.List<net.minecraft.network.chat.Component> lines) {}
     public static final Signal<Tooltip> TOOLTIP = new Signal<>();
-    public static java.util.List<net.minecraft.network.chat.Component> tooltip(java.util.List<net.minecraft.network.chat.Component> original,
-            net.minecraft.world.item.ItemStack stack, net.minecraft.world.item.Item.TooltipContext context, net.minecraft.world.item.TooltipFlag flag) {
-        if (TOOLTIP.empty()) return original;
+    public static java.util.List<net.minecraft.network.chat.Component>
+    tooltip(java.util.List<net.minecraft.network.chat.Component> original,
+            net.minecraft.world.item.ItemStack stack, net.minecraft.world.item.Item.TooltipContext context,
+            net.minecraft.world.item.TooltipFlag flag) {
+        if (TOOLTIP.empty())
+            return original;
         var result = new java.util.ArrayList<>(original);
         TOOLTIP.post(new Tooltip(stack, context, flag, result));
         return result;
@@ -118,7 +135,8 @@ public final class Events {
         public synchronized Runnable listen(byte priority, Consumer<T> cb) {
             var slot = new Slot<>(priority, cb);
             int i = 0;
-            while (i < listeners.size() && listeners.get(i).priority >= priority) i++;
+            while (i < listeners.size() && listeners.get(i).priority >= priority)
+                i++;
             listeners.add(i, slot);
             return () -> remove(slot);
         }
@@ -130,23 +148,29 @@ public final class Events {
             return listeners.isEmpty();
         }
         public Runnable listen(Consumer<T> listener) {
-            return listen((byte) 0, listener);
+            return listen((byte)0, listener);
         }
         public void post(T event) {
-            for (var listener : listeners) listener.consumer.accept(event);
+            for (var listener : listeners)
+                listener.consumer.accept(event);
         }
         public synchronized void clear() {
             listeners.clear();
         }
     }
     static void clear() {
-        for (var s : java.util.List.of(SERVER_ABOUT_TO_START, SERVER_STARTING, SERVER_STARTED, SERVER_STOPPING,
-                 SERVER_STOPPED, CLIENT_TICK_PRE, CLIENT_TICK_POST, PLAYER_LOGIN, PLAYER_LOGOUT))
+        for (var s : java.util.List.of(SERVER_ABOUT_TO_START, SERVER_STARTING, SERVER_STARTED,
+                                       SERVER_STOPPING, SERVER_STOPPED, CLIENT_TICK_PRE, CLIENT_TICK_POST,
+                                       PLAYER_LOGIN, PLAYER_LOGOUT))
             s.clear();
-        LEVEL_LOAD.clear(); LEVEL_UNLOAD.clear(); LEVEL_TICK_PRE.clear(); LEVEL_TICK_POST.clear();
+        LEVEL_LOAD.clear();
+        LEVEL_UNLOAD.clear();
+        LEVEL_TICK_PRE.clear();
+        LEVEL_TICK_POST.clear();
         SERVER_TICK_PRE.clear();
         SERVER_TICK_POST.clear();
-        BLOCK_ENTITY_LOAD.clear(); BLOCK_ENTITY_UNLOAD.clear();
+        BLOCK_ENTITY_LOAD.clear();
+        BLOCK_ENTITY_UNLOAD.clear();
         Reloads.COLLECT.clear();
         TOOLTIP.clear();
         AFTER_DEATH.clear();

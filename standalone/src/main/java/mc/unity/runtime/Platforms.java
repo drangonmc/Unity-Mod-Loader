@@ -78,8 +78,12 @@ public final class Platforms implements AutoCloseable {
                         throw new IOException("Expected one supported platform descriptor");
                     var annotated = new ArrayList<ClassModel>();
                     var models = new ArrayList<ClassModel>();
+                    var omitted =
+                        session.client ? Set.<String>of() : mc.unity.bootstrap.GameLoader.clientEntries(jar);
                     for (var entry : jar.versionedStream()
-                                         .filter(it -> !it.getName().startsWith("META-INF/versions/"))
+                                         .filter(it
+                                                 -> !it.getName().startsWith("META-INF/versions/") &&
+                                                        !omitted.contains(it.getName()))
                                          .toList())
                         if (entry.getName().endsWith(".class") &&
                             !entry.getName().equals("module-info.class")) {
@@ -190,7 +194,7 @@ public final class Platforms implements AutoCloseable {
                     !fabric.get("environment").getAsString().equals("*"))
                     Content.localResources(e.id());
                 if (fabric != null && UniversalData.matches(jar)) {
-                    Content.dataArchive(e.id(), e.file());
+                    Content.dataArchive(e.id(), e.file(), UniversalData.hasAssets(jar));
                     continue;
                 }
                 Content.source(
@@ -249,7 +253,8 @@ public final class Platforms implements AutoCloseable {
                     mod.getEventBus().post(
                         new net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent(values));
             });
-            FabricGameEvents.wire();
+            if (!LoaderView.upstream())
+                FabricGameEvents.wire();
             ForgeCommands.wire(side);
             Events.INIT.listen(ignored -> {
                 try {
@@ -315,7 +320,7 @@ public final class Platforms implements AutoCloseable {
     public void initialize() throws ReflectiveOperationException, IOException {
         for (var e : ordered)
             for (String entry : e.classes()) {
-                Class<?> type = Class.forName(entry, false, domain());
+                Class<?> type = Class.forName(entry.split("::", 2)[0], false, domain());
                 if (type.getClassLoader() != domain() ||
                     !Files.isSameFile(
                         e.file(),
@@ -325,7 +330,9 @@ public final class Platforms implements AutoCloseable {
                 switch (e.kind()) {
                 case FABRIC -> {
                     int size = Content.registrySize();
-                    ((net.fabricmc.api.ModInitializer)type.getConstructor().newInstance()).onInitialize();
+                    LoaderView.INSTANCE
+                        .entrypoint(e.id(), "main", entry, net.fabricmc.api.ModInitializer.class)
+                        .onInitialize();
                     if (size != Content.registrySize())
                         Content.include(e.id());
                 }
@@ -432,7 +439,7 @@ public final class Platforms implements AutoCloseable {
     private void initializeSided() throws ReflectiveOperationException, IOException {
         for (var e : ordered)
             for (String entry : e.sideClasses()) {
-                var type = Class.forName(entry, false, domain());
+                var type = Class.forName(entry.split("::", 2)[0], false, domain());
                 if (!Files.isSameFile(
                         e.file(),
                         Path.of(java.net.URI.create(
@@ -440,14 +447,13 @@ public final class Platforms implements AutoCloseable {
                     throw new IOException("Foreign sided entry point " + entry);
                 int before = Content.registrySize();
                 if (client)
-                    type.asSubclass(net.fabricmc.api.ClientModInitializer.class)
-                        .getConstructor()
-                        .newInstance()
+                    LoaderView.INSTANCE
+                        .entrypoint(e.id(), "client", entry, net.fabricmc.api.ClientModInitializer.class)
                         .onInitializeClient();
                 else
-                    type.asSubclass(net.fabricmc.api.DedicatedServerModInitializer.class)
-                        .getConstructor()
-                        .newInstance()
+                    LoaderView.INSTANCE
+                        .entrypoint(e.id(), "server", entry,
+                                    net.fabricmc.api.DedicatedServerModInitializer.class)
                         .onInitializeServer();
                 if (before != Content.registrySize())
                     Content.include(e.id());

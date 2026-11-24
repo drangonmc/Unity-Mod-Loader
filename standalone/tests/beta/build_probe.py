@@ -15,7 +15,7 @@ with zipfile.ZipFile(parent) as z:
     name="multiloaderdataextensions-neoforge-26.2.0.jar"
     data=z.read("META-INF/jarjar/"+name);assert hashlib.sha256(data).hexdigest()=="ffbadbdc7b3c55462edb935f2493bcabf06f690a5c1f09b3b5a216171349350d"
     (out/name).write_bytes(data)
-runtime=ROOT/"cache/0.2.2-Beta"
+runtime=ROOT/"cache/0.2.3-Beta"
 cp=[out/name,*(refs/(k+".jar") for k in ("neo","neo-loader","neo-bus")),runtime/"versions/26.2/server-26.2.jar",*sorted((runtime/"libraries").rglob("*.jar")),*sorted(refs.glob("nightconfig*.jar"))]
 with tempfile.TemporaryDirectory(dir=out) as tmp:
     subprocess.run(["javac","-proc:none","--release","25","-g:none","-classpath",os.pathsep.join(map(str,cp)),"-d",tmp,str(Path(__file__).with_name("NestedDataProbe.java"))],check=True)

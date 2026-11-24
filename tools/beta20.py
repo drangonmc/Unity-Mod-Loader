@@ -24,7 +24,8 @@ def evidence(root, directory, jar):
     qa=directory/"candidate65.json"
     r=json.loads(qa.read_bytes())
     data_pack=json.loads((root/"standalone/universal-data-sample.json").read_bytes())
-    require(r["loader"]==digest and r["samples"]=={**expected,data_pack["filename"]:data_pack["sha512"]},"Candidate gameplay must use the locked release binary and pack")
+    play_sample=json.loads((root/"standalone/fabric-play-sample.json").read_bytes())
+    require(r["loader"]==digest and r["samples"]=={**expected,data_pack["filename"]:data_pack["sha512"],play_sample["filename"]:play_sample["sha512"]},"Candidate gameplay must use the locked release binary and pack")
     require(len({p["uuid"] for p in r["status"]})==2 and all(p["gpu"] and p["remote"] and not p["visible"] for p in r["status"]),"Two remote rendered clients")
     for field,match in {"initial":"load 23","updated":"reload 71","forgeInitial":"load 31","forgeUpdated":"reload 59","modelBake":"custom layer baked"}.items():
         require(len(r[field])==2 and all(match in s for s in r[field]),field)

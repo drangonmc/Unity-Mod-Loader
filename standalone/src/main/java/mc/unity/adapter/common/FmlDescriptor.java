@@ -95,10 +95,15 @@ public final class FmlDescriptor {
         return mods.getFirst();
     }
     public static List<Meta> mods(JarFile jar, String side, boolean neo) throws IOException {
+        return mods(document(jar, neo), side, neo, implementationVersion(jar));
+    }
+    static String implementationVersion(JarFile jar) throws IOException {
         var manifest = jar.getManifest();
-        return mods(document(jar, neo), side, neo,
-                    manifest == null ? null
-                                     : manifest.getMainAttributes().getValue("Implementation-Version"));
+        return manifest == null ? null : manifest.getMainAttributes().getValue("Implementation-Version");
+    }
+    static String version(UnmodifiableConfig table, String implementation) throws IOException {
+        String value = string(table, "version", "");
+        return value.equals("${file.jarVersion}") && implementation != null ? implementation : value;
     }
     private static List<Meta> mods(UnmodifiableConfig doc, String side, boolean neo, String jarVersion)
         throws IOException {
@@ -112,11 +117,9 @@ public final class FmlDescriptor {
         var ids = new LinkedHashSet<String>();
         var result = new ArrayList<Meta>();
         for (var table : tables(doc, "mods")) {
-            String id = string(table, "modId", ""), version = string(table, "version", "");
+            String id = string(table, "modId", ""), version = version(table, jarVersion);
             if (!id.matches("[a-z][a-z0-9_]{1,63}") || !ids.add(id))
                 throw new IOException("Invalid or duplicate mod ID " + id);
-            if (version.equals("${file.jarVersion}") && jarVersion != null)
-                version = jarVersion;
             var deps = new ArrayList<Dependency>();
             if (dependencies != null)
                 for (var d : tables(dependencies, id)) {

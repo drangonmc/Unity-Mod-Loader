@@ -21,13 +21,13 @@ final class LevelPatches {
                                 i.owner().asInternalName().equals("java/util/Map") &&
                                 i.name().equalsString("put")) {
                                 hits[0]++;
-                                code.invokestatic(
-                                    events, "insertLevel",
-                                    MethodTypeDesc.ofDescriptor("(Ljava/util/Map;Ljava/lang/Object;Ljava/" +
-                                                                "lang/Object;)Ljava/lang/Object;"));
+                                int slot = code.allocateLocal(TypeKind.REFERENCE);
+                                code.dup().astore(slot).with(e).aload(slot).invokestatic(
+                                    events, "loadLevel",
+                                    MethodTypeDesc.ofDescriptor("(Ljava/lang/Object;)V"));
                                 return;
                             }
-                            if (method.methodName().equalsString("unity$stopBody") &&
+                            if (method.methodName().equalsString("stopServer") &&
                                 i.owner().asInternalName().equals(level) && i.name().equalsString("close")) {
                                 hits[1]++;
                                 code.dup().invokestatic(events, "unloadLevel",
@@ -36,8 +36,16 @@ final class LevelPatches {
                             if (method.methodName().equalsString("tickChildren") &&
                                 i.owner().asInternalName().equals(level) && i.name().equalsString("tick")) {
                                 hits[2]++;
-                                code.invokestatic(events, "tickLevel",
-                                                  i.typeSymbol().insertParameterTypes(0, i.owner().asSymbol()));
+                                int slot = code.allocateLocal(TypeKind.REFERENCE);
+                                var signal = MethodTypeDesc.ofDescriptor("(L" + level + ";)V");
+                                code.dup2()
+                                    .pop()
+                                    .dup()
+                                    .astore(slot)
+                                    .invokestatic(events, "beforeLevelTick", signal)
+                                    .with(e)
+                                    .aload(slot)
+                                    .invokestatic(events, "afterLevelTick", signal);
                                 return;
                             }
                         }

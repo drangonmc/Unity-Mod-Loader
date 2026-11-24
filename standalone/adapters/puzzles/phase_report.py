@@ -7,14 +7,14 @@ import re
 import zipfile
 
 ROOT=Path(__file__).resolve().parents[3]
-EVIDENCE=ROOT/"evidence/0.2.2-Beta"
+EVIDENCE=ROOT/"evidence/0.2.3-Beta"
 def main():
     raw=EVIDENCE/"puzzles-57-original.log"
     runtime=json.loads((EVIDENCE/"beta-mixed-gameplay.json").read_bytes())
     specs=json.loads((ROOT/"standalone/beta-gameplay.json").read_bytes())["originals"]
     library=next(x for x in specs if x["id"]=="XkWV0WSp")
     consumer=next(x for x in specs if x["id"]=="VNgfrtBA")
-    original=ROOT/"cache/0.2.2-Beta/samples"/library["filename"]
+    original=ROOT/"cache/0.2.3-Beta/samples"/library["filename"]
     assert hashlib.sha512(original.read_bytes()).hexdigest()==library["sha512"]
     with zipfile.ZipFile(original) as z: classes=set(z.namelist())
     fingerprint=hashlib.sha256(raw.read_bytes()).hexdigest()
@@ -51,7 +51,7 @@ def main():
         rows.append(dict(index=index,phase=phase,kind=kind,symbol=symbol,owner=owner,definedDuringRuns=states,assessment=note))
     counts=dict(collections.Counter(r["phase"] for r in rows))
     assert counts=={"数据生成":4,"客户端":27,"公共／专服":26} and len(rows)==57
-    report={"version":"0.2.2-Beta","originalLogSHA256":hashlib.sha256(raw.read_bytes()).hexdigest(),
+    report={"version":"0.2.3-Beta","originalLogSHA256":hashlib.sha256(raw.read_bytes()).hexdigest(),
             "puzzlesLibSHA512":library["sha512"],"blockRunnerSHA512":consumer["sha512"],"loaderSHA256":runtime["loader"],
             "counts":counts,"rows":rows}
     (EVIDENCE/"puzzles-57-phases.json").write_text(json.dumps(report,ensure_ascii=False,indent=2)+"\n","utf8")

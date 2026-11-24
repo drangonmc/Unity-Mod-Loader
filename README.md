@@ -1,10 +1,12 @@
-# Unity 0.2.2 Beta · Minecraft Java 26.2
+# Unity 0.2.3 Beta · Minecraft Java 26.2
 
 Unity 是从零开发的 Minecraft 模组加载器。项目的长期目标是让 Forge、NeoForge、Fabric 模组与 Bukkit、Spigot、Paper 插件共用一个世界。当前独立 Beta 已在 Minecraft Java 26.2 上验证三种模组平台的指定样本；插件兼容仍属后续目标。
 
-使用 Java 25，下载并解压独立发行包。Windows 专服从 `Start-Unity.cmd` 启动；客户端先安装原版 26.2，再运行 `Install-Unity-Client.cmd`，在启动器中选择 Unity 配置。[下载 V0.2.2 Beta](https://github.com/drangonmc/Unity-Mod-Loader/releases/tag/v0.2.2-beta)
+使用 Java 25，下载并解压独立发行包。Windows 专服从 `Start-Unity.cmd` 启动；客户端先安装原版 26.2，再运行 `Install-Unity-Client.cmd`，在启动器中选择 Unity 配置。完整 Fabric API 可运行 `Install-Unity-Fabric-API.cmd` 安装。[下载 V0.2.3 Beta](https://github.com/drangonmc/Unity-Mod-Loader/releases/tag/v0.2.3-beta) · [0.2.3 兼容范围与验收](standalone/BETA-0.2.3.md)
 
 Unity 源码使用仓库的 MIT 许可证。随包第三方依赖保留各自的版权声明与许可。[项目许可证](LICENSE)
+
+V0.2.3 接入了完整的官方 Fabric API。客户端加载 43 个模块，专服加载 36 个适用模块；安装器使用随包原始 JAR。[完整模式说明](standalone/BETA-0.2.3.md)
 
 V0.2.2 修复了配置握手、跨世界文件监听和嵌套归档求解，保留全部 256 个 Play 可选通道。Forge 和 NeoForge 描述文件使用 NightConfig 解析，新增单平台多模组 JAR、Java 多版本 JAR 和符合条件的通用纯数据包支持。[0.2.2 兼容范围与验收](standalone/BETA-0.2.2.md)
 
@@ -128,7 +130,7 @@ python standalone/tests/platform_samples.py <编译用官方API缓存> <三平�
 python standalone/tests/dual.py --bundle <官方服务端JAR> --client-home <测试客户端根目录> --samples <八个原始Forge样本目录> --eula-from <已同意EULA的本机测试实例/eula.txt> --platform-samples <三平台样本输出目录>
 ```
 
-`standalone/lib/SHA256SUMS` 固定通用字节码库。源码包携带这些原始库，核心构建可离线完成。三平台测试样本另外按锁取得上游 API，仅在编译器进程使用。单客户端物品/方块和缺模组拒绝场景在 `standalone/tests/content.py`，空载、原生扩展及重启回归在 `standalone/tests/acceptance.py`。测试不会向发行 ZIP 写入 Minecraft、用户账号、第三方模组、已接受的 EULA 或世界。
+`standalone/lib/SHA256SUMS` 固定通用字节码库。源码包携带这些原始库，核心构建可离线完成。三平台测试样本另外按锁取得上游 API，仅在编译器进程使用。单客户端物品/方块和缺模组拒绝场景在 `standalone/tests/content.py`，空载、原生扩展及重启回归在 `standalone/tests/acceptance.py`。测试不会向发行 ZIP 写入 Minecraft、用户账号、第三方玩法样本、已接受的 EULA 或世界。
 
 `evidence/0.2.2-Beta/dual.json` 记录双方进程和身份、每步物品数、菜单、包往返、运行类来源和日志散列；同目录含两张由游戏生成的抽屉画面截图。窗口探针的 frames 字段是读到正 FPS 的游戏刻数。此套验收用于功能正确性，不提供并发服性能基准。
 

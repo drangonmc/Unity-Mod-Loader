@@ -82,6 +82,11 @@ public final class FabricAdapter {
                 else
                     alternatives.add(kv.getValue().getAsString());
                 String range = String.join(" || ", alternatives);
+                if (LoaderView.upstream() && !key.equals("minecraft") && !key.equals("java") &&
+                    !key.equals("fabricloader")) {
+                    deps.add(new FmlDescriptor.Dependency(key, range, true, "AFTER"));
+                    continue;
+                }
                 String fixed =
                     dataPack && key.equals("fabric-resource-loader-v0") ? "3.3.20+4fc5413f9c" : fixed(key);
                 if (fixed != null)

@@ -22,13 +22,47 @@ public final class PlayNetwork {
             return executor.submit(r);
         }
     }
+    private record Key(Identifier id, PacketFlow flow) {}
+    /** A codec may be present on both sides while only one side installs a receiver. */
+    public static final class Endpoint<T extends CustomPacketPayload> implements BiConsumer<T, Context> {
+        private volatile BiConsumer<T, Context> receiver;
+        private Object original;
+        private boolean advertised;
+        public synchronized boolean bind(Object identity, BiConsumer<T, Context> handler) {
+            if (original != null)
+                return false;
+            if (advertised)
+                throw new IllegalStateException("Play receiver registration after login");
+            original = Objects.requireNonNull(identity);
+            receiver = Objects.requireNonNull(handler);
+            return true;
+        }
+        public synchronized Object unbind() {
+            if (advertised)
+                throw new IllegalStateException("Play receiver removal after login");
+            Object old = original;
+            original = null;
+            receiver = null;
+            return old;
+        }
+        private synchronized boolean offer() {
+            advertised = true;
+            return receiver != null;
+        }
+        public void accept(T value, Context context) {
+            var registered = receiver;
+            if (registered == null)
+                throw new IllegalArgumentException("No Play receiver for " + value.type().id());
+            registered.accept(value, context);
+        }
+    }
     private record Binding<T extends CustomPacketPayload>(Identifier channel, String version, PacketFlow flow,
                                                           CustomPacketPayload.Type<T> type,
                                                           StreamCodec<RegistryFriendlyByteBuf, T> codec,
                                                           BiConsumer<T, Context> handler, boolean main,
                                                           boolean optional) {}
-    private static final Map<Identifier, Binding<?>> registrations = new LinkedHashMap<>();
-    private static volatile Map<Identifier, Binding<?>> entries = Map.of();
+    private static final Map<Key, Binding<?>> registrations = new LinkedHashMap<>();
+    private static volatile Map<Key, Binding<?>> entries = Map.of();
     private static boolean frozen;
     private static volatile Supplier<Connection> client;
     private static volatile Supplier<net.minecraft.world.entity.player.Player> localPlayer;
@@ -45,7 +79,8 @@ public final class PlayNetwork {
         boolean hasChannel(CustomPacketPayload.Type<?> type);
     }
     public static void checkPeer(Object listener, CustomPacketPayload payload) {
-        var binding = entries.get(payload.type().id());
+        var binding = lookup(payload.type().id(),
+                             ((net.minecraft.network.PacketListener)listener).flow().getOpposite());
         if (binding != null && binding.optional && !((Peer)listener).hasChannel(payload.type()))
             throw new IllegalStateException("Peer did not advertise optional payload " + payload.type().id());
     }
@@ -54,8 +89,8 @@ public final class PlayNetwork {
         if (transport == null)
             throw new IllegalStateException("No client transport");
         var connection = transport.get();
-        var binding = entries.get(payload.type().id());
-        if (binding != null && binding.optional && !hasChannel(connection, payload.type()))
+        var binding = lookup(payload.type().id(), PacketFlow.SERVERBOUND);
+        if (binding != null && binding.optional && !allowed(connection, binding))
             throw new IllegalStateException("Server did not advertise optional payload " +
                                             payload.type().id());
         connection.send(new ServerboundCustomPayloadPacket(payload));
@@ -74,18 +109,50 @@ public final class PlayNetwork {
         Identifier channel, String version, PacketFlow flow, CustomPacketPayload.Type<T> type,
         StreamCodec<RegistryFriendlyByteBuf, T> codec, BiConsumer<T, Context> handler, boolean main,
         boolean optional) {
-        if (frozen || type.id().getNamespace().equals("minecraft") ||
-            registrations.putIfAbsent(type.id(), new Binding<>(channel, version, flow, type, codec, handler,
-                                                               main, optional)) != null)
-            throw new IllegalStateException("Closed or conflicting play registration " + type.id());
+        put(new Binding<>(channel, version, flow, type, codec, handler, main, optional));
+    }
+    private static synchronized void put(Binding<?> binding) {
+        var id = binding.type.id();
+        var flow = binding.flow;
+        if (frozen || id.getNamespace().equals("minecraft") || registrations.containsKey(new Key(id, null)) ||
+            flow == null && (registrations.containsKey(new Key(id, PacketFlow.SERVERBOUND)) ||
+                             registrations.containsKey(new Key(id, PacketFlow.CLIENTBOUND))) ||
+            registrations.putIfAbsent(new Key(id, flow), binding) != null)
+            throw new IllegalStateException("Closed or conflicting play registration " + id);
+    }
+    private static Binding<?> lookup(Identifier id, PacketFlow flow) {
+        var view = entries;
+        var match = view.get(new Key(id, flow));
+        return match == null ? view.get(new Key(id, null)) : match;
+    }
+    public static <T extends CustomPacketPayload> void
+    endpoint(PacketFlow flow, CustomPacketPayload.Type<T> type,
+             StreamCodec<? super RegistryFriendlyByteBuf, T> codec) {
+        put(new Binding<>(type.id(), "fabric/1", flow, type, codec.cast(), new Endpoint<T>(), true, true));
+    }
+    @SuppressWarnings("unchecked")
+    public static synchronized<T extends CustomPacketPayload> Endpoint<T>
+    receiver(PacketFlow flow, CustomPacketPayload.Type<T> type) {
+        var b = registrations.get(new Key(type.id(), flow));
+        if (b == null || !(b.handler instanceof Endpoint<?> receiver))
+            throw new IllegalArgumentException("Undeclared Play codec " + flow + " " + type.id());
+        return (Endpoint<T>)receiver;
+    }
+    public static synchronized Set<Identifier> receivers(PacketFlow flow) {
+        var ids = new HashSet<Identifier>();
+        registrations.forEach((k, b) -> {
+            if (k.flow == flow && b.handler instanceof Endpoint<?> endpoint && endpoint.receiver != null)
+                ids.add(k.id);
+        });
+        return Set.copyOf(ids);
     }
     public static synchronized List<String> manifest() {
         if (!frozen) {
             entries = Map.copyOf(registrations);
-            var tokens = new TreeMap<String, Identifier>();
+            var tokens = new TreeMap<String, Key>();
             for (var b : entries.values())
                 if (b.optional)
-                    tokens.put(token(b), b.type.id());
+                    tokens.put(token(b), new Key(b.type.id(), b.flow));
             if (tokens.size() > 256)
                 throw new IllegalStateException("Optional channel limit exceeded");
             optionalTokens = Map.copyOf(tokens);
@@ -98,9 +165,8 @@ public final class PlayNetwork {
             .sorted()
             .toList();
     }
-    private static final Map<Connection, Set<Identifier>> agreed =
-        Collections.synchronizedMap(new WeakHashMap<>());
-    private static volatile Map<String, Identifier> optionalTokens = Map.of();
+    private static final Map<Connection, Set<Key>> agreed = Collections.synchronizedMap(new WeakHashMap<>());
+    private static volatile Map<String, Key> optionalTokens = Map.of();
     private static String token(Binding<?> b) {
         try {
             String description = b.type.id() + " " + b.channel + " " + b.version + " " + b.flow;
@@ -111,11 +177,16 @@ public final class PlayNetwork {
             throw new AssertionError(impossible);
         }
     }
-    static Set<String> offers() {
-        return optionalTokens.keySet();
+    static Set<String> offers(PacketFlow incoming) {
+        var tokens = new HashSet<String>();
+        optionalTokens.forEach((token, key) -> {
+            if (key.flow != incoming || !(entries.get(key).handler instanceof Endpoint<?> e) || e.offer())
+                tokens.add(token);
+        });
+        return Set.copyOf(tokens);
     }
     static void agree(Connection c, Collection<String> tokens) {
-        var ids = new HashSet<Identifier>();
+        var ids = new HashSet<Key>();
         for (var token : tokens) {
             var id = optionalTokens.get(token);
             if (id != null)
@@ -124,12 +195,32 @@ public final class PlayNetwork {
         agreed.put(c, Set.copyOf(ids));
     }
     public static boolean hasChannel(Connection c, CustomPacketPayload.Type<?> type) {
-        var binding = entries.get(type.id());
-        return binding != null && (!binding.optional || c.isMemoryConnection() ||
-                                   agreed.getOrDefault(c, Set.of()).contains(type.id()));
+        var binding = lookup(type.id(), c.getSending());
+        if (binding == null)
+            binding = lookup(type.id(), c.getReceiving());
+        return binding != null && allowed(c, binding);
+    }
+    private static boolean allowed(Connection c, Binding<?> b) {
+        if (!b.optional)
+            return true;
+        if (c.isMemoryConnection())
+            return !(b.handler instanceof Endpoint<?> e) || e.receiver != null;
+        return agreed.getOrDefault(c, Set.of()).contains(new Key(b.type.id(), b.flow));
+    }
+    public static boolean canSend(Connection connection, PacketFlow direction, Identifier id) {
+        var b = lookup(id, direction);
+        return b != null && b.handler instanceof Endpoint<?> && allowed(connection, b);
+    }
+    public static Set<Identifier> sendable(Connection connection, PacketFlow direction) {
+        var ids = new HashSet<Identifier>();
+        entries.forEach((k, b) -> {
+            if (k.flow == direction && b.handler instanceof Endpoint<?> && allowed(connection, b))
+                ids.add(k.id);
+        });
+        return Set.copyOf(ids);
     }
     public static void check(Identifier channel, CustomPacketPayload payload, PacketFlow direction) {
-        var b = entries.get(payload.type().id());
+        var b = lookup(payload.type().id(), direction);
         if (b == null || !b.channel.equals(channel) || b.flow != null && b.flow != direction)
             throw new IllegalArgumentException("Unregistered message " + payload.type().id());
     }
@@ -157,8 +248,10 @@ public final class PlayNetwork {
                     return fallback.decode(buf);
                 int mark = buf.readerIndex();
                 Identifier id = buf.readIdentifier();
-                Binding b = entries.get(id);
+                Binding b = lookup(id, flow);
                 if (b == null) {
+                    if (lookup(id, flow.getOpposite()) != null)
+                        throw new IllegalArgumentException("Wrong Play payload direction " + id);
                     buf.readerIndex(mark);
                     return fallback.decode(buf);
                 }
@@ -174,7 +267,10 @@ public final class PlayNetwork {
                 CustomPacketPayload payload = packet instanceof ServerboundCustomPayloadPacket s
                                                   ? s.payload()
                                                   : ((ClientboundCustomPayloadPacket)packet).payload();
-                Binding b = entries.get(payload.type().id());
+                Binding b = lookup(payload.type().id(), flow);
+                if (b == null && lookup(payload.type().id(), flow.getOpposite()) != null &&
+                    buf instanceof RegistryFriendlyByteBuf)
+                    throw new IllegalArgumentException("Wrong Play payload direction " + payload.type().id());
                 if (b == null || !(buf instanceof RegistryFriendlyByteBuf game)) {
                     fallback.encode(buf, packet);
                     return;
@@ -188,12 +284,12 @@ public final class PlayNetwork {
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static boolean dispatch(CustomPacketPayload payload, Connection connection, ServerPlayer sender,
                                    BlockableEventLoop<?> executor) {
-        Binding b = entries.get(payload.type().id());
+        var flow = sender == null ? PacketFlow.CLIENTBOUND : PacketFlow.SERVERBOUND;
+        Binding b = lookup(payload.type().id(), flow);
         if (b == null)
             return false;
-        var flow = sender == null ? PacketFlow.CLIENTBOUND : PacketFlow.SERVERBOUND;
         check(b.channel, payload, flow);
-        if (!hasChannel(connection, payload.type()))
+        if (!allowed(connection, b))
             throw new IllegalArgumentException("Unnegotiated channel " + payload.type().id());
         var ctx = new Context(connection, sender, executor);
         Runnable run = () -> {

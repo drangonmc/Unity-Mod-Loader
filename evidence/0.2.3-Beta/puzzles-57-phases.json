@@ -1,0 +1,755 @@
+{
+  "version": "0.2.3-Beta",
+  "originalLogSHA256": "ce7f4145978cb0ebed05b5e3204913658042dd3e76370e9ba887960e5db7c5da",
+  "puzzlesLibSHA512": "3eba05b808ee4d669dc667032bcdfff64cc10b23e94e1169bb46a5d143178b14d990f2a206ff82d5ff7b4f17044f19acbe400571ef973be7f281e17207dce4ce",
+  "blockRunnerSHA512": "38b6b62c4eb6d414941469e574f6c9d6be12a79503bfa097a0f7e6663a8ad7f35b551ca551b4eb61e3927a518ed4646447d6e052e09cf0248edd3429bc15456e",
+  "loaderSHA256": "2f0234359c97efb1394f5f2db7f95b148af150118b2b30629d7154a22f21257b",
+  "counts": {
+    "数据生成": 4,
+    "公共／专服": 26,
+    "客户端": 27
+  },
+  "rows": [
+    {
+      "index": 1,
+      "phase": "数据生成",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/common/data/SoundDefinitionsProvider",
+      "owner": "fuzs/puzzleslib/neoforge/api/client/data/v2/AbstractSoundProvider",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "生成声音资源"
+    },
+    {
+      "index": 2,
+      "phase": "数据生成",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/data/event/GatherDataEvent$DataProviderFromOutput",
+      "owner": "fuzs/puzzleslib/neoforge/api/data/v2/core/DataProviderHelper$1",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "构造器可注册工厂；其产物只在数据生成时使用"
+    },
+    {
+      "index": 3,
+      "phase": "数据生成",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/common/data/DatapackBuiltinEntriesProvider",
+      "owner": "fuzs/puzzleslib/neoforge/api/data/v2/core/DataProviderHelper",
+      "definedDuringRuns": {
+        "server": true,
+        "A": true,
+        "B": true
+      },
+      "assessment": "生成内置动态注册表数据"
+    },
+    {
+      "index": 4,
+      "phase": "数据生成",
+      "kind": "member",
+      "symbol": "net/neoforged/neoforge/data/event/GatherDataEvent.getResourceManager(Lnet/minecraft/server/packs/PackType;)Lnet/minecraft/server/packs/resources/ResourceManager;",
+      "owner": "fuzs/puzzleslib/neoforge/api/data/v2/core/NeoForgeDataProviderContext",
+      "definedDuringRuns": {
+        "server": true,
+        "A": true,
+        "B": true
+      },
+      "assessment": "生成器所用的资源管理器"
+    },
+    {
+      "index": 5,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/capabilities/ICapabilityProvider",
+      "owner": "fuzs/puzzleslib/neoforge/api/init/v3/capability/NeoForgeCapabilityHelper",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 6,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/attachment/IAttachmentHolder",
+      "owner": "fuzs/puzzleslib/neoforge/impl/attachment/NeoForgeAttachmentTypeAdapter",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 7,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/registries/NeoForgeRegistries$Keys",
+      "owner": "fuzs/puzzleslib/neoforge/impl/attachment/builder/NeoForgeDataAttachmentBuilder",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 8,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/attachment/AttachmentType$Builder",
+      "owner": "fuzs/puzzleslib/neoforge/impl/attachment/builder/NeoForgeEntityDataAttachmentBuilder",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 9,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/common/world/ClimateSettingsBuilder",
+      "owner": "fuzs/puzzleslib/neoforge/impl/biome/ClimateSettingsContextNeoForge",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 10,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/common/world/BiomeGenerationSettingsBuilder",
+      "owner": "fuzs/puzzleslib/neoforge/impl/biome/GenerationSettingsContextNeoForge",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 11,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/common/world/MobSpawnSettingsBuilder",
+      "owner": "fuzs/puzzleslib/neoforge/impl/biome/MobSpawnSettingsContextNeoForge",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 12,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/common/world/BiomeSpecialEffectsBuilder",
+      "owner": "fuzs/puzzleslib/neoforge/impl/biome/SpecialEffectsContextNeoForge",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 13,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/AddClientReloadListenersEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/PuzzlesLibNeoForgeClient",
+      "definedDuringRuns": {
+        "server": false,
+        "A": true,
+        "B": true
+      },
+      "assessment": "客户端入口中的开发模式分支"
+    },
+    {
+      "index": 14,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/gui/ConfigurationScreen$ConfigurationListScreen",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/config/NeoForgeConfigurationScreen$CustomConfigurationListScreen",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 15,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/gui/ConfigurationScreen$ConfigurationSectionScreen",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/config/NeoForgeConfigurationScreen$CustomConfigurationSectionScreen",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 16,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/gui/ConfigurationScreen",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/config/NeoForgeConfigurationScreen",
+      "definedDuringRuns": {
+        "server": false,
+        "A": true,
+        "B": true
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 17,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/ClientHooks",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/NeoForgeClientProxy",
+      "definedDuringRuns": {
+        "server": false,
+        "A": true,
+        "B": true
+      },
+      "assessment": "Unity 客户端服务提供器继承作者代理；按能力接入"
+    },
+    {
+      "index": 18,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/RegisterColorHandlersEvent$BlockTintSources",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/BlockColorsContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 19,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/EntityRenderersEvent$RegisterRenderers",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/BlockEntityRenderersContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "0.1.4 提供客户端渲染工厂注册；世界探针覆盖新实体工厂"
+    },
+    {
+      "index": 20,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/ModelEvent$ModifyBakingResult",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/BlockStateResolverContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 21,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/RegisterBlockModelsEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/BuiltInBlockModelsContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 22,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/RegisterClientTooltipComponentFactoriesEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/ClientTooltipComponentsContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 23,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/RegisterEntitySpectatorShadersEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/EntitySpectatorShadersContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 24,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/RegisterGuiLayersEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/GuiLayersContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 25,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/RegisterItemModelsEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/ItemModelsContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 26,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/RegisterKeyMappingsEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/KeyMappingsContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "已提供真实键位注册事件及 Options 注入点；本样本未声明新键位"
+    },
+    {
+      "index": 27,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/EntityRenderersEvent$RegisterLayerDefinitions",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/LayerDefinitionsContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 28,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/RegisterMenuScreensEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/MenuScreensContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 29,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/RegisterParticleProvidersEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/ParticleProvidersContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 30,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/RegisterPictureInPictureRenderersEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/PictureInPictureRenderersContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 31,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/RegisterRenderPipelinesEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/RenderPipelinesContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 32,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/event/AddPackFindersEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/ResourcePackSourcesContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "当前引用来自客户端资源包上下文；AddPackFindersEvent 类型也可用于服务端"
+    },
+    {
+      "index": 33,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/EntityRenderersEvent$CreateSkullModels",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/core/context/SkullRenderersContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 34,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/event/ScreenEvent$Opening",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/event/NeoForgeClientEventInvokers",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端事件由 Unity 提供器按已支持的回调接入"
+    },
+    {
+      "index": 35,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/settings/IKeyConflictContext",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/key/NeoForgeKeyMappingHelper",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 36,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/client/model/quad/BakedNormals",
+      "owner": "fuzs/puzzleslib/neoforge/impl/client/renderer/NeoForgeMutableBakedQuad",
+      "definedDuringRuns": {
+        "server": false,
+        "A": true,
+        "B": true
+      },
+      "assessment": "客户端专用配置、渲染或事件适配；本次未单独验证该接口"
+    },
+    {
+      "index": 37,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/server/ServerLifecycleHooks",
+      "owner": "fuzs/puzzleslib/neoforge/impl/core/NeoForgeCommonProxy",
+      "definedDuringRuns": {
+        "server": true,
+        "A": true,
+        "B": true
+      },
+      "assessment": "公共代理可被两端加载；查询当前服务端不是本次玩法所需调用"
+    },
+    {
+      "index": 38,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/data/loading/DatagenModLoader",
+      "owner": "fuzs/puzzleslib/neoforge/impl/core/NeoForgeEnvironment",
+      "definedDuringRuns": {
+        "server": true,
+        "A": true,
+        "B": true
+      },
+      "assessment": "已提供游戏模式判定；正常启动时跳过作者的数据生成工作"
+    },
+    {
+      "index": 39,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/event/AddServerReloadListenersEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/core/NeoForgeModConstructor",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "Unity 构造 SPI 调用作者的 onConstructMod；额外重载钩子未作为通用实现"
+    },
+    {
+      "index": 40,
+      "phase": "公共／专服",
+      "kind": "member",
+      "symbol": "net/neoforged/neoforgespi/language/IModInfo.getVersion()Lorg/apache/maven/artifact/versioning/ArtifactVersion;",
+      "owner": "fuzs/puzzleslib/neoforge/impl/core/NeoForgeModContainer",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "查询模组版本的通用元数据接口，未作为本次通过项"
+    },
+    {
+      "index": 41,
+      "phase": "公共／专服",
+      "kind": "member",
+      "symbol": "net/neoforged/neoforge/network/registration/PayloadRegistrar.optional()Lnet/neoforged/neoforge/network/registration/PayloadRegistrar;",
+      "owner": "fuzs/puzzleslib/neoforge/impl/core/NeoForgeModContext",
+      "definedDuringRuns": {
+        "server": true,
+        "A": true,
+        "B": true
+      },
+      "assessment": "已实现 optional 注册、双向处理器及按连接握手；两名玩家与专服都有匹配及未匹配通道的对照"
+    },
+    {
+      "index": 42,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/common/world/BiomeModifier",
+      "owner": "fuzs/puzzleslib/neoforge/impl/core/context/BiomeModificationsContextNeoForgeImpl$1",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 43,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/registries/DataPackRegistryEvent$NewRegistry",
+      "owner": "fuzs/puzzleslib/neoforge/impl/core/context/DataPackRegistriesContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "0.1.4 提供基础数据注册表声明，测试含 NeoForge 自定义注册表"
+    },
+    {
+      "index": 44,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/event/entity/EntityAttributeCreationEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/core/context/EntityAttributesContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 45,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/registries/NewRegistryEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/core/context/GameRegistriesContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 46,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/common/ItemAbility",
+      "owner": "fuzs/puzzleslib/neoforge/impl/core/context/GameplayContentContextNeoForgeImpl$BlockConversionBuilder",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 47,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/common/ItemAbilities",
+      "owner": "fuzs/puzzleslib/neoforge/impl/core/context/GameplayContentContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 48,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/event/ModifyDefaultComponentsEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/core/context/ItemComponentsContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 49,
+      "phase": "客户端",
+      "kind": "member",
+      "symbol": "net/neoforged/neoforge/network/registration/PayloadRegistrar.configurationToClient(Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$Type;Lnet/minecraft/network/codec/StreamCodec;Lnet/neoforged/neoforge/network/handling/IPayloadHandler;)Lnet/neoforged/neoforge/network/registration/PayloadRegistrar;",
+      "owner": "fuzs/puzzleslib/neoforge/impl/core/context/PayloadTypesContextNeoForgeImpl$ClientImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "由 NeoForgeClientProxy 创建的客户端注册器，属于配置阶段 S2C；与 play 握手分开"
+    },
+    {
+      "index": 50,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/event/entity/RegisterSpawnPlacementsEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/core/context/SpawnPlacementsContextNeoForgeImpl",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 51,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/registries/ModifyRegistriesEvent",
+      "owner": "fuzs/puzzleslib/neoforge/impl/event/NeoForgeEventInvokers",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "作者原生 NeoForge 事件工厂的注册表修改通知；Unity 走选定的服务提供器"
+    },
+    {
+      "index": 52,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/network/IContainerFactory",
+      "owner": "fuzs/puzzleslib/neoforge/impl/init/MenuTypeWithData",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 53,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/registries/RegistryBuilder",
+      "owner": "fuzs/puzzleslib/neoforge/impl/init/NeoForgeRegistryFactory",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 54,
+      "phase": "公共／专服",
+      "kind": "member",
+      "symbol": "net/neoforged/neoforge/registries/DeferredHolder.create(Lnet/minecraft/resources/ResourceKey;)Lnet/neoforged/neoforge/registries/DeferredHolder;",
+      "owner": "fuzs/puzzleslib/neoforge/impl/init/NeoForgeRegistryManager",
+      "definedDuringRuns": {
+        "server": true,
+        "A": true,
+        "B": true
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 55,
+      "phase": "公共／专服",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/common/crafting/IntersectionIngredient",
+      "owner": "fuzs/puzzleslib/neoforge/impl/item/crafting/NeoForgeCombinedIngredients",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "通用扩展，超出 Block Runner 本次实测调用面"
+    },
+    {
+      "index": 56,
+      "phase": "客户端",
+      "kind": "member",
+      "symbol": "net/neoforged/neoforge/network/handling/IPayloadContext.listener()Lnet/neoforged/neoforge/common/extensions/ICommonPacketListener;",
+      "owner": "fuzs/puzzleslib/neoforge/impl/network/MessageContextNeoForgeImpl$ClientboundConfiguration",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "泛型父类绑定 ClientConfigurationPacketListenerImpl，接收者是客户端"
+    },
+    {
+      "index": 57,
+      "phase": "客户端",
+      "kind": "type",
+      "symbol": "net/neoforged/neoforge/internal/BrandingControl",
+      "owner": "fuzs/puzzleslib/neoforge/mixin/client/accessor/BrandingControlAccessor",
+      "definedDuringRuns": {
+        "server": false,
+        "A": false,
+        "B": false
+      },
+      "assessment": "提供可供 Mixin 访问的品牌字段；未对开发模式品牌编辑作玩法验收"
+    }
+  ]
+}

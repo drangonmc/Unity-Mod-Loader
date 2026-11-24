@@ -16,7 +16,7 @@ import uuid
 import zipfile
 from urllib.parse import unquote, urlsplit
 
-VERSION = "0.2.2-Beta"
+VERSION = "0.2.3-Beta"
 ROOT = Path(__file__).resolve().parents[2]
 DIST = ROOT / "versions" / VERSION
 EVIDENCE = ROOT / "evidence" / VERSION

@@ -1,0 +1,21 @@
+{
+  "parentsSHA512": {
+    "BlockRunner-v26.2.0-mc26.2.x-NeoForge.jar": "38b6b62c4eb6d414941469e574f6c9d6be12a79503bfa097a0f7e6663a8ad7f35b551ca551b4eb61e3927a518ed4646447d6e052e09cf0248edd3429bc15456e",
+    "ImmersiveOres-26.2-0.3.jar": "426984339b6d2a5828a2cf86685cdd4fdea965a6afc6d988c4f52b166c6708831bfb2f8cfbee78e64091da5ffc7be8cced923da1b7920a26d33167d2de48eae7"
+  },
+  "loaderSHA256": "2f0234359c97efb1394f5f2db7f95b148af150118b2b30629d7154a22f21257b",
+  "resolved": {
+    "client": [
+      "27c180f803b28ada61eb56c691e7ce562de90a57710d948c60362d035f091da3",
+      "ffbadbdc7b3c55462edb935f2493bcabf06f690a5c1f09b3b5a216171349350d"
+    ],
+    "server": [
+      "27c180f803b28ada61eb56c691e7ce562de90a57710d948c60362d035f091da3",
+      "ffbadbdc7b3c55462edb935f2493bcabf06f690a5c1f09b3b5a216171349350d"
+    ]
+  },
+  "membersSHA256": {
+    "META-INF/jarjar/multiloaderdataextensions-neoforge-26.2.0.jar": "ffbadbdc7b3c55462edb935f2493bcabf06f690a5c1f09b3b5a216171349350d",
+    "META-INF/jars/PlayerAbilityLib-1.16.0.jar": "27c180f803b28ada61eb56c691e7ce562de90a57710d948c60362d035f091da3"
+  }
+}

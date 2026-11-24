@@ -2,7 +2,7 @@
 from pathlib import Path
 import argparse, hashlib, json, os, subprocess, tempfile, zipfile
 root=Path(__file__).resolve().parents[3]
-v="0.2.2-Beta"
+v="0.2.3-Beta"
 def build(refs, home, samples, loader, dest):
     lock=json.loads((root/"standalone/beta-gameplay.json").read_bytes())
     spec=next(row for row in lock["originals"] if row["id"]=="XkWV0WSp")

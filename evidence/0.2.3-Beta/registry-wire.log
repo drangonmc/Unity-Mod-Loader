@@ -1,0 +1,116 @@
+[Unity] Access transforms [net/minecraft/data/worldgen/ProcessorLists, net/minecraft/data/worldgen/biome/EndBiomes, net/minecraft/data/worldgen/biome/NetherBiomes, net/minecraft/data/worldgen/biome/OverworldBiomes, net/minecraft/network/chat/TextColor, net/minecraft/network/chat/contents/TranslatableContents, net/minecraft/server/level/ServerLevel, net/minecraft/sounds/SoundEvent, net/minecraft/world/SimpleContainer, net/minecraft/world/damagesource/DamageSources, net/minecraft/world/entity/Display, net/minecraft/world/entity/Display$BlockDisplay, net/minecraft/world/entity/Display$ItemDisplay, net/minecraft/world/entity/Display$TextDisplay, net/minecraft/world/entity/Interaction, net/minecraft/world/entity/LivingEntity, net/minecraft/world/entity/SpawnPlacements, net/minecraft/world/entity/ai/sensing/SensorType, net/minecraft/world/entity/npc/villager/VillagerType, net/minecraft/world/entity/projectile/FishingHook, net/minecraft/world/entity/projectile/Projectile, net/minecraft/world/entity/schedule/Activity, net/minecraft/world/inventory/MenuType, net/minecraft/world/inventory/MenuType$MenuSupplier, net/minecraft/world/item/Item, net/minecraft/world/item/Item$Properties, net/minecraft/world/item/context/BlockPlaceContext, net/minecraft/world/item/context/UseOnContext, net/minecraft/world/item/enchantment/Enchantment, net/minecraft/world/item/enchantment/Enchantment$FloatAction, net/minecraft/world/item/enchantment/Enchantment$GenericAction, net/minecraft/world/item/enchantment/EnchantmentHelper, net/minecraft/world/item/enchantment/EnchantmentHelper$EnchantmentInSlotVisitor, net/minecraft/world/item/enchantment/EnchantmentHelper$EnchantmentVisitor, net/minecraft/world/item/equipment/ArmorMaterials, net/minecraft/world/level/block/AttachedStemBlock, net/minecraft/world/level/block/AzaleaBlock, net/minecraft/world/level/block/BarrierBlock, net/minecraft/world/level/block/BaseCoralFanBlock, net/minecraft/world/level/block/BaseCoralPlantBlock, net/minecraft/world/level/block/BaseCoralWallFanBlock, net/minecraft/world/level/block/BigDripleafBlock, net/minecraft/world/level/block/BigDripleafStemBlock, net/minecraft/world/level/block/BlastFurnaceBlock, net/minecraft/world/level/block/Blocks, net/minecraft/world/level/block/BushBlock, net/minecraft/world/level/block/ButtonBlock, net/minecraft/world/level/block/CactusBlock, net/minecraft/world/level/block/CakeBlock, net/minecraft/world/level/block/CandleCakeBlock, net/minecraft/world/level/block/CartographyTableBlock, net/minecraft/world/level/block/CarvedPumpkinBlock, net/minecraft/world/level/block/ChestBlock, net/minecraft/world/level/block/ChorusFlowerBlock, net/minecraft/world/level/block/ChorusPlantBlock, net/minecraft/world/level/block/CoralFanBlock, net/minecraft/world/level/block/CoralPlantBlock, net/minecraft/world/level/block/CoralWallFanBlock, net/minecraft/world/level/block/CraftingTableBlock, net/minecraft/world/level/block/CreakingHeartBlock, net/minecraft/world/level/block/CropBlock, net/minecraft/world/level/block/DecoratedPotBlock, net/minecraft/world/level/block/DirtPathBlock, net/minecraft/world/level/block/DispenserBlock, net/minecraft/world/level/block/DoorBlock, net/minecraft/world/level/block/DryVegetationBlock, net/minecraft/world/level/block/EnchantingTableBlock, net/minecraft/world/level/block/EndGatewayBlock, net/minecraft/world/level/block/EndPortalBlock, net/minecraft/world/level/block/EndRodBlock, net/minecraft/world/level/block/EnderChestBlock, net/minecraft/world/level/block/FarmlandBlock, net/minecraft/world/level/block/FlowerBedBlock, net/minecraft/world/level/block/FurnaceBlock, net/minecraft/world/level/block/GrindstoneBlock, net/minecraft/world/level/block/HalfTransparentBlock, net/minecraft/world/level/block/HangingRootsBlock, net/minecraft/world/level/block/IronBarsBlock, net/minecraft/world/level/block/JigsawBlock, net/minecraft/world/level/block/JukeboxBlock, net/minecraft/world/level/block/KelpBlock, net/minecraft/world/level/block/KelpPlantBlock, net/minecraft/world/level/block/LadderBlock, net/minecraft/world/level/block/LecternBlock, net/minecraft/world/level/block/LeverBlock, net/minecraft/world/level/block/LilyPadBlock, net/minecraft/world/level/block/LiquidBlock, net/minecraft/world/level/block/LoomBlock, net/minecraft/world/level/block/MangroveRootsBlock, net/minecraft/world/level/block/NetherFungusBlock, net/minecraft/world/level/block/NetherRootsBlock, net/minecraft/world/level/block/NetherWartBlock, net/minecraft/world/level/block/NyliumBlock, net/minecraft/world/level/block/PlayerHeadBlock, net/minecraft/world/level/block/PlayerWallHeadBlock, net/minecraft/world/level/block/PoweredRailBlock, net/minecraft/world/level/block/PressurePlateBlock, net/minecraft/world/level/block/PumpkinBlock, net/minecraft/world/level/block/RailBlock, net/minecraft/world/level/block/RedstoneTorchBlock, net/minecraft/world/level/block/RedstoneWallTorchBlock, net/minecraft/world/level/block/RepeaterBlock, net/minecraft/world/level/block/SaplingBlock, net/minecraft/world/level/block/ScaffoldingBlock, net/minecraft/world/level/block/SeaPickleBlock, net/minecraft/world/level/block/SeagrassBlock, net/minecraft/world/level/block/ShortDryGrassBlock, net/minecraft/world/level/block/SkullBlock, net/minecraft/world/level/block/SmithingTableBlock, net/minecraft/world/level/block/SmokerBlock, net/minecraft/world/level/block/SnowLayerBlock, net/minecraft/world/level/block/SnowyBlock, net/minecraft/world/level/block/SpawnerBlock, net/minecraft/world/level/block/SpongeBlock, net/minecraft/world/level/block/StairBlock, net/minecraft/world/level/block/StemBlock, net/minecraft/world/level/block/StructureBlock, net/minecraft/world/level/block/StructureVoidBlock, net/minecraft/world/level/block/SugarCaneBlock, net/minecraft/world/level/block/TallDryGrassBlock, net/minecraft/world/level/block/TallGrassBlock, net/minecraft/world/level/block/TorchBlock, net/minecraft/world/level/block/TransparentBlock, net/minecraft/world/level/block/TrapDoorBlock, net/minecraft/world/level/block/WallSkullBlock, net/minecraft/world/level/block/WallTorchBlock, net/minecraft/world/level/block/WaterloggedTransparentBlock, net/minecraft/world/level/block/WeatheringCopperBarsBlock, net/minecraft/world/level/block/WeatheringCopperChainBlock, net/minecraft/world/level/block/WeatheringCopperDoorBlock, net/minecraft/world/level/block/WeatheringCopperGrateBlock, net/minecraft/world/level/block/WeatheringCopperTrapDoorBlock, net/minecraft/world/level/block/WeatheringLanternBlock, net/minecraft/world/level/block/WeatheringLightningRodBlock, net/minecraft/world/level/block/WeightedPressurePlateBlock, net/minecraft/world/level/block/WetSpongeBlock, net/minecraft/world/level/block/WitherSkullBlock, net/minecraft/world/level/block/WitherWallSkullBlock, net/minecraft/world/level/block/WoolCarpetBlock, net/minecraft/world/level/levelgen/NoiseRouterData, net/minecraft/world/level/levelgen/feature/foliageplacers/FoliagePlacerType, net/minecraft/world/level/levelgen/feature/rootplacers/RootPlacerType, net/minecraft/world/level/levelgen/feature/stateproviders/BlockStateProviderType, net/minecraft/world/level/levelgen/feature/treedecorators/TreeDecoratorType, net/minecraft/world/level/levelgen/feature/trunkplacers/TrunkPlacerType, net/minecraft/world/level/storage/loot/LootPool, net/minecraft/world/scores/criteria/ObjectiveCriteria]
+[Unity] 0.2.3-Beta standalone | Minecraft 26.2 | Mojang libraries: 39
+[Unity] Discovered native mods [world-marker]; platform mods [worldprobe, worldprobe_fabric, worldprobe_neo]
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by com.sun.jna.Native in an unnamed module (file:/D:/测试/Unity/cache/0.2.3-Beta/libraries/net/java/dev/jna/jna/5.17.0/jna-5.17.0.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+[20:50:33] [main/ERROR]: Unable to locate English counter names in registry Perflib 009. Counters may need to be rebuilt: 
+com.sun.jna.platform.win32.Win32Exception: 参数错误。
+	at Unity Minecraft 26.2//com.sun.jna.platform.win32.Advapi32Util.registryGetStringArray(Advapi32Util.java:921)
+	at Unity Minecraft 26.2//com.sun.jna.platform.win32.Advapi32Util.registryGetStringArray(Advapi32Util.java:898)
+	at Unity Minecraft 26.2//oshi.driver.windows.registry.HkeyPerformanceDataUtil.mapCounterIndicesFromRegistry(HkeyPerformanceDataUtil.java:274)
+	at Unity Minecraft 26.2//oshi.driver.windows.registry.HkeyPerformanceDataUtil.<clinit>(HkeyPerformanceDataUtil.java:51)
+	at Unity Minecraft 26.2//oshi.driver.windows.registry.ProcessPerformanceData.buildProcessMapFromRegistry(ProcessPerformanceData.java:45)
+	at Unity Minecraft 26.2//oshi.software.os.windows.WindowsOperatingSystem.queryProcessMapFromRegistry(WindowsOperatingSystem.java:328)
+	at Unity Minecraft 26.2//oshi.util.Memoizer$1.get(Memoizer.java:65)
+	at Unity Minecraft 26.2//oshi.software.os.windows.WindowsOperatingSystem.processMapToList(WindowsOperatingSystem.java:298)
+	at Unity Minecraft 26.2//oshi.software.os.windows.WindowsOperatingSystem.getProcess(WindowsOperatingSystem.java:292)
+	at Unity Minecraft 26.2//oshi.software.os.OperatingSystem.getCurrentProcess(OperatingSystem.java:246)
+	at Unity Minecraft 26.2//net.minecraft.SystemReport.lambda$putSoftware$0(SystemReport.java:116)
+	at Unity Minecraft 26.2//net.minecraft.SystemReport.ignoreErrors(SystemReport.java:121)
+	at Unity Minecraft 26.2//net.minecraft.SystemReport.putSoftware(SystemReport.java:116)
+	at Unity Minecraft 26.2//net.minecraft.SystemReport.lambda$new$7(SystemReport.java:68)
+	at Unity Minecraft 26.2//net.minecraft.SystemReport.ignoreErrors(SystemReport.java:121)
+	at Unity Minecraft 26.2//net.minecraft.SystemReport.<init>(SystemReport.java:68)
+	at Unity Minecraft 26.2//net.minecraft.CrashReport.<init>(CrashReport.java:35)
+	at Unity Minecraft 26.2//net.minecraft.CrashReport.preload(CrashReport.java:252)
+	at Unity Minecraft 26.2//net.minecraft.server.Main.main(Main.java:104)
+	at Unity Minecraft 26.2//mc.unity.runtime.Dedicated.launch(Dedicated.java:28)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:104)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:565)
+	at mc.unity.bootstrap.Main.main(Main.java:59)
+[20:50:33] [main/WARN]: Unable to locate English counter names in registry Perflib 009. Assuming English counters. Error 0x80070057. See https://support.microsoft.com/en-us/help/300956/how-to-manually-rebuild-performance-counter-library-values
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by org.joml.MemUtil$MemUtilUnsafe (file:/D:/测试/Unity/cache/0.2.3-Beta/libraries/org/joml/joml/1.10.8/joml-1.10.8.jar)
+WARNING: Please consider reporting this to the maintainers of class org.joml.MemUtil$MemUtilUnsafe
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+[20:50:36] [main/ERROR]: No data fixer registered for worldprobe:crystal
+[20:50:36] [main/ERROR]: No data fixer registered for worldprobe_neo:orb
+[Unity] Registered content [worldprobe, worldprobe_neo] registry b8807cae0bdc3c46b9b8b5400198ad0b76e5c9b3e2ecf6409c4deb8b6a555b0f
+[20:50:36] [main/INFO]: Environment: Environment[sessionHost=https://sessionserver.mojang.com, servicesHost=https://api.minecraftservices.com, profilesHost=https://api.mojang.com, name=PROD]
+[20:50:36] [main/INFO]: Found new data pack file/wire, loading it automatically
+[20:50:36] [main/INFO]: Found new data pack unity/worldprobe, loading it automatically
+[20:50:36] [main/INFO]: Found new data pack unity/worldprobe_neo, loading it automatically
+[20:50:36] [main/INFO]: Found new data pack unity_common_tags, loading it automatically
+[20:50:37] [Worker-Main-8/INFO]: No existing world data, creating new world
+[20:50:37] [main/INFO]: Loaded 1586 recipes
+[20:50:37] [main/INFO]: Loaded 1688 advancements
+[20:50:37] [Server thread/INFO]: Starting minecraft server version 26.2
+[20:50:37] [Server thread/INFO]: Loading properties
+[20:50:37] [Server thread/INFO]: Default game type: SURVIVAL
+[20:50:37] [Server thread/INFO]: Generating keypair
+[20:50:37] [Server thread/INFO]: Starting Minecraft server on 127.0.0.1:3020
+[20:50:37] [Server thread/WARN]: **** SERVER IS RUNNING IN OFFLINE/INSECURE MODE!
+[20:50:37] [Server thread/WARN]: The server will make no attempt to authenticate usernames. Beware.
+[20:50:37] [Server thread/WARN]: While this makes the game possible to play without internet access, it also opens up the ability for hackers to connect with any username they choose.
+[20:50:37] [Server thread/WARN]: To change this, set "online-mode" to "true" in the server.properties file.
+[20:50:37] [Server thread/INFO]: Preparing level "world"
+[20:50:37] [Server thread/INFO]: [STDOUT]: QA14 starting world
+[20:50:38] [Server thread/INFO]: [STDOUT]: QA14 level-load world minecraft:overworld
+[20:50:38] [Server thread/INFO]: Selecting global world spawn...
+[20:50:39] [Server thread/INFO]: [STDOUT]: QA14 level-load world minecraft:the_end
+[20:50:39] [Server thread/INFO]: [STDOUT]: QA14 level-load world minecraft:the_nether
+[20:50:39] [Server thread/INFO]: Loading 0 persistent chunks...
+[20:50:39] [Server thread/INFO]: Preparing spawn area: 100%
+[20:50:39] [Server thread/INFO]: Time elapsed: 1501 ms
+[20:50:39] [Server thread/INFO]: Done (1.655s)! For help, type "help"
+[20:50:39] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[20:50:39] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[20:50:40] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[20:50:41] [Server thread/INFO]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[20:50:41] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[20:50:41] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[20:50:41] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved
+[20:50:41] [Server thread/INFO]: [STDOUT]: QA14 started world 41
+[20:50:41] [Server thread/INFO]: [STDOUT]: [Unity] Standalone ready; native [world-marker]
+[20:50:59] [Netty NIO IO #1/INFO]: [STDOUT]: [Unity] Login capabilities play=0 configuration=false extended=false
+[20:50:59] [Netty NIO IO #1/INFO]: [STDOUT]: [Unity] Verified client content registry b8807cae0bdc3c46b9b8b5400198ad0b76e5c9b3e2ecf6409c4deb8b6a555b0f
+[20:51:01] [Server thread/INFO]: UnityRegistry[/127.0.0.1:3049] logged in with entity id 11 at (268.5, 78.0, -152.5)
+[20:51:01] [Server thread/INFO]: UnityRegistry joined the game
+[20:51:03] [Server thread/INFO]: Marked 4 chunks in minecraft:overworld from [2, 1] to [3, 2] to be force loaded
+[20:51:03] [Server thread/INFO]: [Not Secure] [Server] WAIT_WIRE_READY
+[20:51:03] [Server thread/INFO]: [Not Secure] [Server] WAIT_WIRE_READY
+[20:51:04] [Server thread/INFO]: [Not Secure] [Server] WAIT_WIRE_READY
+[20:51:04] [Server thread/INFO]: [Not Secure] [Server] WAIT_WIRE_READY
+[20:51:04] [Server thread/INFO]: [Not Secure] [Server] WIRE_READY
+[20:51:04] [Server thread/INFO]: Successfully filled 224 block(s)
+[20:51:04] [Server thread/INFO]: No blocks were filled
+[20:51:04] [Server thread/INFO]: Teleported UnityRegistry to 44.500000, 201.000000, 32.500000
+[20:51:06] [Server thread/INFO]: Changed the block at 44, 201, 36
+[20:51:06] [Server thread/INFO]: Changed the block at 43, 201, 35
+[20:51:06] [Server thread/INFO]: Changed the block at 45, 201, 35
+[20:51:06] [Server thread/INFO]: Summoned new entity.worldprobe.crystal
+[20:51:06] [Server thread/INFO]: Replaced a slot on UnityRegistry with [Emerald]
+[20:51:06] [Server thread/INFO]: Played sound worldprobe:chime to UnityRegistry
+[20:51:07] [Server thread/INFO]: [STDOUT]: QA14 NETWORK {"numericIds":[1968,158,111,21],"worldValue":127,"privateRule":9,"component":53,"recipeResult":31,"entities":["01f3cf2f-02b5-4e6b-9444-89e552943af9"]}
+[20:51:09] [Server thread/INFO]: UnityRegistry lost connection: Disconnected
+[20:51:09] [Server thread/INFO]: UnityRegistry left the game
+[20:51:10] [Server thread/INFO]: Stopping the server
+[20:51:10] [Server thread/INFO]: [STDOUT]: QA14 stopping world
+[20:51:10] [Server thread/INFO]: Stopping server
+[20:51:10] [Server thread/INFO]: Saving players
+[20:51:10] [Server thread/INFO]: Saving worlds
+[20:51:10] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:overworld
+[20:51:58] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_end
+[20:51:58] [Server thread/INFO]: Saving chunks for level 'ServerLevel[world]'/minecraft:the_nether
+[20:51:59] [Server thread/INFO]: ThreadedAnvilChunkStorage (world): All chunks are saved
+[20:51:59] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved
+[20:51:59] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved
+[20:51:59] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved
+[20:51:59] [Server thread/INFO]: [STDOUT]: QA14 level-unload world minecraft:overworld
+[20:51:59] [Server thread/INFO]: [STDOUT]: QA14 level-unload world minecraft:the_end
+[20:51:59] [Server thread/INFO]: [STDOUT]: QA14 level-unload world minecraft:the_nether
+[20:51:59] [Server thread/INFO]: [STDOUT]: QA14 stopped world
+[20:51:59] [Server thread/INFO]: [STDOUT]: [Unity] Standalone stopped

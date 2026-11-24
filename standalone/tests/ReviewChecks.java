@@ -179,8 +179,11 @@ class ReviewChecks {
             }
             public void acceptConfig(ILoadedConfig c) {}
         };
+        Object monitor = field(ModConfigs.class, "local").get(null);
         ModConfigs.register("watchtest", ModConfig.Type.COMMON, spec, "a.toml", e -> {
             if (e instanceof net.neoforged.fml.event.config.ModConfigEvent.Reloading) {
+                check(!Thread.holdsLock(monitor), "Mod callback under watcher lock");
+                check(!Thread.holdsLock(ModConfigs.class), "Mod callback under registry lock");
                 calls.incrementAndGet();
                 entered.countDown();
                 waitInside(release);
@@ -219,11 +222,19 @@ class ReviewChecks {
             await(entered);
             var started = new CountDownLatch(1);
             var close = pool.submit(() -> {
-                started.countDown();
+                synchronized (ModConfigs.class) {
+                    synchronized (watcher) {
+                        ModConfigs.getConfigSet(ModConfig.Type.COMMON);
+                        started.countDown();
+                    }
+                }
                 ModConfigs.close();
             });
-            await(started);
-            release.countDown();
+            try {
+                await(started);
+            } finally {
+                release.countDown();
+            }
             check(tick.get(5, TimeUnit.SECONDS), "Lost change");
             close.get(5, TimeUnit.SECONDS);
         } finally {
@@ -232,183 +243,213 @@ class ReviewChecks {
         }
         check(service.get(watcher) == null && !(boolean)poll.invoke(watcher) && calls.get() == 1,
               "Closed watcher tick");
-        System.out.println(
-            "PASS watcher replacement, normalized paths, poll during teardown and handle closure");
-    }
-    static void limits() {
-        var id = type("bounded");
-        for (boolean play : new boolean[] {false, true})
-            for (var flow : PacketFlow.values()) {
-                int limit = flow == PacketFlow.SERVERBOUND ? 32767 : 1048576;
-                PlayNetwork.clear();
-                ConfigurationNetwork.clear();
-                var seen = new AtomicInteger(-1);
-                StreamCodec<FriendlyByteBuf, Value> writer = new StreamCodec<>() {
-                    public Value decode(FriendlyByteBuf b) {
-                        return new Value(id);
-                    }
-                    public void encode(FriendlyByteBuf b, Value v) {
-                        seen.set(b.maxCapacity());
-                        check(!play || b instanceof RegistryFriendlyByteBuf, "Lost registry context");
-                        b.ensureWritable(limit + 1);
-                    }
-                };
-                if (play) {
-                    PlayNetwork.register(id.id(), "1", flow, id, writer.cast(), (v, ctx) -> {}, false, true);
-                    PlayNetwork.manifest();
-                } else
-                    ConfigurationNetwork.type(flow, id, writer, "1", true);
-                StreamCodec base = flow == PacketFlow.SERVERBOUND
-                                       ? ServerboundCustomPayloadPacket.STREAM_CODEC
-                                   : play ? ClientboundCustomPayloadPacket.GAMEPLAY_STREAM_CODEC
-                                          : ClientboundCustomPayloadPacket.CONFIG_STREAM_CODEC;
-                StreamCodec codec =
-                    flow == PacketFlow.SERVERBOUND
-                        ? (play ? PlayNetwork.serverbound(base) : ConfigurationNetwork.serverbound(base))
-                        : (play ? PlayNetwork.clientbound(base) : ConfigurationNetwork.clientbound(base));
-                FriendlyByteBuf out = play ? new RegistryFriendlyByteBuf(
-                                                 Unpooled.buffer(16), net.minecraft.core.RegistryAccess.EMPTY)
-                                           : new FriendlyByteBuf(Unpooled.buffer(16));
-                try {
-                    out.writeByte(27);
-                    try {
-                        codec.encode(out, ConfigurationNetwork.packet(flow, new Value(id)));
-                        throw new AssertionError("Oversize accepted");
-                    } catch (IllegalArgumentException expected) {}
-                    check(seen.get() == limit && out.capacity() == 16 && out.writerIndex() == 1 &&
-                              out.getByte(0) == 27,
-                          "Unbounded allocation or partial output");
-                } finally {
-                    out.release();
-                }
+        var watchEntered = new CountDownLatch(1);
+        var watchRelease = new CountDownLatch(1);
+        ModConfigs.bind(dir.resolve("during-watch"), true);
+        ModConfigs.register("watchtest", ModConfig.Type.COMMON, spec, "b.toml", e -> {
+            if (e instanceof net.neoforged.fml.event.config.ModConfigEvent.Reloading) {
+                check(!Thread.holdsLock(watcher), "Initial rescan invoked mod under watcher monitor");
+                watchEntered.countDown();
+                waitInside(watchRelease);
+                ModConfigs.getConfigSet(ModConfig.Type.COMMON);
             }
-        PlayNetwork.clear();
-        ConfigurationNetwork.clear();
-        System.out.println(
-            "PASS bounded Play and configuration encoders, registry context and atomic output");
-    }
-    static byte[] jar(Map<String, byte[]> members) throws IOException {
-        var data = new ByteArrayOutputStream();
-        try (var out = new JarOutputStream(data)) {
-            for (var e : members.entrySet()) {
-                out.putNextEntry(new JarEntry(e.getKey()));
-                out.write(e.getValue());
-                out.closeEntry();
-            }
-        }
-        return data.toByteArray();
-    }
-    static byte[] mod(String id, String version, Map<String, String> deps, Map<String, byte[]> inners)
-        throws IOException {
-        var json = new JsonObject();
-        json.addProperty("schemaVersion", 1);
-        json.addProperty("id", id);
-        json.addProperty("version", version);
-        var requires = new JsonObject();
-        deps.forEach(requires::addProperty);
-        json.add("depends", requires);
-        var members = new LinkedHashMap<>(inners);
-        var jars = new JsonArray();
-        for (String n : inners.keySet()) {
-            var e = new JsonObject();
-            e.addProperty("file", n);
-            jars.add(e);
-        }
-        json.add("jars", jars);
-        members.put("fabric.mod.json", json.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
-        return jar(members);
-    }
-    static void solve(Path dir) throws Exception {
-        Files.createDirectories(dir);
-        var inners = new TreeMap<String, byte[]>();
-        var deps = new HashMap<String, String>();
-        for (int i = 0; i < 24; i++) {
-            String id = "lib" + i;
-            deps.put(id, "=1.0");
-            for (String ver : List.of("1.0", "2.0"))
-                inners.put(id + "-" + ver + ".jar", mod(id, ver, Map.of(), Map.of()));
-        }
-        inners.put("last.jar", mod("zz_narrow", "1.0", deps, Map.of()));
-        Files.write(dir.resolve("parent.jar"), mod("root_mod", "1.0", Map.of(), inners));
-        try (var found = NestedArchives.resolve(dir, false)) {
-            check(found.metadata()
-                          .stream()
-                          .filter(e -> e.id().startsWith("lib") && e.version().equals("1.0"))
-                          .count() == 24,
-                  "Wrong nested result");
-            check(found.searchSteps() <= 27, "Excessive backtracking: " + found.searchSteps());
-            System.out.println("PASS MRV solver resolved 24 binary choices in " + found.searchSteps() +
-                               " states");
-        }
-    }
-    static void cleanup(Path dir) throws Exception {
-        var file = dir.resolve("a file #%.jar");
-        Files.write(file, jar(Map.of("docs/a #%.txt", new byte[] {5})));
-        var cl = Class.forName("mc.unity.bootstrap.GameLoader");
-        var ctor = cl.getDeclaredConstructor(URL[].class, Path.class);
-        ctor.setAccessible(true);
-        var loader = (java.net.URLClassLoader)ctor.newInstance(new URL[] {file.toUri().toURL()}, file);
-        IOException primary = new IOException("first archive");
+        });
         try {
-            var failing = new JarFile(file.toFile()) {
-                public void close() throws IOException {
-                    super.close();
-                    throw primary;
+            ModConfigs.loadCommon();
+            var item = ModConfigs.getConfigSet(ModConfig.Type.COMMON).iterator().next();
+            Files.writeString(item.getFullPath(), "v=9\n");
+            try (var workers = Executors.newFixedThreadPool(2)) {
+                var installing = workers.submit(() -> watch.invoke(watcher, List.of(item)));
+                try {
+                    await(watchEntered);
+                    var replacing = workers.submit(() -> {
+                        synchronized (ModConfigs.class) { return watch.invoke(watcher, List.of());
+                }
+            });
+            replacing.get(5, TimeUnit.SECONDS);
+        } finally {
+            watchRelease.countDown();
+        }
+        installing.get(5, TimeUnit.SECONDS);
+    }
+}
+finally {
+    ModConfigs.close();
+}
+System.out.println("PASS independent registry and watcher acquisition during watch and poll callbacks");
+System.out.println("PASS watcher replacement, normalized paths, poll during teardown and handle closure");
+}
+static void limits() {
+    var id = type("bounded");
+    for (boolean play : new boolean[] {false, true})
+        for (var flow : PacketFlow.values()) {
+            int limit = flow == PacketFlow.SERVERBOUND ? 32767 : 1048576;
+            PlayNetwork.clear();
+            ConfigurationNetwork.clear();
+            var seen = new AtomicInteger(-1);
+            StreamCodec<FriendlyByteBuf, Value> writer = new StreamCodec<>() {
+                public Value decode(FriendlyByteBuf b) {
+                    return new Value(id);
+                }
+                public void encode(FriendlyByteBuf b, Value v) {
+                    seen.set(b.maxCapacity());
+                    check(!play || b instanceof RegistryFriendlyByteBuf, "Lost registry context");
+                    b.ensureWritable(limit + 1);
                 }
             };
-            var url = method(cl, "url", JarFile.class, String.class);
-            var good = (URL)url.invoke(loader, failing, "docs/a #%.txt");
-            try (var in = good.openStream()) {
-                check(in.read() == 5, "Encoded URL failed");
-            }
-            var missing = (URL)url.invoke(loader, failing, "missing");
-            try (var ignored = missing.openStream()) {
-                throw new AssertionError("Missing resource opened");
-            } catch (FileNotFoundException expected) {}
-            ((Map<Path, JarFile>)field(cl, "mods").get(loader)).put(file, failing);
-            var attempts = new AtomicInteger();
-            field(cl, "nested").set(loader, (AutoCloseable)() -> {
-                if (attempts.getAndIncrement() == 0)
-                    throw new IOException("nested archive");
-            });
+            if (play) {
+                PlayNetwork.register(id.id(), "1", flow, id, writer.cast(), (v, ctx) -> {}, false, true);
+                PlayNetwork.manifest();
+            } else
+                ConfigurationNetwork.type(flow, id, writer, "1", true);
+            StreamCodec base = flow == PacketFlow.SERVERBOUND ? ServerboundCustomPayloadPacket.STREAM_CODEC
+                               : play ? ClientboundCustomPayloadPacket.GAMEPLAY_STREAM_CODEC
+                                      : ClientboundCustomPayloadPacket.CONFIG_STREAM_CODEC;
+            StreamCodec codec =
+                flow == PacketFlow.SERVERBOUND
+                    ? (play ? PlayNetwork.serverbound(base) : ConfigurationNetwork.serverbound(base))
+                    : (play ? PlayNetwork.clientbound(base) : ConfigurationNetwork.clientbound(base));
+            FriendlyByteBuf out = play ? new RegistryFriendlyByteBuf(Unpooled.buffer(16),
+                                                                     net.minecraft.core.RegistryAccess.EMPTY)
+                                       : new FriendlyByteBuf(Unpooled.buffer(16));
             try {
-                cl.getMethod("releaseMods").invoke(loader);
-                throw new AssertionError("Close failure lost");
-            } catch (InvocationTargetException e) {
-                Throwable cause = e.getCause();
-                check(cause == primary && cause.getSuppressed().length == 1 &&
-                          cause.getSuppressed()[0].getCause().getMessage().equals("nested archive"),
-                      "Close exception ordering");
+                out.writeByte(27);
+                try {
+                    codec.encode(out, ConfigurationNetwork.packet(flow, new Value(id)));
+                    throw new AssertionError("Oversize accepted");
+                } catch (IllegalArgumentException expected) {}
+                check(seen.get() == limit && out.capacity() == 16 && out.writerIndex() == 1 &&
+                          out.getByte(0) == 27,
+                      "Unbounded allocation or partial output");
+            } finally {
+                out.release();
             }
-            try (var ignored = good.openStream()) {
-                throw new AssertionError("Closed resource opened");
-            } catch (IOException expected) {
-                check(expected.getCause() instanceof IllegalStateException, "Closed JAR diagnosis");
-            }
-            loader.close();
-            check(attempts.get() == 2, "Nested close retry lost");
-        } finally {
-            loader.close();
         }
-        System.out.println("PASS archive close exception preservation and missing/closed resource URLs");
+    PlayNetwork.clear();
+    ConfigurationNetwork.clear();
+    System.out.println("PASS bounded Play and configuration encoders, registry context and atomic output");
+}
+static byte[] jar(Map<String, byte[]> members) throws IOException {
+    var data = new ByteArrayOutputStream();
+    try (var out = new JarOutputStream(data)) {
+        for (var e : members.entrySet()) {
+            out.putNextEntry(new JarEntry(e.getKey()));
+            out.write(e.getValue());
+            out.closeEntry();
+        }
     }
-    static void placement() throws Exception {
-        var a = new Placement.Change(null, null, null, null, 3, 0);
-        var b = new Placement.Change(null, null, null, null, 3, 0);
-        check(a.equals(b) && a != b, "Placement fixture");
-        var changes = new ArrayList<>(List.of(a, b, a));
-        method(Placement.class, "discard", List.class, Placement.Change.class).invoke(null, changes, b);
-        check(changes.size() == 2 && changes.get(0) == a && changes.get(1) == a,
-              "Wrong nested snapshot removed");
-        System.out.println("PASS identity-based removal of equal recursive placement snapshots");
+    return data.toByteArray();
+}
+static byte[] mod(String id, String version, Map<String, String> deps, Map<String, byte[]> inners)
+    throws IOException {
+    var json = new JsonObject();
+    json.addProperty("schemaVersion", 1);
+    json.addProperty("id", id);
+    json.addProperty("version", version);
+    var requires = new JsonObject();
+    deps.forEach(requires::addProperty);
+    json.add("depends", requires);
+    var members = new LinkedHashMap<>(inners);
+    var jars = new JsonArray();
+    for (String n : inners.keySet()) {
+        var e = new JsonObject();
+        e.addProperty("file", n);
+        jars.add(e);
     }
-    public static void main(String[] args) throws Exception {
-        var dir = Files.createDirectories(Path.of(args[0]).resolve("review"));
-        terminal();
-        watcher(dir.resolve("configs"));
-        limits();
-        solve(dir.resolve("solver"));
-        cleanup(dir);
-        placement();
+    json.add("jars", jars);
+    members.put("fabric.mod.json", json.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+    return jar(members);
+}
+static void solve(Path dir) throws Exception {
+    Files.createDirectories(dir);
+    var inners = new TreeMap<String, byte[]>();
+    var deps = new HashMap<String, String>();
+    for (int i = 0; i < 24; i++) {
+        String id = "lib" + i;
+        deps.put(id, "=1.0");
+        for (String ver : List.of("1.0", "2.0"))
+            inners.put(id + "-" + ver + ".jar", mod(id, ver, Map.of(), Map.of()));
     }
+    inners.put("last.jar", mod("zz_narrow", "1.0", deps, Map.of()));
+    Files.write(dir.resolve("parent.jar"), mod("root_mod", "1.0", Map.of(), inners));
+    try (var found = NestedArchives.resolve(dir, false)) {
+        check(found.metadata()
+                      .stream()
+                      .filter(e -> e.id().startsWith("lib") && e.version().equals("1.0"))
+                      .count() == 24,
+              "Wrong nested result");
+        check(found.searchSteps() <= 27, "Excessive backtracking: " + found.searchSteps());
+        System.out.println("PASS MRV solver resolved 24 binary choices in " + found.searchSteps() +
+                           " states");
+    }
+}
+static void cleanup(Path dir) throws Exception {
+    var file = dir.resolve("a file #%.jar");
+    Files.write(file, jar(Map.of("docs/a #%.txt", new byte[] {5})));
+    var cl = Class.forName("mc.unity.bootstrap.GameLoader");
+    var ctor = cl.getDeclaredConstructor(URL[].class, Path.class);
+    ctor.setAccessible(true);
+    var loader = (java.net.URLClassLoader)ctor.newInstance(new URL[] {file.toUri().toURL()}, file);
+    IOException primary = new IOException("first archive");
+    try {
+        var failing = new JarFile(file.toFile()) {
+            public void close() throws IOException {
+                super.close();
+                throw primary;
+            }
+        };
+        var url = method(cl, "url", JarFile.class, String.class);
+        var good = (URL)url.invoke(loader, failing, "docs/a #%.txt");
+        try (var in = good.openStream()) {
+            check(in.read() == 5, "Encoded URL failed");
+        }
+        var missing = (URL)url.invoke(loader, failing, "missing");
+        try (var ignored = missing.openStream()) {
+            throw new AssertionError("Missing resource opened");
+        } catch (FileNotFoundException expected) {}
+        ((Map<Path, JarFile>)field(cl, "mods").get(loader)).put(file, failing);
+        var attempts = new AtomicInteger();
+        field(cl, "nested").set(loader, (AutoCloseable)() -> {
+            if (attempts.getAndIncrement() == 0)
+                throw new IOException("nested archive");
+        });
+        try {
+            cl.getMethod("releaseMods").invoke(loader);
+            throw new AssertionError("Close failure lost");
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            check(cause == primary && cause.getSuppressed().length == 1 &&
+                      cause.getSuppressed()[0].getCause().getMessage().equals("nested archive"),
+                  "Close exception ordering");
+        }
+        try (var ignored = good.openStream()) {
+            throw new AssertionError("Closed resource opened");
+        } catch (IOException expected) {
+            check(expected.getCause() instanceof IllegalStateException, "Closed JAR diagnosis");
+        }
+        loader.close();
+        check(attempts.get() == 2, "Nested close retry lost");
+    } finally {
+        loader.close();
+    }
+    System.out.println("PASS archive close exception preservation and missing/closed resource URLs");
+}
+static void placement() throws Exception {
+    var a = new Placement.Change(null, null, null, null, 3, 0);
+    var b = new Placement.Change(null, null, null, null, 3, 0);
+    check(a.equals(b) && a != b, "Placement fixture");
+    var changes = new ArrayList<>(List.of(a, b, a));
+    method(Placement.class, "discard", List.class, Placement.Change.class).invoke(null, changes, b);
+    check(changes.size() == 2 && changes.get(0) == a && changes.get(1) == a, "Wrong nested snapshot removed");
+    System.out.println("PASS identity-based removal of equal recursive placement snapshots");
+}
+public static void main(String[] args) throws Exception {
+    var dir = Files.createDirectories(Path.of(args[0]).resolve("review"));
+    terminal();
+    watcher(dir.resolve("configs"));
+    limits();
+    solve(dir.resolve("solver"));
+    cleanup(dir);
+    placement();
+}
 }

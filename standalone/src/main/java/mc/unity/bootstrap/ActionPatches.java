@@ -53,11 +53,12 @@ final class ActionPatches {
     private interface Edit {
         boolean apply(CodeBuilder b, CodeElement e, int[] state);
     }
-    private static void patch(
-        TransformPlan plan, String cls, String method, String sig, int expected, Edit edit) {
+    private static void patch(TransformPlan plan, String cls, String method, String sig, int expected,
+                              Edit edit) {
         plan.add(cls, 135, "Unity gameplay", method + sig, (cf, model) -> {
             int[] hits = {0}, state = {-1, 0, 0, 0};
-            var bytes = cf.transformClass(model,
+            var bytes = cf.transformClass(
+                model,
                 ClassTransform.transformingMethodBodies(
                     m -> m.methodName().equalsString(method) && m.methodType().equalsString(sig), (b, e) -> {
                         if (edit.apply(b, e, state))
@@ -130,7 +131,7 @@ final class ActionPatches {
         });
         head(plan, P, "interactOn", "(" + t(E) + t(HAND) + t(VEC) + ")" + t(RESULT), b -> {
             game(b.aload(0).aload(1).aload(2).aload(3), "interactEntity",
-                "(" + t(P) + t(E) + t(HAND) + t(VEC) + ")" + t(RESULT));
+                 "(" + t(P) + t(E) + t(HAND) + t(VEC) + ")" + t(RESULT));
             result(b);
         });
         for (String owner : List.of(LE, SP))
@@ -146,7 +147,8 @@ final class ActionPatches {
                 return false;
             });
         right(plan, false);
-        if(client) right(plan,true);
+        if (client)
+            right(plan, true);
         if (client) {
             String mc = N + "client/Minecraft";
             patch(plan, mc, "startAttack", "()Z", 1, (b, e, k) -> {
@@ -157,19 +159,22 @@ final class ActionPatches {
                 return true;
             });
             emptyHandUse(plan, mc);
-            plan.add(CLIENT, 134, "Unity gameplay", "mining prediction policy",
+            plan.add(
+                CLIENT, 134, "Unity gameplay", "mining prediction policy",
                 (cf, m)
-                    -> cf.transformClass(m,
+                    -> cf.transformClass(
+                        m,
                         ClassTransform.endHandler(
                             b -> b.withField("unity$denyBlockAttack", CD_boolean, ClassFile.ACC_PRIVATE))));
             patch(plan, CLIENT, "lambda$startDestroyBlock$1",
-                "(" + t(S) + t(POS) + t(DIR) + "I)" + t(N + "network/protocol/Packet"), 1, (b, e, k) -> {
-                    if (!invoke(e, "attack"))
-                        return false;
-                    b.aload(0).getfield(ClassDesc.ofInternalName(CLIENT), "unity$denyBlockAttack", CD_boolean);
-                    game(b, "clientBlockAttack", "(" + t(S) + t(L) + t(POS) + t(P) + "Z)V");
-                    return true;
-                });
+                  "(" + t(S) + t(POS) + t(DIR) + "I)" + t(N + "network/protocol/Packet"), 1, (b, e, k) -> {
+                      if (!invoke(e, "attack"))
+                          return false;
+                      b.aload(0).getfield(ClassDesc.ofInternalName(CLIENT), "unity$denyBlockAttack",
+                                          CD_boolean);
+                      game(b, "clientBlockAttack", "(" + t(S) + t(L) + t(POS) + t(P) + "Z)V");
+                      return true;
+                  });
             for (String m : List.of("startDestroyBlock", "continueDestroyBlock"))
                 head(plan, CLIENT, m, "(" + t(POS) + t(DIR) + ")Z", b -> {
                     get(b.aload(0), CLIENT, "minecraft", N + "client/Minecraft");
@@ -201,8 +206,8 @@ final class ActionPatches {
                 if (invoke(e, "playerDestroy")) {
                     b.aload(k[0]);
                     game(b, "harvested",
-                        "(" + t(N + "world/level/block/Block") + t(L) + t(P) + t(POS) + t(S)
-                            + t(N + "world/level/block/entity/BlockEntity") + t(STACK) + t(PLAN) + ")V");
+                         "(" + t(N + "world/level/block/Block") + t(L) + t(P) + t(POS) + t(S) +
+                             t(N + "world/level/block/entity/BlockEntity") + t(STACK) + t(PLAN) + ")V");
                     return true;
                 }
                 return false;
@@ -216,39 +221,52 @@ final class ActionPatches {
                 result(b);
             });
             patch(plan, MODE, "handleBlockBreakAction", "(" + t(POS) + t(PACKET) + t(DIR) + "II)V", 3,
-                (b, e, k) -> {
-                    if (k[0] < 0 && e instanceof Instruction) {
-                        k[0] = b.allocateLocal(TypeKind.REFERENCE);
-                        get(b.aload(0), MODE, "player", SP);
-                        b.aload(1).aload(3).aload(2).invokevirtual(
-                            CD_Enum, "name", MethodTypeDesc.of(CD_String));
-                        game(b, "leftServer", "(" + t(P) + t(POS) + t(DIR) + "Ljava/lang/String;)" + t(PLAN));
-                        b.dup().astore(k[0]);
-                        game(b, "stopMining", "(" + t(PLAN) + ")Z");
-                        fail(b, false);
-                        b.with(e);
-                        return true;
-                    }
-                    if (invoke(e, "onHitBlock")) {
-                        var allow = b.newLabel();
-                        var done = b.newLabel();
-                        game(b.aload(k[0]), "blockDenied", "(" + t(PLAN) + ")Z");
-                        b.ifeq(allow);
-                        for (int i = 0; i < ((InvokeInstruction) e).typeSymbol().parameterCount(); i++) b.pop();
-                        b.goto_(done).labelBinding(allow).with(e).labelBinding(done);
-                        return true;
-                    }
-                    if (invoke(e, "attack")) {
-                        b.aload(k[0]);
-                        game(b, "blockAttack", "(" + t(S) + t(L) + t(POS) + t(P) + t(PLAN) + ")V");
-                        return true;
-                    }
-                    return false;
-                });
+                  (b, e, k) -> {
+                      if (k[0] < 0 && e instanceof Instruction) {
+                          k[0] = b.allocateLocal(TypeKind.REFERENCE);
+                          get(b.aload(0), MODE, "player", SP);
+                          b.aload(1).aload(3).aload(2).invokevirtual(CD_Enum, "name",
+                                                                     MethodTypeDesc.of(CD_String));
+                          game(b, "leftServer",
+                               "(" + t(P) + t(POS) + t(DIR) + "Ljava/lang/String;)" + t(PLAN));
+                          b.dup().astore(k[0]);
+                          game(b, "stopMining", "(" + t(PLAN) + ")Z");
+                          fail(b, false);
+                          b.with(e);
+                          return true;
+                      }
+                      if (invoke(e, "onHitBlock")) {
+                          var allow = b.newLabel();
+                          var done = b.newLabel();
+                          game(b.aload(k[0]), "blockDenied", "(" + t(PLAN) + ")Z");
+                          b.ifeq(allow);
+                          for (int i = 0; i < ((InvokeInstruction)e).typeSymbol().parameterCount(); i++)
+                              b.pop();
+                          b.goto_(done).labelBinding(allow).with(e).labelBinding(done);
+                          return true;
+                      }
+                      if (invoke(e, "attack")) {
+                          b.aload(k[0]);
+                          game(b, "blockAttack", "(" + t(S) + t(L) + t(POS) + t(P) + t(PLAN) + ")V");
+                          return true;
+                      }
+                      return false;
+                  });
         }
         patch(plan, STACK, "useOn", "(" + t(CTX) + ")" + t(RESULT), 1, (b, e, k) -> {
             if (invoke(e, "useOn")) {
-                call(b, PLACE, "use", "(" + t(ITEM) + t(CTX) + ")" + t(RESULT));
+                String use = t(PLACE + "$Use");
+                int slot = b.allocateLocal(TypeKind.REFERENCE);
+                var start = b.newLabel();
+                var end = b.newLabel();
+                var fail = b.newLabel();
+                var done = b.newLabel();
+                call(b.dup2(), PLACE, "begin", "(" + t(ITEM) + t(CTX) + ")" + use);
+                b.astore(slot).labelBinding(start).with(e).labelBinding(end).aload(slot);
+                call(b, PLACE, "finish", "(" + t(RESULT) + use + ")" + t(RESULT));
+                b.goto_(done).labelBinding(fail).aload(slot);
+                call(b, PLACE, "abortUse", "(" + use + ")V");
+                b.athrow().labelBinding(done).exceptionCatchAll(start, end, fail);
                 return true;
             }
             return false;
@@ -266,7 +284,7 @@ final class ActionPatches {
         patch(plan, CHUNK, "setBlockState", "(" + t(POS) + t(S) + "I)" + t(S), 3, (b, e, k) -> {
             if (invoke(e, "preRemoveSideEffects")) {
                 call(b, PLACE, "preRemove",
-                    "(" + t(N + "world/level/block/entity/BlockEntity") + t(POS) + t(S) + ")V");
+                     "(" + t(N + "world/level/block/entity/BlockEntity") + t(POS) + t(S) + ")V");
                 return true;
             }
             if (invoke(e, "affectNeighborsAfterRemoval")) {
@@ -281,13 +299,13 @@ final class ActionPatches {
     }
     private static void emptyHandUse(TransformPlan plan, String owner) {
         plan.add(owner, 135, "Unity gameplay", "startUseItem()V", (cf, model) -> {
-            var method =
-                model.methods()
-                    .stream()
-                    .filter(
-                        m -> m.methodName().equalsString("startUseItem") && m.methodType().equalsString("()V"))
-                    .findFirst()
-                    .orElseThrow();
+            var method = model.methods()
+                             .stream()
+                             .filter(m
+                                     -> m.methodName().equalsString("startUseItem") &&
+                                            m.methodType().equalsString("()V"))
+                             .findFirst()
+                             .orElseThrow();
             var code = method.code().orElseThrow();
             var ins = code.elementList()
                           .stream()
@@ -296,19 +314,18 @@ final class ActionPatches {
                           .toList();
             int match = -1, hand = -1;
             for (int i = 0; i < ins.size(); i++) {
-                if (!(ins.get(i) instanceof InvokeInstruction call)
-                    || !call.owner().asInternalName().equals(CLIENT) || !call.name().equalsString("useItem"))
+                if (!(ins.get(i) instanceof InvokeInstruction call) ||
+                    !call.owner().asInternalName().equals(CLIENT) || !call.name().equalsString("useItem"))
                     continue;
-                if (i == 0 || !(ins.get(i - 1) instanceof LoadInstruction load)
-                    || load.typeKind() != TypeKind.REFERENCE)
+                if (i == 0 || !(ins.get(i - 1) instanceof LoadInstruction load) ||
+                    load.typeKind() != TypeKind.REFERENCE)
                     throw new IOException("Missing hand argument for useItem");
                 int guard = i - 2;
-                while (guard >= 0
-                    && (ins.get(guard) instanceof LoadInstruction
-                        || ins.get(guard) instanceof FieldInstruction))
+                while (guard >= 0 && (ins.get(guard) instanceof LoadInstruction || ins.get(guard) instanceof
+                                                                                       FieldInstruction))
                     guard--;
-                if (guard < 1 || ins.get(guard).opcode() != Opcode.IFNE
-                    || !invoke(ins.get(guard - 1), "isEmpty") || match >= 0)
+                if (guard < 1 || ins.get(guard).opcode() != Opcode.IFNE ||
+                    !invoke(ins.get(guard - 1), "isEmpty") || match >= 0)
                     throw new IOException("Ambiguous held-stack guard before useItem");
                 match = guard - 1;
                 hand = load.slot();
@@ -317,8 +334,10 @@ final class ActionPatches {
                 throw new IOException("Missing held-stack guard");
             final int target = match, handArg = hand;
             int[] index = {0};
-            return cf.transformClass(model,
-                ClassTransform.transformingMethodBodies(m
+            return cf.transformClass(
+                model,
+                ClassTransform.transformingMethodBodies(
+                    m
                     -> m.methodName().equalsString("startUseItem") && m.methodType().equalsString("()V"),
                     (cb, el) -> {
                         if (el instanceof Instruction && index[0]++ == target) {
@@ -327,7 +346,7 @@ final class ActionPatches {
                             cb.aload(handArg);
                             get(cb.aload(0), owner, "hitResult", N + "world/phys/HitResult");
                             game(cb, "emptyRight",
-                                "(" + t(STACK) + t(P) + t(HAND) + t(N + "world/phys/HitResult") + ")V");
+                                 "(" + t(STACK) + t(P) + t(HAND) + t(N + "world/phys/HitResult") + ")V");
                         }
                         cb.with(el);
                     }));
@@ -341,7 +360,7 @@ final class ActionPatches {
             if (k[0] < 0 && e instanceof Instruction) {
                 k[0] = b.allocateLocal(TypeKind.REFERENCE);
                 game(b.aload(1).aload(client ? 2 : 4).aload(client ? 3 : 5), "useBlock",
-                    "(" + t(P) + t(HAND) + t(HIT) + ")" + t(PLAN));
+                     "(" + t(P) + t(HAND) + t(HIT) + ")" + t(PLAN));
                 b.dup().astore(k[0]);
                 game(b, "cancelResult", "(" + t(PLAN) + ")" + t(RESULT));
                 result(b);

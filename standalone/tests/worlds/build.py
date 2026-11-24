@@ -18,7 +18,7 @@ def build(refs,fabric,cache,out,home=None):
         if hashlib.sha256(f.read_bytes()).hexdigest()!=lock["modules"][f.name]:raise ValueError(f)
         api.append(f)
     client=home/"versions/26.2/26.2.jar"
-    cp=api+[ROOT/"standalone/lib/unity-client-api-0.2.2.jar",client,*sorted((cache/"libraries").rglob("*.jar")),*sorted(p for p in (home/"libraries").rglob("*.jar") if "/mc/unity/" not in p.as_posix())]
+    cp=api+[ROOT/"standalone/lib/unity-client-api-0.2.3.jar",client,*sorted((cache/"libraries").rglob("*.jar")),*sorted(p for p in (home/"libraries").rglob("*.jar") if "/mc/unity/" not in p.as_posix())]
     with tempfile.TemporaryDirectory(dir=out) as local:
         tmp=Path(local);classes=tmp/"classes";classes.mkdir()
         subprocess.run(["javac","--release","25","-g:none","-proc:none","-encoding","UTF-8","-cp",os.pathsep.join(map(str,cp)),"-d",classes,*sorted(Path(__file__).parent.glob("*.java")),ROOT/"src/main/java/mc/unity/api/UnityMod.java",ROOT/"standalone/src/main/java/mc/unity/api/TickingMod.java"],check=True)

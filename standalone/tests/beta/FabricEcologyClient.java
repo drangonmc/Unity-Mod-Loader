@@ -52,6 +52,7 @@ public class FabricEcologyClient implements ClientModInitializer {
         }
     }
     public void onInitializeClient() {
+        FabricPlayClient.bind();
         net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK.register(
             this::clientFallback);
         FabricPhaseClient.bind();

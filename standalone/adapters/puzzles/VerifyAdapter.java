@@ -26,7 +26,10 @@ class VerifyAdapter {
         check(PlayNetwork.manifest().isEmpty(),"Optional wire must not enter mandatory digest");
         var yes=new Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
         var no=new Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
-        var offers=(Collection<?>)lookup("offers").invoke(null);
+        var offerMethod=lookup("offers",net.minecraft.network.protocol.PacketFlow.class);
+        var offers=(Collection<?>)offerMethod.invoke(null,net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
+        check(offers.equals(offerMethod.invoke(null,net.minecraft.network.protocol.PacketFlow.CLIENTBOUND)),
+              "Bidirectional optional registration must be offered by both peers");
         check(offers.size()==1 && !PlayNetwork.hasChannel(yes,TestPacket.ID),"Premature optional channel");
         var agree=lookup("agree",Connection.class,Collection.class);
         agree.invoke(null,yes,offers);
