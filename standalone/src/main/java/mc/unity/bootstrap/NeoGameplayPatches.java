@@ -38,8 +38,16 @@ final class NeoGameplayPatches {
                     hits[0]++;
                     b.aload(0).aload(0).getfield(options,"keyMappings",keyArray).aload(0)
                         .invokestatic(ClassDesc.of("net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent"),"collect",MethodTypeDesc.of(keyArray,keyArray,options))
-                        .putfield(options,"keyMappings",keyArray);
+                        .putfield(options,"keyMappings",keyArray).aload(0)
+                        .invokestatic(ClassDesc.of("net.minecraftforge.client.event.RegisterKeyMappingsEvent"),"fire",MethodTypeDesc.of(CD_void,options));
                 }
+            }).andThen((builder,element)->{
+                if(element instanceof FieldModel f && f.fieldName().equalsString("keyMappings") && f.fieldTypeSymbol().equals(keyArray)) {
+                    builder.transformField(f,(field,part)->{
+                        if(part instanceof AccessFlags flags)field.withFlags(flags.flagsMask() & ~ClassFile.ACC_FINAL);
+                        else field.with(part);
+                    });
+                } else builder.with(element);
             }));
             if(hits[0]!=1)throw new java.io.IOException("Unexpected Options key mapping assignments: "+hits[0]);
             return bytes;

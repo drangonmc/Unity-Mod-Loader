@@ -49,6 +49,7 @@ public final class Renderers {
         }
     }
     public static void close() {
+        net.minecraftforge.client.event.RegisterKeyMappingsEvent.clear();
         net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers.clear();
         net.minecraftforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions.clear();
         ModelLayers.clear();

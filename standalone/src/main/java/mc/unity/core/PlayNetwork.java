@@ -13,7 +13,11 @@ import net.minecraft.util.thread.BlockableEventLoop;
 
 /** Gameplay-only codecs. Configuration, vanilla channels, and unknown IDs keep their native codecs. */
 public final class PlayNetwork {
-    public record Context(Connection connection, ServerPlayer sender, BlockableEventLoop<?> executor) {
+    public record Context(Connection connection, Supplier<ServerPlayer> currentPlayer, BlockableEventLoop<?> executor) {
+        public Context(Connection connection, ServerPlayer sender, BlockableEventLoop<?> executor) {
+            this(connection, () -> sender, executor);
+        }
+        public ServerPlayer sender() { return currentPlayer.get(); }
         public CompletableFuture<Void> enqueue(Runnable r) {
             if (executor.isSameThread()) {
                 r.run();
@@ -281,17 +285,29 @@ public final class PlayNetwork {
             }
         };
     }
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    public static boolean dispatchServer(ServerboundCustomPayloadPacket packet,
+                                         net.minecraft.server.network.ServerGamePacketListenerImpl listener,
+                                         Connection connection, net.minecraft.server.MinecraftServer server) {
+        var payload = packet.payload();
+        var binding = lookup(payload.type().id(), PacketFlow.SERVERBOUND);
+        if (binding == null) return false;
+        if (binding.main)
+            net.minecraft.network.protocol.PacketUtils.ensureRunningOnSameThread(packet,listener,server.packetProcessor());
+        return deliver(payload, new Context(connection, listener::getPlayer, server), PacketFlow.SERVERBOUND, binding);
+    }
     public static boolean dispatch(CustomPacketPayload payload, Connection connection, ServerPlayer sender,
                                    BlockableEventLoop<?> executor) {
         var flow = sender == null ? PacketFlow.CLIENTBOUND : PacketFlow.SERVERBOUND;
-        Binding b = lookup(payload.type().id(), flow);
-        if (b == null)
-            return false;
+        var b = lookup(payload.type().id(), flow);
+        return b != null && deliver(payload, new Context(connection,sender,executor), flow, b);
+    }
+    @SuppressWarnings({"rawtypes","unchecked"})
+    private static boolean deliver(CustomPacketPayload payload, Context ctx, PacketFlow flow, Binding b) {
+        var connection = ctx.connection();
+        var executor = ctx.executor();
         check(b.channel, payload, flow);
         if (!allowed(connection, b))
             throw new IllegalArgumentException("Unnegotiated channel " + payload.type().id());
-        var ctx = new Context(connection, sender, executor);
         Runnable run = () -> {
             if (!connection.isConnected())
                 return;

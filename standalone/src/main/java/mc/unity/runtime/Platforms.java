@@ -16,6 +16,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public final class Platforms implements AutoCloseable {
     private static Platforms active;
     private boolean client;
+    private final Map<String, List<String>> neoSubscribers = new HashMap<>();
     private final Map<String, net.neoforged.fml.ModContainer> neoContainers = new LinkedHashMap<>();
     private List<Entry> ordered = List.of();
     private Set<String> ids = Set.of();
@@ -39,11 +40,6 @@ public final class Platforms implements AutoCloseable {
         session.client = side.equals("CLIENT");
         active = session;
         try {
-            if (Files.isDirectory(game.resolve("plugins")))
-                try (var files = Files.list(game.resolve("plugins"))) {
-                    if (files.anyMatch(p -> p.toString().endsWith(".jar")))
-                        throw new IOException("Plugins are unsupported by this runtime");
-                }
             Map<Path, JarFile> jars;
             try {
                 @SuppressWarnings("unchecked")
@@ -74,7 +70,11 @@ public final class Platforms implements AutoCloseable {
                                         .getMethod("plainLibrary", Path.class)
                                         .invoke(domain(), file);
                     boolean dataPack = f && (g || n) && UniversalData.matches(jar);
-                    if (!plain && !dataPack && (f ? 1 : 0) + (n ? 1 : 0) + (g ? 1 : 0) != 1)
+                    var choice = PlatformChoice.read(jar);
+                    if (choice.multiple())
+                        System.out.println("[Unity] " + file.getFileName() + " selected " + choice.kind() +
+                                           " on " + side);
+                    if (!plain && choice.kind() == null)
                         throw new IOException("Expected one supported platform descriptor");
                     var annotated = new ArrayList<ClassModel>();
                     var models = new ArrayList<ClassModel>();
@@ -96,12 +96,17 @@ public final class Platforms implements AutoCloseable {
                                     annotated.add(m);
                             }
                         }
-                    boolean alternateProvider = n && (boolean)domain()
-                                                         .getClass()
-                                                         .getMethod("usesPuzzlesSpi", Path.class)
-                                                         .invoke(domain(), file);
+                    boolean alternateProvider =
+                        choice.kind() == Entry.Kind.NEOFORGE && (boolean)domain()
+                                                                    .getClass()
+                                                                    .getMethod("usesPuzzlesSpi", Path.class)
+                                                                    .invoke(domain(), file);
                     var inactive = FabricEntrypoints.inactive(
                         f ? NestedArchives.json(jar, "fabric.mod.json") : null, session.client, models);
+                    inactive = new HashSet<>(inactive);
+                    inactive.addAll(mc.unity.adapter.common.SidedClasses.inactive(
+                        models, choice, session.client,
+                        f ? NestedArchives.json(jar, "fabric.mod.json") : null));
                     for (var model : models)
                         if (!inactive.contains(model.thisClass().asInternalName())) {
                             try {
@@ -150,6 +155,8 @@ public final class Platforms implements AutoCloseable {
                             }
                         for (var meta : metas) {
                             metadata.put(meta.id(), meta);
+                            if (n) session.neoSubscribers.put(meta.id(),
+                                NeoAdapter.subscribers(annotated, inactive, meta.id(), metas.size() == 1));
                             entries.add(
                                 n ? NeoAdapter.read(file, side, annotated, meta)
                                   : ForgeCommands.read(file, side, annotated, meta, metas.size() == 1));
@@ -182,6 +189,7 @@ public final class Platforms implements AutoCloseable {
             session.ids = Set.copyOf(seen);
             session.ordered = order(byId);
             for (var e : session.ordered) {
+                Content.version(e.id(), e.version());
                 var jar = jars.get(e.file());
                 if (e.kind() == Entry.Kind.NEOFORGE) {
                     var meta = metadata.get(e.id());
@@ -189,18 +197,21 @@ public final class Platforms implements AutoCloseable {
                         e.id(), new net.neoforged.fml.ModContainer(e.id(), new NeoBus(e.id()), meta.title(),
                                                                    meta.description()));
                 }
+                boolean clientOnly=e.kind()==Entry.Kind.FORGE && FmlDescriptor.clientSideOnly(jar);
+                if(clientOnly)Content.localResources(e.id());
                 var fabric = NestedArchives.json(jar, "fabric.mod.json");
                 if (fabric != null && fabric.has("environment") &&
                     !fabric.get("environment").getAsString().equals("*"))
                     Content.localResources(e.id());
                 if (fabric != null && UniversalData.matches(jar)) {
-                    Content.dataArchive(e.id(), e.file(), UniversalData.hasAssets(jar));
+                    Content.dataArchive(e.id(), e.file(), UniversalData.hasAssets(jar),
+                                        UniversalData.hasData(jar));
                     continue;
                 }
                 Content.source(
                     e.id(), e.file(),
                     jar.versionedStream().anyMatch(x
-                                                   -> x.getName().startsWith("assets/" + e.id() + "/") ||
+                                                   -> clientOnly && x.getName().startsWith("assets/") || x.getName().startsWith("assets/" + e.id() + "/") ||
                                                           x.getName().startsWith("data/" + e.id() + "/")));
             }
             net.minecraftforge.fml.loading.FMLPaths.setup(game);
@@ -383,6 +394,18 @@ public final class Platforms implements AutoCloseable {
                 }
                 }
             }
+        for (var entry : ordered) {
+            var container = neoContainers.get(entry.id());
+            if (container == null) continue;
+            var previous = net.neoforged.fml.ModLoadingContext.enter(container);
+            try {
+                for (var name : neoSubscribers.getOrDefault(entry.id(), List.of())) {
+                    var listener = Class.forName(name, true, domain());
+                    ((NeoBus) container.getEventBus()).register(listener, true);
+                    ((NeoBus) net.neoforged.neoforge.common.NeoForge.EVENT_BUS).register(listener, true);
+                }
+            } finally { net.neoforged.fml.ModLoadingContext.enter(previous); }
+        }
         net.minecraftforge.registries.DataPackRegistryEvent.NewRegistry.fire();
         for (var container : neoContainers.values()) {
             var previous = net.neoforged.fml.ModLoadingContext.enter(container);

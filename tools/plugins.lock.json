@@ -1,0 +1,29 @@
+[
+  {
+    "slug": "keepchunks",
+    "version_id": "v7LjD3AV",
+    "filename": "KeepChunks-1.7.3.jar",
+    "url": "https://cdn.modrinth.com/data/lyQqh3RC/versions/v7LjD3AV/KeepChunks-1.7.3.jar",
+    "sha512": "4e78b64d0fe73dcc240eecdbc5037b9bc1205848fafac526c30cd185d7b5aa0a22963045e4c8dfca02e37b41c4d4140e20737612607f5c915457c050f49e3a9e",
+    "size": 97267,
+    "source": "https://github.com/Geitenijs/KeepChunks"
+  },
+  {
+    "slug": "serveruptime",
+    "version_id": "t6FQoUOO",
+    "filename": "ServerUptime-1.0.5+26.2.jar",
+    "url": "https://cdn.modrinth.com/data/xVW8dbUh/versions/t6FQoUOO/ServerUptime-1.0.5%2B26.2.jar",
+    "sha512": "7c48e4a8c014a573e3fa07bd5ec47305375e58cc9b4fb5dd9e231b553132cb2ca63d3af22486c9e04ca5be621657850a672846aae9b74392eddf385d1116e9e9",
+    "size": 3559,
+    "source": "https://github.com/DeluxerPanda/ServerUptime/tree/main"
+  },
+  {
+    "slug": "just-a-ping",
+    "version_id": "Je6L2Qzx",
+    "filename": "just-a-ping-public-1.0-Paper-26.2.jar",
+    "url": "https://cdn.modrinth.com/data/wbNuNJR5/versions/Je6L2Qzx/just-a-ping-public-1.0-Paper-26.2.jar",
+    "sha512": "baae5b592735a11a4c512adaabb5bbe01311185a3971c60849fe6e963d4e4a6e5a1f843240228e55c2721602d49212e593a27ae1cbbadc3f3f5cc451ba78869e",
+    "size": 2687,
+    "source": "https://modrinth.com/plugin/just-a-ping"
+  }
+]

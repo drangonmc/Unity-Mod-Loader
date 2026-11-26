@@ -32,7 +32,7 @@ public final class LoaderView implements FabricLoader, AutoCloseable {
         com.google.gson.JsonObject metadata = new com.google.gson.JsonObject();
         View parent;
         final List<ModContainer> children = new ArrayList<>();
-        final Map<String, Object> instances = new HashMap<>();
+        final Map<EntryKey, Resolution> instances = new HashMap<>();
         public Optional<ModContainer> getContainingMod() {
             return Optional.ofNullable(parent);
         }
@@ -193,22 +193,90 @@ public final class LoaderView implements FabricLoader, AutoCloseable {
                         return definition;
                     }
                     public T getEntrypoint() {
-                        synchronized (v.instances) {
-                            return type.cast(v.instances.computeIfAbsent(
-                                key + " " + definition + " " + type.getName(), unused -> {
-                                    try {
-                                        return resolve(definition, type);
-                                    } catch (ReflectiveOperationException ex) {
-                                        throw new IllegalStateException(
-                                            "Entrypoint " + v.getId() + " " + definition, ex);
-                                    }
-                                }));
-                        }
+                        return instance(v, new EntryKey(key, definition, type), type);
                     }
                 });
             }
         }
         return List.copyOf(result);
+    }
+    private record EntryKey(String stage, String definition, Class<?> type) {}
+    private static final class Resolution {
+        Thread owner = Thread.currentThread();
+        final java.util.concurrent.CompletableFuture<Object> result =
+            new java.util.concurrent.CompletableFuture<>();
+    }
+    private final Map<Thread, Resolution> waiting = new IdentityHashMap<>();
+    private <T> T instance(View view, EntryKey key, Class<T> type) {
+        Thread caller = Thread.currentThread();
+        Resolution slot;
+        boolean construct;
+        synchronized (waiting) {
+            slot = view.instances.get(key);
+            construct = slot == null;
+            if (construct) {
+                slot = new Resolution();
+                view.instances.put(key, slot);
+            } else if (!slot.result.isDone()) {
+                for (var dependency = slot; dependency != null && !dependency.result.isDone();
+                     dependency = waiting.get(dependency.owner)) {
+                    if (dependency.owner == caller)
+                        throw new IllegalStateException("Circular Fabric entrypoint " + view.getId() + " " +
+                                                        key.definition);
+                }
+                waiting.put(caller, slot);
+            }
+        }
+        if (construct) {
+            try {
+                Object value = Objects.requireNonNull(resolve(key.definition, type), "null entrypoint");
+                synchronized (waiting) {
+                    slot.owner = null;
+                }
+                slot.result.complete(value);
+            } catch (Throwable failure) {
+                synchronized (waiting) {
+                    view.instances.remove(key, slot);
+                    slot.owner = null;
+                }
+                slot.result.completeExceptionally(failure);
+            }
+        }
+        try {
+            return type.cast(slot.result.join());
+        } catch (java.util.concurrent.CompletionException ex) {
+            if (ex.getCause() instanceof Error error)
+                throw error;
+            throw new IllegalStateException("Entrypoint " + view.getId() + " " + key.definition,
+                                            ex.getCause());
+        } finally {
+            synchronized (waiting) {
+                waiting.remove(caller, slot);
+            }
+        }
+    }
+    private static java.lang.reflect.Method sam(Class<?> type) {
+        java.lang.reflect.Method result = null;
+        for (var method : type.getMethods()) {
+            if (!java.lang.reflect.Modifier.isAbstract(method.getModifiers()) || method.isBridge())
+                continue;
+            try {
+                Object.class.getMethod(method.getName(), method.getParameterTypes());
+                continue;
+            } catch (NoSuchMethodException realAbstractMethod) {}
+            if (result == null)
+                result = method;
+            else if (!result.getName().equals(method.getName()) ||
+                     !Arrays.equals(result.getParameterTypes(), method.getParameterTypes()))
+                throw new IllegalArgumentException("Expected a functional entrypoint interface " +
+                                                   type.getName());
+            else if (result.getReturnType().isAssignableFrom(method.getReturnType()))
+                result = method;
+        }
+        if (!type.isInterface() || result == null)
+            throw new IllegalArgumentException("Expected a functional entrypoint interface " +
+                                               type.getName());
+        return result;
     }
     public <T> T entrypoint(String id, String key, String definition, Class<T> type) {
         for (var container : getEntrypointContainers(key, type))
@@ -226,12 +294,20 @@ public final class LoaderView implements FabricLoader, AutoCloseable {
             var field = cls.getField(parts[1]);
             return type.cast(field.get(null));
         } catch (NoSuchFieldException absent) {
-            var sam = Arrays.stream(type.getMethods())
-                          .filter(m -> java.lang.reflect.Modifier.isAbstract(m.getModifiers()))
-                          .toList();
-            if (sam.size() != 1)
-                throw new IllegalArgumentException("Expected a functional entrypoint " + definition);
-            var method = cls.getMethod(parts[1], sam.getFirst().getParameterTypes());
+            var abstractMethod = sam(type);
+            java.lang.reflect.Method method;
+            try {
+                method = cls.getMethod(parts[1], abstractMethod.getParameterTypes());
+            } catch (NoSuchMethodException differentErasure) {
+                var named = Arrays.stream(cls.getMethods())
+                                .filter(m
+                                        -> !m.isBridge() && m.getName().equals(parts[1]) &&
+                                               m.getParameterCount() == abstractMethod.getParameterCount())
+                                .toList();
+                if (named.size() != 1)
+                    throw differentErasure;
+                method = named.getFirst();
+            }
             var handle = java.lang.invoke.MethodHandles.publicLookup().unreflect(method);
             if (!java.lang.reflect.Modifier.isStatic(method.getModifiers()))
                 handle = handle.bindTo(cls.getConstructor().newInstance());

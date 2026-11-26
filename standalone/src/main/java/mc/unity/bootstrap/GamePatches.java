@@ -27,6 +27,23 @@ final class GamePatches {
         var cf = ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(
             ClassHierarchyResolver.ofResourceParsing(loader).cached()));
         var plan = new TransformPlan();
+        if (!client) {
+            plan.add("net/minecraft/server/Main", 50, "Unity archive lifetime", "main -> spin", (file, model) -> {
+                int[] hits = {0};
+                byte[] bytes = file.transformClass(model, ClassTransform.transformingMethodBodies(
+                    m -> m.methodName().equalsString("main"), (b, e) -> {
+                        b.with(e);
+                        if (e instanceof java.lang.classfile.instruction.InvokeInstruction call &&
+                            call.owner().asInternalName().equals(SERVER) && call.name().equalsString("spin") &&
+                            call.type().equalsString("(Ljava/util/function/Function;)L"+SERVER+";")) {
+                            b.dup().invokestatic(ClassDesc.of("mc.unity.runtime.Dedicated"),"startedThread",SERVER_ARG);
+                            hits[0]++;
+                        }
+                    }));
+                if (hits[0]!=1) throw new IOException("Missing dedicated server thread handoff");
+                return bytes;
+            });
+        }
         plan.add("net/minecraft/core/Holder", 40, "NeoForge holder ABI", "permitted subclasses",
                  (file, model) -> file.transformClass(model, (b, e) -> {
                      if (!(e instanceof java.lang.classfile.attribute.PermittedSubclassesAttribute))
@@ -65,6 +82,7 @@ final class GamePatches {
         InventoryPatches.add(plan);
         LifecyclePatches.add(plan, client);
         LevelPatches.add(plan);
+        BukkitPatches.add(plan);
         ActionPatches.add(plan, client);
         NeoDataPatches.add(plan);
         NeoGameplayPatches.add(plan, client);

@@ -422,8 +422,8 @@ class RuntimeChecks {
     }
     public static void main(String[] args) throws Exception {
         Path root = Path.of(args[0]).toRealPath(), temp = Path.of(args[1]).toRealPath();
-        var core = root.resolve("versions/0.2.3-Beta/unity-loader-0.2.3-Beta.jar");
-        Path runtime = root.resolve("cache/0.2.3-Beta");
+        var core = (args.length>2 ? Path.of(args[2]) : root.resolve("versions/0.2.5-Beta/unity-loader-0.2.5-Beta.jar"));
+        Path runtime = (args.length>3 ? Path.of(args[3]) : root.resolve("cache/0.2.5-Beta"));
         var files = new ArrayList<Path>(List.of(core, runtime.resolve("versions/26.2/server-26.2.jar")));
         try (var paths = Files.walk(runtime.resolve("libraries"))) {
             files.addAll(paths.filter(p -> p.toString().endsWith(".jar")).toList());
@@ -441,10 +441,15 @@ class RuntimeChecks {
         String name = "net.minecraft.server.MinecraftServer";
         var server = ClassDesc.of(name);
         var empty = MethodTypeDesc.of(CD_void);
+        var eventLoop=ClassDesc.of("net.minecraft.util.thread.ReentrantBlockableEventLoop");
         var stub = cf.build(server, b -> {
+            // Match the verified 26.2 server hierarchy even for code reached during shutdown.
+            b.withSuperclass(eventLoop);
+            b.withInterfaceSymbols(ClassDesc.of("net.minecraft.commands.CommandSource"),ClassDesc.of("net.minecraft.server.ServerInfo"),
+                                   ClassDesc.of("net.minecraft.world.level.chunk.storage.ChunkIOErrorReporter"));
             b.withField("status", CD_int, 0);
             b.withMethodBody("<init>", empty, ClassFile.ACC_PUBLIC,
-                c -> c.aload(0).invokespecial(CD_Object, "<init>", empty).return_());
+                c -> c.aload(0).ldc("Unity fixture").iconst_0().invokespecial(eventLoop, "<init>", MethodTypeDesc.of(CD_void,CD_String,CD_boolean)).return_());
             b.withMethodBody("runServer", empty, ClassFile.ACC_PUBLIC,
                 c -> c.aload(0).iconst_1().putfield(server, "status", CD_int).return_());
             b.withMethodBody("tickServer",

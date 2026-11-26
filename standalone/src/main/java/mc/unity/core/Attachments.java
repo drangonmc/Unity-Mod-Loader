@@ -46,6 +46,7 @@ public final class Attachments {
     private static final String FIELD = "unity:attachments";
     private static final Map<Identifier, Key<?>> keys = new LinkedHashMap<>();
     private final Map<Key<?>, Object> values = new IdentityHashMap<>();
+    private CompoundTag lastGood = new CompoundTag();
     private CompoundTag unknown = new CompoundTag();
     public static synchronized void register(Key<?> key) {
         if (keys.putIfAbsent(key.id(), key) != null)
@@ -63,7 +64,10 @@ public final class Attachments {
         var data = owner.unity$attachments(value != null);
         if (data == null)
             return null;
-        data.unknown.remove(key.id().toString());
+        String name = key.id().toString();
+        if (value == null) data.lastGood.remove(name);
+        else if (data.unknown.contains(name)) data.lastGood.put(name, data.unknown.get(name).copy());
+        data.unknown.remove(name);
         T old = (T)(value == null ? data.values.remove(key) : data.values.put(key, value));
         if (owner instanceof BlockEntity tile)
             tile.setChanged();
@@ -80,10 +84,23 @@ public final class Attachments {
             set(owner, key, value);
     }
     private <O, T> void encodeEntry(RecordBuilder<O> result, DynamicOps<O> ops, Key<T> key) {
-        if (key.codec() != null && !unknown.contains(key.id().toString())) {
+        String name = key.id().toString();
+        if (unknown.contains(name)) return;
+        try {
+            var codec = key.codec();
+            if (codec == null) return;
             @SuppressWarnings("unchecked") T value = (T)values.get(key);
-            result.add(key.id().toString(), key.codec().encodeStart(ops, value));
+            O encoded = codec.encodeStart(ops, value).getOrThrow();
+            var raw = ops.convertTo(NbtOps.INSTANCE, encoded);
+            lastGood.put(name, raw.copy());
+            result.add(name, encoded);
+            return;
+        } catch (RuntimeException failure) {
+            LOGGER.warn("Could not encode attachment {}; previous serialized value available: {}",
+                        name, lastGood.contains(name), failure);
         }
+        var saved = lastGood.get(name);
+        if (saved != null) result.add(name, NbtOps.INSTANCE.convertTo(ops, saved));
     }
     private static final Codec<Attachments> CODEC = new Codec<>() {
         public <O> DataResult<O> encode(Attachments data, DynamicOps<O> ops, O prefix) {
@@ -110,6 +127,7 @@ public final class Attachments {
                         try {
                             var decoded = key.codec().parse(ops, entry.getSecond());
                             if (decoded.result().isPresent()) {
+                                data.lastGood.put(name, ops.convertTo(NbtOps.INSTANCE, entry.getSecond()).copy());
                                 data.values.put(key, decoded.result().orElseThrow());
                                 continue;
                             }
@@ -175,6 +193,7 @@ public final class Attachments {
     private static void copy(Attachments from, Attachments to) {
         to.values.putAll(from.values);
         to.unknown = from.unknown.copy();
+        to.lastGood = from.lastGood.copy();
     }
     public static void save(Owner owner, ValueOutput output) {
         var data = owner.unity$attachments(false);
@@ -188,9 +207,7 @@ public final class Attachments {
             return;
         data.values.clear();
         data.unknown = new CompoundTag();
-        saved.ifPresent(decoded -> {
-            data.values.putAll(decoded.values);
-            data.unknown = decoded.unknown;
-        });
+        data.lastGood = new CompoundTag();
+        saved.ifPresent(decoded -> copy(decoded, data));
     }
 }

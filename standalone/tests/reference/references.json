@@ -1,0 +1,34 @@
+{
+  "paper.jar": {
+    "url": "https://fill-data.papermc.io/v1/objects/0de30efb024bc8b83c9c7d507d11802897ad8056b6110ec09fe1a91d126ccb54/paper-26.2-121.jar",
+    "sha256": "0de30efb024bc8b83c9c7d507d11802897ad8056b6110ec09fe1a91d126ccb54"
+  },
+  "mdk-pinned.zip": {
+    "url": "https://codeload.github.com/NeoForgeMDKs/MDK-26.2-ModDevGradle/zip/9e2388ea72e8df3ea6fd34998656b1288121a23d",
+    "sha256": "09fd1e4ae4a2462ffd8eb685c76b3a7d569820673e5971930e9c2792db2b7fc9"
+  },
+  "neo-upstream.zip": {
+    "url": "https://codeload.github.com/neoforged/NeoForge/zip/b6c967adb1ed258f36639204cdea70800d198c0f",
+    "sha256": "dc96c8d9c6d287d9ff686c24509c3cbafb6b1a8cd3826e9ca175233dbee9461b"
+  },
+  "fabric-upstream.zip": {
+    "url": "https://codeload.github.com/FabricMC/fabric/zip/e14617e8d44c8eacf6c24e63dc6a694c283bf9f7",
+    "sha256": "a026faee5a43a36cdbd6c158a79e67d67278c8b5955d8637cb0c2fe47ae67517"
+  },
+  "fabric-server.jar": {
+    "url": "https://meta.fabricmc.net/v2/versions/loader/26.2/0.19.3/1.1.1/server/jar",
+    "sha256": "99829c49ec8f8eec08a2eb95005f37bbb9d56abfedc0e7d687ad5bed65728376"
+  },
+  "fabric-gametest.jar": {
+    "url": "https://maven.fabricmc.net/net/fabricmc/fabric-api/fabric-gametest-api-v1/4.0.21+4a7fa0819c/fabric-gametest-api-v1-4.0.21+4a7fa0819c.jar",
+    "sha256": "a4240382300181927cfa3b7dc5046f54631a7f655214bcc435b8b91459108ad1"
+  },
+  "neo-framework.jar": {
+    "url": "https://maven.neoforged.net/releases/net/neoforged/testframework/26.2.0.93/testframework-26.2.0.93.jar",
+    "sha256": "d51bfb48596d5b26bf65b1eff67599c3d748b9fab61aa2ccea914d70feea5593"
+  },
+  "neo-installer.jar": {
+    "url": "https://maven.neoforged.net/releases/net/neoforged/neoforge/26.2.0.93/neoforge-26.2.0.93-installer.jar",
+    "sha256": "7618883b9d87186281da2bd2a5e9a11af042ed15112bb63ccfc62bb0230ca699"
+  }
+}

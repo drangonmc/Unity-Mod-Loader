@@ -46,6 +46,21 @@ final class GameActionProbe {
                 out.addProperty("startZ", walkStart);
                 out.addProperty("endZ", me.getZ());
             }
+            case "qaKeyPress" -> {
+                String name=req.get("name").getAsString();
+                var matches=java.util.Arrays.stream(mc.options.keyMappings).filter(k->k.getName().equals(name)).toList();
+                if(matches.size()!=1)throw new IllegalStateException("Expected one key binding "+name+": "+matches.size());
+                var key=matches.getFirst().getDefaultKey();
+                net.minecraft.client.KeyMapping.set(key,true);
+                net.minecraft.client.KeyMapping.set(key,false);
+            }
+            case "qaFlight" -> {
+                if(!me.getAbilities().mayfly)throw new IllegalStateException("Flight not available");
+                me.getAbilities().flying=true;me.onUpdateAbilities();
+            }
+            case "qaSelect" -> {
+                me.getInventory().setSelectedSlot(slot);
+            }
             case "qaCommand" -> {
                 mc.getConnection().sendCommand(req.get("cmd").getAsString());
             }
@@ -169,11 +184,18 @@ final class GameActionProbe {
                     "hand", BuiltInRegistries.ITEM.getKey(p.getMainHandItem().getItem()).toString());
                 out.addProperty("held", p.getMainHandItem().getCount());
                 out.addProperty("damage", p.getMainHandItem().getDamageValue());
+                out.addProperty("chest",BuiltInRegistries.ITEM.getKey(p.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST).getItem()).toString());
                 out.addProperty("dead", p.isDeadOrDying());
                 out.addProperty("x", p.getX());
                 out.addProperty("y", p.getY());
                 out.addProperty("z", p.getZ());
                 if (p == me) {
+                    out.addProperty("mayfly",me.getAbilities().mayfly);
+                    out.addProperty("flying",me.getAbilities().flying);
+                    out.addProperty("xpLevel",me.experienceLevel);
+                    out.addProperty("xpProgress",me.experienceProgress);
+                    out.addProperty("xpPoints",Math.round(me.experienceProgress*me.getXpNeededForNextLevel()));
+                    out.addProperty("selected",me.getInventory().getSelectedSlot());
                     var bag = new JsonObject();
                     for (int i = 0; i < me.getInventory().getContainerSize(); i++) {
                         var stack = me.getInventory().getItem(i);
@@ -183,6 +205,27 @@ final class GameActionProbe {
                                     + stack.getDamageValue());
                     }
                     out.add("bag", bag);
+                }
+            }
+            case "qaProtectedUse", "qaProtectedBow" -> {
+                if(first) {
+                    me.getInventory().setSelectedSlot(slot);
+                    Vec3 target;
+                    if(req.has("name")) {
+                        var other=mc.level.players().stream().filter(p->p.getGameProfile().name().equals(req.get("name").getAsString())).findFirst().orElseThrow();
+                        target=other.position().add(0,1.25,0);
+                    } else {
+                        target=new Vec3(req.get("x").getAsDouble(),req.get("y").getAsDouble(),req.get("z").getAsDouble());
+                    }
+                    me.lookAt(EntityAnchorArgument.Anchor.EYES,target);
+                    if(action.equals("qaProtectedBow")) mc.options.keyUse.setDown(true);
+                    var used=mc.gameMode.useItem(me,InteractionHand.MAIN_HAND);
+                    out.addProperty("used",used.consumesAction());
+                }
+                if(action.equals("qaProtectedBow")) {
+                    if(elapsed<25)return false;
+                    mc.options.keyUse.setDown(false);
+                    mc.gameMode.releaseUsingItem(me);
                 }
             }
             case "qaUseOnce" -> {

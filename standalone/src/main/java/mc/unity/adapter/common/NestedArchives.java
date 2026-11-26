@@ -26,6 +26,65 @@ public final class NestedArchives implements AutoCloseable {
     private final List<mc.unity.adapter.Entry> metadata = new ArrayList<>();
     private final Map<Path, Map<String, String>> provided = new HashMap<>();
     private int searchSteps;
+    /**
+     * Trust the verified contents, including all nested modules, regardless of ZIP compression or
+     * timestamps.
+     */
+    public boolean officialFabricApi() throws Exception {
+        var umbrella =
+            metadata.stream()
+                .filter(e -> e.kind() == mc.unity.adapter.Entry.Kind.FABRIC && e.id().equals("fabric-api"))
+                .findFirst();
+        if (umbrella.isEmpty())
+            return false;
+        var owner = umbrella.get();
+        var remaining = new HashMap<String, String>();
+        try (var reader = new java.io.BufferedReader(
+                 new java.io.InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream(
+                                                   "/META-INF/unity/fabric-api-contents.sha256")),
+                                               java.nio.charset.StandardCharsets.UTF_8))) {
+            for (String line : reader.lines().toList()) {
+                var fields = line.split("  ", 2);
+                remaining.put(fields[1], fields[0]);
+            }
+        }
+        try (var jar = new JarFile(owner.file().toFile(), true)) {
+            for (var entry : Collections.list(jar.entries())) {
+                if (entry.isDirectory())
+                    continue;
+                var expected = remaining.remove(entry.getName());
+                if (expected == null)
+                    throw new IOException("Unexpected or duplicate Fabric API member " + entry.getName());
+                var hash = MessageDigest.getInstance("SHA-256");
+                try (var stream = new java.security.DigestInputStream(jar.getInputStream(entry), hash)) {
+                    stream.transferTo(OutputStream.nullOutputStream());
+                }
+                if (!HexFormat.of().formatHex(hash.digest()).equals(expected))
+                    throw new IOException("Unsupported Fabric API " + owner.version() +
+                                          " or changed member " + entry.getName() +
+                                          "; tested 0.152.1+26.2");
+            }
+        }
+        if (!remaining.isEmpty())
+            throw new IOException("Missing official Fabric API members " + remaining.keySet());
+        try (var reader = new BufferedReader(
+                 new InputStreamReader(Objects.requireNonNull(getClass().getResourceAsStream(
+                                           "/META-INF/unity/fabric-api-modules.sha256")),
+                                       java.nio.charset.StandardCharsets.UTF_8))) {
+            var byId = new HashMap<String, Path>();
+            for (var e : metadata)
+                byId.put(e.id(), e.file());
+            for (String row : reader.lines().toList()) {
+                var f = row.split(" ");
+                if (!client && f[3].equals("client"))
+                    continue;
+                Path file = byId.get(f[1]);
+                if (file == null || !hash(file).equals(f[0]))
+                    throw new IOException("Conflicting provider for official Fabric module " + f[1]);
+            }
+        }
+        return true;
+    }
     public int searchSteps() {
         return searchSteps;
     }
@@ -322,7 +381,7 @@ public final class NestedArchives implements AutoCloseable {
                     add(edges, "mod:" + inner.id, "*", inner.version, inner);
                 }
             var jij = json(jar, "META-INF/jarjar/metadata.json");
-            if (jij != null)
+            if (jij != null && !(fabric != null && PlatformChoice.read(jar).multiple()))
                 for (var value : jij.getAsJsonArray("jars")) {
                     var child = value.getAsJsonObject();
                     var identifier = child.getAsJsonObject("identifier");

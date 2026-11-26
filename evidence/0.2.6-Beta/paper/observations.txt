@@ -1,0 +1,134 @@
+[first-VolumeA-client.log]
+[00:45:09] [Render thread/INFO]: [System] [CHAT] Operation completed (6 blocks affected).
+[00:45:09] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:09] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:09] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:10] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:10] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:11] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:11] [Render thread/INFO]: [System] [CHAT] Undid 1 available edits.
+[00:45:11] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:11] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:12] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:12] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:13] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:14] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:15] [Render thread/INFO]: [System] [CHAT] Redid 1 available edits.
+[00:45:15] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:15] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:16] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:16] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:16] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:16] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:17] [Render thread/INFO]: [System] [CHAT] The clipboard has been pasted at (9, 80, 4)
+[00:45:17] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[00:45:17] [Render thread/INFO]: [System] [CHAT] The clipboard has been pasted at (30, 80, 4)
+[00:45:19] [Render thread/INFO]: [System] [CHAT] Undid 1 available edits.
+[00:45:19] [Render thread/INFO]: [System] [CHAT] Redid 1 available edits.
+[00:45:21] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[00:45:21] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:21] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:21] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:22] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:22] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:22] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[first-VolumeB-client.log]
+[00:45:09] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:09] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:09] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:10] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:10] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:10] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:11] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:11] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:12] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:12] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:13] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:14] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:15] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:15] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:16] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:16] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:16] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:16] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:17] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[00:45:21] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[00:45:21] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:21] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:22] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:45:22] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:22] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:45:22] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[first.log]
+[00:45:09 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:45:09 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:45:09 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:45:10 INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[00:45:10 INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[00:45:10 INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[00:45:11 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:45:11 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:45:12 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:45:12 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:45:13 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:45:14 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:45:15 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:45:15 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:45:16 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:45:16 INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[00:45:16 INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[00:45:16 INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[00:45:17 INFO]: [Not Secure] [Server] REGION_CHEST_INTACT
+[00:45:18 INFO]: 30, 80, 7 has the following block data: {z: 7, id: "minecraft:chest", y: 80, x: 30, Items: [{Slot: 3b, id: "minecraft:emerald", count: 11, components: {"minecraft:custom_data": {unity_copy: 1}}}], components: {}}
+[00:45:18 INFO]: 30, 80, 7 has the following block data: [{Slot: 3b, id: "minecraft:emerald", count: 11, components: {"minecraft:custom_data": {unity_copy: 1}}}]
+[00:45:19 INFO]: 30, 80, 7 has the following block data: {z: 7, id: "minecraft:chest", y: 80, x: 30, Items: [{Slot: 3b, id: "minecraft:diamond", count: 3, components: {"minecraft:custom_data": {unity_copy: 1}}}], components: {}}
+[00:45:19 INFO]: 30, 80, 7 has the following block data: [{Slot: 3b, id: "minecraft:diamond", count: 3, components: {"minecraft:custom_data": {unity_copy: 1}}}]
+[00:45:20 INFO]: 30, 80, 7 has the following block data: {z: 7, id: "minecraft:chest", y: 80, x: 30, Items: [{Slot: 3b, id: "minecraft:emerald", count: 11, components: {"minecraft:custom_data": {unity_copy: 1}}}], components: {}}
+[00:45:20 INFO]: 30, 80, 7 has the following block data: [{Slot: 3b, id: "minecraft:emerald", count: 11, components: {"minecraft:custom_data": {unity_copy: 1}}}]
+[00:45:21 INFO]: [Not Secure] [Server] REGION_CHEST_INTACT
+[00:45:21 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:45:21 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:45:21 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:45:22 INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[00:45:22 INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[00:45:22 INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[00:45:23 INFO]: 24, 80, 7 has the following block data: {z: 7, id: "minecraft:chest", y: 80, x: 24, Items: [{Slot: 3b, id: "minecraft:emerald", count: 11, components: {"minecraft:custom_data": {unity_copy: 1}}}], components: {}}
+[00:45:23 INFO]: 24, 80, 7 has the following block data: [{Slot: 3b, id: "minecraft:emerald", count: 11, components: {"minecraft:custom_data": {unity_copy: 1}}}]
+[00:45:23 INFO]: 30, 80, 7 has the following block data: {z: 7, id: "minecraft:chest", y: 80, x: 30, Items: [{Slot: 3b, id: "minecraft:emerald", count: 11, components: {"minecraft:custom_data": {unity_copy: 1}}}], components: {}}
+[00:45:23 INFO]: 30, 80, 7 has the following block data: [{Slot: 3b, id: "minecraft:emerald", count: 11, components: {"minecraft:custom_data": {unity_copy: 1}}}]
+[00:45:24 INFO]: VolumeA has the following entity data: [{Slot: 4b, id: "minecraft:obsidian", count: 3}]
+[00:45:25 INFO]: VolumeB has the following entity data: [{Slot: 4b, id: "minecraft:flint", count: 5}]
+[00:45:25 INFO]: VolumeA has the following entity data: 20.0f
+[00:45:25 INFO]: VolumeB has the following entity data: 20.0f
+[restart-VolumeA-client.log]
+[00:46:11] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[00:46:12] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:46:13] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:46:13] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:46:13] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:46:14] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:46:14] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[restart-VolumeB-client.log]
+[00:46:11] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[00:46:12] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:46:13] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:46:13] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[00:46:13] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:46:14] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[00:46:14] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[restart.log]
+[00:46:11 INFO]: [Not Secure] [Server] REGION_CHEST_INTACT
+[00:46:12 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:46:13 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:46:13 INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[00:46:13 INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[00:46:14 INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[00:46:14 INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[00:46:14 INFO]: 24, 80, 7 has the following block data: {z: 7, id: "minecraft:chest", y: 80, x: 24, Items: [{Slot: 3b, id: "minecraft:emerald", count: 11, components: {"minecraft:custom_data": {unity_copy: 1}}}], components: {}}
+[00:46:15 INFO]: 24, 80, 7 has the following block data: [{Slot: 3b, id: "minecraft:emerald", count: 11, components: {"minecraft:custom_data": {unity_copy: 1}}}]
+[00:46:16 INFO]: 30, 80, 7 has the following block data: {z: 7, id: "minecraft:chest", y: 80, x: 30, Items: [{Slot: 3b, id: "minecraft:emerald", count: 11, components: {"minecraft:custom_data": {unity_copy: 1}}}], components: {}}
+[00:46:16 INFO]: 30, 80, 7 has the following block data: [{Slot: 3b, id: "minecraft:emerald", count: 11, components: {"minecraft:custom_data": {unity_copy: 1}}}]
+[00:46:17 INFO]: VolumeA has the following entity data: [{Slot: 4b, id: "minecraft:obsidian", count: 3}]
+[00:46:18 INFO]: VolumeB has the following entity data: [{Slot: 4b, id: "minecraft:flint", count: 5}]
+[00:46:18 INFO]: VolumeA has the following entity data: 20.0f
+[00:46:18 INFO]: VolumeB has the following entity data: 20.0f

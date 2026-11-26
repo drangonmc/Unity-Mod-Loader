@@ -11,7 +11,7 @@ public final class ClientHooks {
         if (java.nio.file.Files.exists(game.resolve(".unity-client.sha256")))
             throw new IllegalStateException(
                 "Choose a standalone client directory, separate from the compatibility client.");
-        if (shutdown != null)
+        if (cleanup != null)
             throw new IllegalStateException("Client session already open");
         setup = false;
         var mods = NativeLoader.open(game, "client");
@@ -59,7 +59,6 @@ public final class ClientHooks {
                         .toList();
         System.out.println(
             "[Unity] Client native mods " + mods.mods().stream().map(NativeLoader.Loaded::id).toList());
-        shutdown = new Thread(ClientHooks::finish, "Unity client mod shutdown");
         cleanup = () -> {
             ServerHooks.detachClient();
             mc.unity.client.Renderers.close();
@@ -69,24 +68,15 @@ public final class ClientHooks {
                 forge.close();
             }
         };
-        Runtime.getRuntime().addShutdownHook(shutdown);
     }
-    private static Thread shutdown;
     private static AutoCloseable cleanup;
     public static synchronized void finish() {
-        if (shutdown == null)
-            return;
-        if (shutdown != Thread.currentThread())
-            try {
-                Runtime.getRuntime().removeShutdownHook(shutdown);
-            } catch (IllegalStateException ignored) {
-            }
+        if (cleanup == null) return;
         try {
             cleanup.close();
         } catch (Exception e) {
             throw new IllegalStateException("Closing client mods", e);
         } finally {
-            shutdown = null;
             cleanup = null;
             setup = false;
             callbacks = List.of();

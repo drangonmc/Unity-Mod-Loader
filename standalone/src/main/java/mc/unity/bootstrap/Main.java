@@ -6,7 +6,7 @@ import java.nio.file.*;
 import java.util.*;
 
 public final class Main {
-    public static final String VERSION = "0.2.3-Beta";
+    public static final String VERSION = "0.2.6-Beta";
     public static void main(String[] args) throws Throwable {
         if (args.length > 0 && args[0].equals("--client-home")) {
             if (args.length < 2)
@@ -38,16 +38,8 @@ public final class Main {
         urls.add(runtime.game().toUri().toURL());
         for (Path lib : runtime.libraries()) urls.add(lib.toUri().toURL());
         var loader = new GameLoader(urls.toArray(URL[] ::new), runtime.game());
-        // Vanilla starts its dedicated server thread before returning from main.
-        var shutdown = new Thread(() -> {
-            try {
-                loader.close();
-            } catch (java.io.IOException e) {
-                System.err.println(e);
-            }
-        }, "Unity archive shutdown");
-        Runtime.getRuntime().addShutdownHook(shutdown);
-        try {
+        var previous = Thread.currentThread().getContextClassLoader();
+        try (loader) {
             Thread.currentThread().setContextClassLoader(loader);
             GamePatches.install(loader, runtime.game());
             loader.mixins(Path.of(".").toAbsolutePath().normalize(), false);
@@ -60,12 +52,8 @@ public final class Main {
             } catch (InvocationTargetException e) {
                 throw e.getCause();
             }
-        } catch (Throwable e) {
-            Runtime.getRuntime().removeShutdownHook(shutdown);
-            loader.close();
-            throw e;
         } finally {
-            Thread.currentThread().setContextClassLoader(Main.class.getClassLoader());
+            Thread.currentThread().setContextClassLoader(previous);
         }
     }
 }

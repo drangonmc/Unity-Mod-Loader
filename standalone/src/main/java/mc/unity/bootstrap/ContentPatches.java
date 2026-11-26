@@ -70,27 +70,27 @@ final class ContentPatches {
                       List.of(new Rule("readPayload",
                                        "(ILnet/minecraft/network/FriendlyByteBuf;)L" + LOGIN +
                                            "custom/CustomQueryAnswerPayload;",
-                                       null, false, b -> {
-                                           var original = b.newLabel();
-                                           b.iload(0)
-                                               .ldc(0x554e4954)
-                                               .if_icmpne(original)
-                                               .aload(1)
-                                               .invokestatic(SYNC, "readReply",
-                                                             mt("(Lnet/minecraft/network/FriendlyByteBuf;)L" +
-                                                                LOGIN + "custom/CustomQueryAnswerPayload;"))
-                                               .areturn()
-                                               .labelBinding(original);
-                                       })));
-            rules.put(SERVER, List.of(new Rule("onDisconnect",
-                                               "(Lnet/minecraft/network/DisconnectionDetails;)V", null, false,
-                                               b -> {
-                                                   connection(b, SERVER);
-                                                   b.invokestatic(SYNC, "forget",
-                                                                  mt("(L" + CONNECTION + ";)V"));
-                                               }),
-                                      guard(SERVER, "handleCustomQueryPacket",
-                                            LOGIN + "ServerboundCustomQueryAnswerPacket", "answer", true)));
+                                       null, false, ContentPatches::decodeLogin)));
+            rules.put(SERVER,
+                      List.of(new Rule("tick", "()V", null, false,
+                                       b -> {
+                                           var normal = b.newLabel();
+                                           b.aload(0);
+                                           connection(b, SERVER);
+                                           b.invokestatic(SYNC, "diagnosticTimeout",
+                                                          mt("(L" + SERVER + ";L" + CONNECTION + ";)Z"))
+                                               .ifeq(normal)
+                                               .return_()
+                                               .labelBinding(normal);
+                                       }),
+                              new Rule("onDisconnect", "(Lnet/minecraft/network/DisconnectionDetails;)V",
+                                       null, false,
+                                       b -> {
+                                           connection(b, SERVER);
+                                           b.invokestatic(SYNC, "forget", mt("(L" + CONNECTION + ";)V"));
+                                       }),
+                              guard(SERVER, "handleCustomQueryPacket",
+                                    LOGIN + "ServerboundCustomQueryAnswerPacket", "answer", true)));
         }
         for (var slot : rules.entrySet()) {
             String name = slot.getKey();
@@ -138,18 +138,7 @@ final class ContentPatches {
             route = new Rule("readPayload",
                              "(ILnet/minecraft/network/FriendlyByteBuf;)L" + LOGIN +
                                  "custom/CustomQueryAnswerPayload;",
-                             null, false, b -> {
-                                 var other = b.newLabel();
-                                 b.iload(0)
-                                     .ldc(0x554e4954)
-                                     .if_icmpne(other)
-                                     .aload(1)
-                                     .invokestatic(SYNC, "readReply",
-                                                   mt("(Lnet/minecraft/network/FriendlyByteBuf;)L" + LOGIN +
-                                                      "custom/CustomQueryAnswerPayload;"))
-                                     .areturn()
-                                     .labelBinding(other);
-                             });
+                             null, false, ContentPatches::decodeLogin);
         } else if (owner.equals(SERVER))
             route = guard(SERVER, "handleCustomQueryPacket", packet, "answer", true);
         else if (owner.equals(CLIENT))
@@ -172,6 +161,19 @@ final class ContentPatches {
                                                     b.with(e);
                                                 }
                                             }));
+    }
+    private static void decodeLogin(CodeBuilder b) {
+        var other = b.newLabel();
+        b.iload(0)
+            .invokestatic(SYNC, "ownsTransaction", mt("(I)Z"))
+            .ifeq(other)
+            .iload(0)
+            .aload(1)
+            .invokestatic(SYNC, "readReply",
+                          mt("(ILnet/minecraft/network/FriendlyByteBuf;)L" + LOGIN +
+                             "custom/CustomQueryAnswerPayload;"))
+            .areturn()
+            .labelBinding(other);
     }
     private static MethodTypeDesc mt(String s) {
         return MethodTypeDesc.ofDescriptor(s);

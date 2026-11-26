@@ -10,6 +10,10 @@ public final class UniversalData {
         return jar.stream().anyMatch(
             e -> !e.isDirectory() && (e.getName().startsWith("assets/") || e.getName().contains("/assets/")));
     }
+    public static boolean hasData(JarFile jar) {
+        return jar.stream().anyMatch(
+            e -> !e.isDirectory() && (e.getName().startsWith("data/") || e.getName().contains("/data/")));
+    }
     public static boolean matches(JarFile jar) throws IOException {
         boolean forge = jar.getJarEntry("META-INF/mods.toml") != null,
                 neo = jar.getJarEntry("META-INF/neoforge.mods.toml") != null;
@@ -48,6 +52,6 @@ public final class UniversalData {
                     FmlDescriptor.version(mods.getFirst(), FmlDescriptor.implementationVersion(jar))))
                 return false;
         }
-        return jar.stream().anyMatch(e -> !e.isDirectory() && e.getName().startsWith("data/"));
+        return hasData(jar) || hasAssets(jar);
     }
 }

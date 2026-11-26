@@ -70,7 +70,10 @@ public final class ForgeCommands {
         throws IOException {
         String id = metaInfo.id();
         String entry = null;
+        boolean declaredInactive = false;
         for (var model : annotated) {
+            boolean otherSide = mc.unity.adapter.common.SidedClasses.outside(
+                model, mc.unity.adapter.Entry.Kind.FORGE, side.equals("CLIENT"));
             var annotations = model.findAttribute(Attributes.runtimeVisibleAnnotations());
             if (annotations.isEmpty())
                 continue;
@@ -98,7 +101,7 @@ public final class ForgeCommands {
                                        en.constantName().equalsString(
                                            side.equals("CLIENT") ? "CLIENT" : "DEDICATED_SERVER"));
                     }
-                    if (enabled)
+                    if (enabled && !otherSide)
                         subscribers.computeIfAbsent(id, k -> new ArrayList<>())
                             .add(model.thisClass().asInternalName().replace('/', '.'));
                 }
@@ -110,15 +113,19 @@ public final class ForgeCommands {
                                e.value() instanceof AnnotationValue.OfString v && v.stringValue().equals(id));
                     if (!matches)
                         continue;
+                    if (otherSide) {
+                        declaredInactive = true;
+                        continue;
+                    }
                     if (entry != null)
                         throw new IOException(
                             "Forge annotation and descriptor disagree or entry is ambiguous: " + id);
                     entry = model.thisClass().asInternalName().replace('/', '.');
                 }
         }
-        if (entry == null)
+        if (entry == null && !declaredInactive)
             throw new IOException("Missing @Mod entry: " + id);
-        return new mc.unity.adapter.Entry(id, metaInfo.version(), List.of(entry),
+        return new mc.unity.adapter.Entry(id, metaInfo.version(), entry == null ? List.of() : List.of(entry),
                                           mc.unity.adapter.Entry.Kind.FORGE, file, metaInfo.dependencies());
     }
     public static void clear() {

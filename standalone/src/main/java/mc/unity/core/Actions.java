@@ -42,6 +42,9 @@ public final class Actions {
         public float amount;
         public List<Placement.Change> changes;
         public Integer experience;
+        public boolean dropItems = true;
+        public BlockPos against;
+        public net.minecraft.world.item.ItemStack usedStack;
         public boolean initiallyDenied;
         public boolean cancelled;
         public InteractionResult result = InteractionResult.PASS;
@@ -54,16 +57,31 @@ public final class Actions {
         boolean handles(Kind kind);
         void accept(Action event);
     }
-    private static final java.util.List<Adapter> adapters = new java.util.concurrent.CopyOnWriteArrayList<>();
+    private static final class Registration implements Runnable {
+        final Adapter adapter;
+        Registration(Adapter adapter) {
+            this.adapter = Objects.requireNonNull(adapter);
+        }
+        public void run() {
+            adapters.remove(this);
+        }
+    }
+    private static final java.util.List<Registration> adapters =
+        new java.util.concurrent.CopyOnWriteArrayList<>();
     public static void attach(Adapter a) {
-        adapters.add(a);
+        attachScoped(a);
+    }
+    public static Runnable attachScoped(Adapter a) {
+        var registration = new Registration(a);
+        adapters.add(registration);
+        return registration;
     }
     public static void clear() {
         adapters.clear();
     }
     public static boolean active(Kind k) {
         for (var a : adapters)
-            if (a.handles(k))
+            if (a.adapter.handles(k))
                 return true;
         return false;
     }
@@ -71,8 +89,8 @@ public final class Actions {
         for (var a : adapters) {
             if (e.cancelled)
                 break;
-            if (a.handles(e.kind))
-                a.accept(e);
+            if (a.adapter.handles(e.kind))
+                a.adapter.accept(e);
         }
         return e;
     }
@@ -103,6 +121,10 @@ public final class Actions {
         return action == null || action != FORBIDDEN && !action.cancelled;
     }
     private static final ThreadLocal<Action> replacingXP = new ThreadLocal<>();
+    public static boolean skipBlockDrop(Level level, BlockPos pos) {
+        var e = replacingXP.get();
+        return e != null && !e.dropItems && e.level == level && e.pos.equals(pos);
+    }
     public static boolean replaceXP(Level level, BlockPos pos) {
         var e = replacingXP.get();
         return e != null && e.level == level && e.pos.equals(pos);
@@ -281,6 +303,9 @@ public final class Actions {
                 sp.getHealth(), f.getFoodLevel(), f.getSaturationLevel()));
         }
         return e.cancelled ? -1 : Math.max(0, e.amount);
+    }
+    public static float attackAmount(LivingEntity t, DamageSource s, float a) {
+        return damage(Kind.ATTACK, t, s, a);
     }
     public static boolean attacked(LivingEntity t, DamageSource s, float a) {
         return damage(Kind.ATTACK, t, s, a) < 0;

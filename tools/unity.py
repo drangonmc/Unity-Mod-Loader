@@ -11,7 +11,7 @@ import shutil
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.2.3-Beta"
+VERSION = "0.2.6-Beta"
 DIST = ROOT / "versions" / VERSION
 CACHE = ROOT / "cache" / VERSION
 JAR = DIST / f"unity-loader-{VERSION}.jar"
@@ -30,9 +30,9 @@ def install_samples(cache_only=False):
 
     specs=sum((json.loads((ROOT/"standalone"/name).read_bytes()) for name in ("forge-content.json","forge-containers.json","ecosystem.json","creative-content.json")),[])
     commands=json.loads((ROOT/"standalone/forge-samples.json").read_bytes())
-    if selected in ("0.1.3-Beta","0.1.4-Beta","0.2.0-Beta","0.2.1-Beta","0.2.2-Beta","0.2.3-Beta"):
+    if selected in ("0.1.3-Beta","0.1.4-Beta","0.2.0-Beta","0.2.1-Beta","0.2.2-Beta","0.2.3-Beta","0.2.4-Beta","0.2.5-Beta","0.2.6-Beta"):
         specs.extend(beta_samples(ROOT))
-    if selected in ("0.2.0-Beta","0.2.1-Beta","0.2.2-Beta","0.2.3-Beta"):
+    if selected in ("0.2.0-Beta","0.2.1-Beta","0.2.2-Beta","0.2.3-Beta","0.2.4-Beta","0.2.5-Beta","0.2.6-Beta"):
         specs.extend(json.loads((ROOT/"standalone/ecology-modules.json").read_bytes()))
     for spec in [*specs,*commands]:
         cache=cache_root/"samples"/spec["filename"]
@@ -141,9 +141,16 @@ def main():
         if options.client_home:
             args.append(options.client_home.resolve())
         return subprocess.call(args)
+    state=ROOT/"versions/state.json"
+    selected=json.loads(state.read_bytes())["active"]["version"] if state.exists() else VERSION
+    if Path(selected).name!=selected or selected in ("",".",".."):
+        raise ValueError("Invalid active version")
+    distribution=ROOT/"versions"/selected
+    executable=distribution/f"unity-loader-{selected}.jar"
+    runtime_cache=ROOT/"cache"/selected
     if options.action == "install-client":
-        return subprocess.call(["java", "-jar", JAR, "--install-client", options.launcher_root.resolve()])
-    args = ["java", "-Xms256m", "-Xmx2g", "-jar", JAR, "--runtime-dir", CACHE]
+        return subprocess.call(["java", "-jar", executable, "--install-client", options.launcher_root.resolve()])
+    args = ["java", "-Xms256m", "-Xmx2g", "-jar", executable, "--runtime-dir", runtime_cache]
     if getattr(options, "server_jar", None):
         args.extend(["--server-jar", options.server_jar.resolve()])
     if options.action == "prepare":
@@ -152,7 +159,7 @@ def main():
     mods = game / "unity-mods"
     if not mods.exists():
         mods.mkdir(parents=True)
-        shutil.copy2(DIST / "unity-world-marker.jar", mods)
+        shutil.copy2(distribution / "unity-world-marker.jar", mods)
     return subprocess.call([*args, "nogui"], cwd=game)
 
 

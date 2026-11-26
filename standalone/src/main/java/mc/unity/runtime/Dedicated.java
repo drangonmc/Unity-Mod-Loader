@@ -4,6 +4,10 @@ import java.nio.file.*;
 import java.util.Properties;
 
 public final class Dedicated {
+    private static Thread serverThread;
+    public static void startedThread(net.minecraft.server.MinecraftServer server) {
+        serverThread = server.getRunningThread();
+    }
     public static void launch(String[] args) throws Exception {
         Path instance = Path.of("").toAbsolutePath().normalize();
         if (Files.exists(instance.resolve(".unity-loader.sha256")))
@@ -25,6 +29,17 @@ public final class Dedicated {
                 java.util.List.of(args), java.util.List.of("--help", "--initSettings", "--version"))) {
             ServerHooks.discover(instance);
         }
-        net.minecraft.server.Main.main(args);
+        try {
+            net.minecraft.server.Main.main(args);
+        } finally {
+            // Vanilla main hands the lifetime to the server thread. It owns the final save and close.
+            boolean interrupted = false;
+            while (serverThread != null && serverThread.isAlive()) {
+                try { serverThread.join(); }
+                catch (InterruptedException retry) { interrupted = true; }
+            }
+            serverThread = null;
+            if (interrupted) Thread.currentThread().interrupt();
+        }
     }
 }

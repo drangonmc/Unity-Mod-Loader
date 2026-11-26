@@ -9,12 +9,18 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.network.ServerLoginPacketListenerImpl;
 public final class LoginSync {
     public static final int TX = 0x554e4954;
+    public static final int TX_DIFF = TX + 1;
+    private static final long DIAGNOSTIC_TIMEOUT = java.util.concurrent.TimeUnit.SECONDS.toNanos(5);
+    public static boolean ownsTransaction(int id) {
+        return id == TX || id == TX_DIFF;
+    }
     private static final Map<Connection, Pending> waiting = new IdentityHashMap<>();
     private static final Set<Connection> matched = Collections.newSetFromMap(new WeakHashMap<>());
     private static final Set<Connection> verified = Collections.newSetFromMap(new WeakHashMap<>());
     private static final class Pending {
         final Runnable resume;
-        boolean consumed;
+        boolean consumed, diagnosing;
+        long diagnosticDeadline;
         Offer offer;
         Pending(Runnable resume) {
             this.resume = resume;
@@ -94,12 +100,20 @@ public final class LoginSync {
         return values;
     }
     public static CustomQueryAnswerPayload readReply(FriendlyByteBuf buf) {
+        return readReply(TX, buf);
+    }
+    public static CustomQueryAnswerPayload readReply(int transaction, FriendlyByteBuf buf) {
         if (!buf.readBoolean()) {
             if (buf.isReadable())
                 throw new IllegalArgumentException("Unexpected registry reply data");
             return null;
         }
         String registry = buf.readUtf(64);
+        if (transaction == TX_DIFF) {
+            if (!registry.equals(LoginInventory.MAGIC))
+                throw new IllegalArgumentException("Invalid diagnostic reply");
+            return LoginInventory.read(buf);
+        }
         if (!registry.matches("[0-9a-f]{64}"))
             throw new IllegalArgumentException("Invalid registry reply");
         int n = buf.isReadable() ? buf.readVarInt() : 0;
@@ -167,9 +181,22 @@ public final class LoginSync {
     }
     public static synchronized boolean answer(ServerLoginPacketListenerImpl listener, Connection connection,
                                               ServerboundCustomQueryAnswerPacket packet) {
-        if (packet.transactionId() != TX || !waiting.containsKey(connection))
+        int transaction = packet.transactionId();
+        if (!ownsTransaction(transaction))
             return false;
         var entry = waiting.get(connection);
+        if (entry == null)
+            return true;
+        if (transaction == TX_DIFF) {
+            if (!entry.diagnosing)
+                return true;
+            String message = packet.payload() instanceof LoginInventory peer
+                                 ? Content.inventory.difference(peer)
+                                 : "Unity: content registry mismatch";
+            forget(connection);
+            listener.disconnect(Component.literal(message));
+            return true;
+        }
         if (!entry.consume())
             return true;
         if (packet.payload() == null && Content.digest().isEmpty()) {
@@ -188,8 +215,15 @@ public final class LoginSync {
                                " digestMatch=" + (reply != null && wireDigest().equals(reply.registry())) +
                                " config=" + (reply != null && reply.configuration()) +
                                " required=" + ConfigurationNetwork.required());
-            forget(connection);
-            listener.disconnect(Component.literal("Unity: content registry mismatch"));
+            entry.diagnosing = true;
+            entry.diagnosticDeadline = System.nanoTime() + DIAGNOSTIC_TIMEOUT;
+            try {
+                connection.send(new ClientboundCustomQueryPacket(
+                    TX_DIFF, new DiscardedQueryPayload(Identifier.parse("unity:registry_diff/v1"))));
+            } catch (RuntimeException failure) {
+                forget(connection);
+                listener.disconnect(Component.literal("Unity: content registry mismatch — 诊断查询发送失败"));
+            }
             return true;
         }
         PlayNetwork.agree(connection, reply.optional());
@@ -199,6 +233,17 @@ public final class LoginSync {
                                " configuration=" + reply.configuration() + " extended=" + reply.extended());
         entry.resume.run();
         System.out.println("[Unity] Verified client content registry " + Content.digest());
+        return true;
+    }
+    public static boolean diagnosticTimeout(ServerLoginPacketListenerImpl listener, Connection connection) {
+        synchronized (LoginSync.class) {
+            var entry = waiting.get(connection);
+            if (entry == null || !entry.diagnosing || System.nanoTime() - entry.diagnosticDeadline < 0)
+                return false;
+            forget(connection);
+        }
+        listener.disconnect(
+            Component.literal("Unity: content registry mismatch — 未收到客户端诊断清单（超时）"));
         return true;
     }
     public static synchronized boolean rejectMissing(Connection connection,
@@ -213,6 +258,10 @@ public final class LoginSync {
     }
     public static synchronized boolean query(Connection connection, ClientboundCustomQueryPacket packet) {
         var id = packet.payload().id();
+        if (packet.transactionId() == TX_DIFF && id.toString().equals("unity:registry_diff/v1")) {
+            connection.send(new ServerboundCustomQueryAnswerPacket(TX_DIFF, Content.inventory));
+            return true;
+        }
         if (packet.transactionId() != TX || !id.getNamespace().equals("unity") ||
             !id.getPath().startsWith("registry/"))
             return false;

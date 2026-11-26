@@ -1,0 +1,42 @@
+[
+  {
+    "project": "PL5F9WAX",
+    "slug": "no-dim",
+    "platform": "fabric",
+    "version": "REa8H1vX",
+    "filename": "NoDim-1.3.1.jar",
+    "sha512": "ef780ba58b32272f246178b7719a180166d2d5ba0757b574d0b01dbf2f6fa82040494ba6276d4c10e81de7397d768f362707ca9d3d3d3e7d376016585bbc3a6f",
+    "url": "https://cdn.modrinth.com/data/PL5F9WAX/versions/REa8H1vX/NoDim-1.3.1.jar",
+    "classes": 5,
+    "dependencies": []
+  },
+  {
+    "project": "FSWe8RZ3",
+    "slug": "classic-gamerule",
+    "platform": "fabric",
+    "version": "Lv5x2F4Y",
+    "filename": "classic-gamerule-v1.0.6-mc26.2.jar",
+    "sha512": "5665cbe919115708961d794a4285ed407eced4c42acc3577d709a9a3bb918b7b34a427e0d7863facacfa85c49c22085788013edca7deeca8bfc4f72668d4b19a",
+    "url": "https://cdn.modrinth.com/data/FSWe8RZ3/versions/Lv5x2F4Y/classic-gamerule-v1.0.6-mc26.2.jar",
+    "classes": 14,
+    "dependencies": []
+  },
+  {
+    "project": "cqM5MIQg",
+    "slug": "exptrade",
+    "platform": "fabric",
+    "version": "ezv0KRcp",
+    "filename": "exptrade-1.3.2_MC-26.1-3-multi.jar",
+    "sha512": "16e2eec51cb77453eb99d213bbafe705593d367876ee8451f63bb99dc29ba0d9b1ce64bd6f58405cfb003058f9e62831880df06981602591282237e11d7fe390",
+    "url": "https://cdn.modrinth.com/data/cqM5MIQg/versions/ezv0KRcp/exptrade-1.3.2_MC-26.1-3-multi.jar",
+    "classes": 16,
+    "dependencies": [
+      {
+        "version_id": null,
+        "project_id": "P7dR8mSH",
+        "file_name": null,
+        "dependency_type": "optional"
+      }
+    ]
+  }
+]

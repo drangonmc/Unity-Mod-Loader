@@ -1,0 +1,43 @@
+[
+  {
+    "slug": "lmd",
+    "filename": "003-LetMeDespawn-1.26.10.3.jar",
+    "url": "https://cdn.modrinth.com/data/vE2FN5qn/versions/TQCJjueW/LetMeDespawn-1.26.10.3.jar",
+    "sha512": "d227591fdb199216041158656c6cf36f9ad070b38e6192c188c24f9d3ee1b7997f1d6acb64d889861aca6ea5047ba42b76fa8b7327e5730385c93caad3da5adc",
+    "rank": 3,
+    "group": "panel"
+  },
+  {
+    "slug": "worldedit",
+    "filename": "007-worldedit-bukkit-7.4.6.jar",
+    "url": "https://cdn.modrinth.com/data/1u6JkXh5/versions/YFnqiUlL/worldedit-bukkit-7.4.6.jar",
+    "sha512": "1fe3975132857093f971fed9efc601299bfa76fa7885f52a542fee41e7a0165ca9cb3cbcf5ae244474887d774d650b0db6f8f79aa80f98b245dea44f1c1b4152",
+    "rank": 7,
+    "group": "dependency"
+  },
+  {
+    "slug": "worldguard",
+    "filename": "022-worldguard-bukkit-7.0.19.jar",
+    "url": "https://cdn.modrinth.com/data/DKY9btbd/versions/TtfwTyi6/worldguard-bukkit-7.0.19.jar",
+    "sha512": "e9ad7ad53c93a07a7d5c3af3d844a677abbe894de4d7ff69fc03397daae5e8532217d57de23a3cddbe0d94ae81ee7acde6c78384b9596aa1eb3001bb37087d41",
+    "rank": 22,
+    "group": "panel"
+  },
+  {
+    "slug": "skippy-pearls",
+    "filename": "039-SkippyPearls-1.1.0.0.jar",
+    "url": "https://cdn.modrinth.com/data/KM7gMSY1/versions/VnVKmHdg/SkippyPearls-1.1.0.0.jar",
+    "sha512": "9ee192f9f9b8e60fc462ef0ef9e08a08e050d830274b9a4559d9aa257a30063aa1a1c5e8edb85e7dbe4f37d9dea87745e8121cef0ab5d127691d529a12e81e3f",
+    "rank": 39,
+    "group": "panel"
+  },
+  {
+    "slug": "antilavacast",
+    "project": "fPmaQiqU",
+    "version": "fnzo2uSh",
+    "filename": "AntiLavaCast-1.0.4.jar",
+    "url": "https://cdn.modrinth.com/data/fPmaQiqU/versions/fnzo2uSh/AntiLavaCast-1.0.4.jar",
+    "sha512": "8e59045a5967106f66f129a68d5033405fe0cd89bd8597bfe09d3b5149578590b426b66957ec767b5670ef441bf6d4b26f9e6a878e14e5b0923db4d83dfe4920",
+    "group": "supplement"
+  }
+]

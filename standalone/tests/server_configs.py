@@ -73,6 +73,14 @@ def verify_play(server,server_log,clients,logs,status):
             checks[i][mode]=server.send("execute "+("if" if mode=="enable" else "unless")+" "+condition+" run say "+marker,r"\[Server\] "+marker)
     return checks
 
+def biome_resources():
+    return {
+                "worldgen/configured_feature/sky_marker":{"type":"minecraft:simple_block","config":{"to_place":{"type":"minecraft:simple_state_provider","state":{"Name":"minecraft:amethyst_block"}}}},
+                "worldgen/placed_feature/sky_marker":{"feature":"qa_fabric_ecology:sky_marker","placement":[{"type":"minecraft:height_range","height":{"type":"minecraft:uniform","min_inclusive":{"absolute":250},"max_inclusive":{"absolute":250}}}]},
+                "forge/biome_modifier/sky_markers":{"type":"forge:add_features","biomes":"#minecraft:is_overworld","features":"qa_fabric_ecology:sky_marker","step":"top_layer_modification"},
+                "neoforge/biome_modifier/pigs":{"type":"neoforge:add_spawns","biomes":"minecraft:plains","spawners":[{"type":"qa_fabric_ecology:pig","weight":17,"minCount":2,"maxCount":4}]}
+            }
+
 def run(o):
     label=o.label
     if not re.fullmatch(r"[a-z0-9-]+",label):raise ValueError(label)
@@ -195,12 +203,7 @@ def run(o):
             pack=srv/"world/datapacks/qa";folder=pack/"data/qa_fabric_ecology/loot_table";folder.mkdir(parents=True)
             (pack/"pack.mcmeta").write_text('{"pack":{"description":"QA","min_format":107,"max_format":107}}')
             data=pack/"data/qa_fabric_ecology"
-            resources={
-                "worldgen/configured_feature/sky_marker":{"type":"minecraft:simple_block","config":{"to_place":{"type":"minecraft:simple_state_provider","state":{"Name":"minecraft:amethyst_block"}}}},
-                "worldgen/placed_feature/sky_marker":{"feature":"qa_fabric_ecology:sky_marker","placement":[{"type":"minecraft:height_range","height":{"type":"minecraft:uniform","min_inclusive":{"absolute":250},"max_inclusive":{"absolute":250}}}]},
-                "forge/biome_modifier/sky_markers":{"type":"forge:add_features","biomes":"#minecraft:is_overworld","features":"qa_fabric_ecology:sky_marker","step":"top_layer_modification"},
-                "neoforge/biome_modifier/pigs":{"type":"neoforge:add_spawns","biomes":"minecraft:plains","spawners":[{"type":"qa_fabric_ecology:pig","weight":17,"minCount":2,"maxCount":4}]}
-            }
+            resources=biome_resources()
             for platform,table in [("forge","sample"),("neoforge","world_only")]:
                 listing=pack/"data"/platform/"loot_modifiers/global_loot_modifiers.json"
                 listing.parent.mkdir(parents=True)

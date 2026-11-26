@@ -183,6 +183,9 @@ public final class Placement {
                 event.changes = commits.stream().map(Transition::start).toList();
                 event.pos = event.changes.getFirst().pos;
                 event.face = context.getClickedFace();
+                event.against = context.getClickedPos();
+                event.hand = context.getHand();
+                event.usedStack = before;
                 if (Actions.post(event).cancelled)
                     return InteractionResult.FAIL;
             }

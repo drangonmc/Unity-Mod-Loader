@@ -6,6 +6,11 @@ import net.minecraft.commands.*;
 import net.minecraft.world.item.CreativeModeTab;
 
 public final class Events {
+    public static void shutdownFailure(String owner, Throwable failure) {
+        if (failure instanceof VirtualMachineError fatal) throw fatal;
+        if (failure instanceof ThreadDeath fatal) throw fatal;
+        System.getLogger("mc.unity").log(System.Logger.Level.ERROR, "Stopping callback " + owner, failure);
+    }
     public static final class TickSignal {
         private final CopyOnWriteArrayList<java.util.function.BiConsumer<
             net.minecraft.server.MinecraftServer, java.util.function.BooleanSupplier>> callbacks =
@@ -13,6 +18,12 @@ public final class Events {
         public void listen(java.util.function.BiConsumer<net.minecraft.server.MinecraftServer,
                                                          java.util.function.BooleanSupplier> listener) {
             callbacks.add(listener);
+        }
+        public Runnable
+        listenScoped(java.util.function.BiConsumer<net.minecraft.server.MinecraftServer,
+                                                   java.util.function.BooleanSupplier> listener) {
+            callbacks.add(listener);
+            return () -> callbacks.remove(listener);
         }
         public void post(net.minecraft.server.MinecraftServer s, java.util.function.BooleanSupplier t) {
             for (var cb : callbacks)
@@ -35,7 +46,7 @@ public final class Events {
         LEVEL_LOAD.post((net.minecraft.server.level.ServerLevel)value);
     }
     public static void unloadLevel(net.minecraft.server.level.ServerLevel value) {
-        LEVEL_UNLOAD.post(value);
+        LEVEL_UNLOAD.postDuringShutdown(value);
     }
     public static void beforeLevelTick(net.minecraft.server.level.ServerLevel value) {
         LEVEL_TICK_PRE.post(value);
@@ -57,10 +68,10 @@ public final class Events {
         SERVER_STARTED.post(s);
     }
     public static void stopping(net.minecraft.server.MinecraftServer s) {
-        SERVER_STOPPING.post(s);
+        SERVER_STOPPING.postDuringShutdown(s);
     }
     public static void stopped(net.minecraft.server.MinecraftServer s) {
-        SERVER_STOPPED.post(s);
+        SERVER_STOPPED.postDuringShutdown(s);
     }
     public static void tickPre(net.minecraft.server.MinecraftServer s,
                                java.util.function.BooleanSupplier time) {
@@ -149,6 +160,12 @@ public final class Events {
         }
         public Runnable listen(Consumer<T> listener) {
             return listen((byte)0, listener);
+        }
+        public void postDuringShutdown(T event) {
+            for (var slot : listeners) {
+                try { slot.consumer.accept(event); }
+                catch (Throwable failure) { shutdownFailure(slot.consumer.getClass().getName(), failure); }
+            }
         }
         public void post(T event) {
             for (var listener : listeners)

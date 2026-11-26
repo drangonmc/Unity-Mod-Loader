@@ -1,0 +1,23 @@
+[
+  {
+    "slug": "no-hiding-dragon-eggs",
+    "project": "kiWvykwF",
+    "filename": "nohidingdragoneggs-1.0.0.jar",
+    "url": "https://cdn.modrinth.com/data/kiWvykwF/versions/9ikWCu7k/nohidingdragoneggs-1.0.0.jar",
+    "sha512": "2d4c90bbb926209a7d5d8cbe15f7ec15c53297e46ac453a24a0304047b2534f57004bddf64f0a27d1ca3db93ff9839ee41497148aa09acbe8f974a216fcf6f20"
+  },
+  {
+    "slug": "nopvp",
+    "project": "RXKsoYhc",
+    "filename": "NoPvP-r1.0-MC_1.8.8-Spigot.jar",
+    "url": "https://cdn.modrinth.com/data/RXKsoYhc/versions/RqqTuFw2/NoPvP-r1.0-MC_1.8.8-Spigot.jar",
+    "sha512": "e1cb78fcc1e6bd0f16c710639abba9da1e76bbc5b6ef81dcafac845c6b50c88b0413b717ba13fed2c5c5c27d4411577c986afb13dc48dbe8fdafd423c5fa4f40"
+  },
+  {
+    "slug": "bundle-ban",
+    "project": "j0ktEeiy",
+    "filename": "bundleban.jar",
+    "url": "https://cdn.modrinth.com/data/j0ktEeiy/versions/XNGUqmyM/bundleban.jar",
+    "sha512": "f6bf91b872920d43c36196937ed3802f165a4f8402926e6744219809ea5c9f6c0eca93b7f909c706d8164ba6ce1e5c173050ae5a009777a3231f74f6efd6a961"
+  }
+]

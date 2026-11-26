@@ -78,6 +78,17 @@ final class MenuProbe {
             mc.gameMode.handleContainerInput(
                 menu.containerId, index, request.get("button").getAsInt(), ContainerInput.PICKUP, player);
             out.addProperty("clicked", index);
+        } else if (action.equals("menuDrag")) {
+            int type = request.get("button").getAsInt();
+            for (int phase = 0; phase < 3; phase++) {
+                int mask = net.minecraft.world.inventory.AbstractContainerMenu.getQuickcraftMask(phase, type);
+                if (phase == 1) {
+                    for (var index : request.getAsJsonArray("indices"))
+                        mc.gameMode.handleContainerInput(menu.containerId, index.getAsInt(), mask, ContainerInput.QUICK_CRAFT, player);
+                } else {
+                    mc.gameMode.handleContainerInput(menu.containerId, -999, mask, ContainerInput.QUICK_CRAFT, player);
+                }
+            }
         } else if (action.equals("menuEdit") || action.equals("menuButton")) {
             int nth = request.has("nth") ? request.get("nth").getAsInt() : 0;
             var widget = screen.children()

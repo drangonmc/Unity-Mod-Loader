@@ -8,7 +8,7 @@ import javax.tools.ToolProvider;
 
 /** JDK-only source build. Arguments: project directory, original 26.2 Mojang server bundle. */
 class Build {
-    static final String VERSION = "0.2.3-Beta";
+    static final String VERSION = "0.2.6-Beta";
     public static void main(String[] args) throws Exception {
         if (args.length < 2 || args.length > 3)
             throw new IllegalArgumentException(
@@ -43,6 +43,7 @@ class Build {
             game.addFirst(compileApi);
             var sources = javaFiles(src.resolve("main/java"));
             sources.add(root.resolve("src/main/java/mc/unity/api/UnityMod.java"));
+            sources.add(root.resolve("src/main/java/mc/unity/api/PluginHost.java"));
             sources.add(root.resolve("src/main/java/mc/unity/loader/NativeLoader.java"));
             sources.add(root.resolve("src/main/java/net/minecraftforge/fml/common/Mod.java"));
             var libraryDir=root.resolve("standalone/lib");
@@ -83,6 +84,27 @@ class Build {
             attr.putValue("Main-Class", "mc.unity.bootstrap.Main");
             attr.putValue("Implementation-Version", VERSION);
             var asmVersion=new Attributes();asmVersion.putValue("Implementation-Version","9.10.1");manifest.getEntries().put("org/objectweb/asm/",asmVersion);
+            var weAdapter=root.resolve("src/plugin/resources/META-INF/unity/worldedit-7.4.6.jar");
+            String weLock=Files.readString(root.resolve("standalone/adapters/worldedit/SHA256SUMS")).strip();
+            if(!weLock.equals(checksum(weAdapter)+"  "+weAdapter.getFileName()))
+                throw new IOException("Changed WorldEdit adapter "+weAdapter);
+            Path pluginDir=root.resolve("standalone/vendor/bukkit");
+            Path embedded=Files.createDirectories(bundled.resolve("META-INF/unity/bukkit"));
+            List<Path> pluginClasspath=new ArrayList<>(List.of(classes));
+            List<String> pluginIndex=new ArrayList<>();
+            for(String row:Files.readAllLines(pluginDir.resolve("SHA256SUMS"))){
+                var fields=row.split("  ",2);var lib=pluginDir.resolve(fields[1]);
+                if(!checksum(lib).equals(fields[0]))throw new IOException("Changed Bukkit API dependency "+lib);
+                pluginClasspath.add(lib); Files.copy(lib,embedded.resolve(fields[1]));pluginIndex.add(row);
+            }
+            pluginClasspath.addAll(game);
+            var adapterClasses=work.resolve("plugin-classes");
+            compile(javaFiles(root.resolve("src/plugin/java")),pluginClasspath,adapterClasses,empty);
+            var adapter=embedded.resolve("unity-bukkit.jar");
+            var metadata=new Manifest();metadata.getMainAttributes().putValue("Manifest-Version","1.0");
+            pack(adapter,metadata,adapterClasses,root.resolve("src/plugin/resources"));
+            pluginIndex.add(checksum(adapter)+"  unity-bukkit.jar");
+            Files.writeString(embedded.resolve("index"),String.join("\n",pluginIndex)+"\n");
             Path artifact = work.resolve("unity-loader-" + VERSION + ".jar");
             pack(artifact, manifest, classes, src.resolve("main/resources"),bundled);
             game.add(0, artifact);
@@ -120,6 +142,9 @@ class Build {
                 for (var p : paths.sorted(Comparator.reverseOrder()).toList()) Files.delete(p);
             }
         }
+    }
+    private static String checksum(Path file) throws Exception {
+        return HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(file)));
     }
     private static ArrayList<Path> javaFiles(Path dir) throws IOException {
         try (var files = Files.walk(dir)) {

@@ -5,7 +5,11 @@ public final class ModList {
     private static final ModList INSTANCE = new ModList();
     private static volatile Map<String, ModContainer> containers = Map.of();
     public static ModList get() { return INSTANCE; }
-    public static void bind(Map<String, ModContainer> mods) { containers = Map.copyOf(mods); }
+    public static void bind(Map<String, ModContainer> mods) {
+        var next = new LinkedHashMap<>(mods);
+        next.putIfAbsent("minecraft", new ModContainer("minecraft", new mc.unity.adapter.neoforge.NeoBus("minecraft"), "Minecraft", ""));
+        containers = Map.copyOf(next);
+    }
     public Optional<ModContainer> getModContainerById(String id) {
         return Optional.ofNullable(containers.get(id));
     }

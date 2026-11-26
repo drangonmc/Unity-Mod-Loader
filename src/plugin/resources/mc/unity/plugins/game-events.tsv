@@ -1,0 +1,32 @@
+block.BlockDispenseEvent	Bucket dispenser actions; cancellation before inventory or fluid mutation
+block.CauldronLevelChangeEvent	Player bucket fill and empty after bucket event approval
+block.BlockBreakEvent	Player block break, cancellation, drop-items switch and experience
+block.BlockMultiPlaceEvent	Multi-position placement journal and rollback
+block.BlockPlaceEvent	Server-authoritative placement journal; rollback and hand resynchronization
+entity.EntityDamageByEntityEvent	Living targets with a source entity, including player-on-player damage; common damage HandlerList.
+entity.EntityDamageEvent	Living targets: incoming damage and cancellation before vanilla damage processing. Armor modifier breakdown pending.
+entity.EntityShootBowEvent	Prepared arrow before admission and bow wear
+entity.ProjectileHitEvent	Projectile impact before hit processing
+entity.ProjectileLaunchEvent	Server projectile admission before tracking
+inventory.InventoryClickEvent	Validated menu packet before client predictions. Ordinary container slots, cursor and cancellation.
+inventory.InventoryDragEvent	Server quick-craft slot selection and distribution; cancellable before slot writes.
+player.PlayerBucketEmptyEvent	Player fluid bucket empty decision at the placement target
+player.PlayerBucketFillEvent	Player pickup from a source, with authoritative block and hand resync
+player.PlayerGameModeChangeEvent	Game mode decision and cancellation; detailed change cause pending
+player.PlayerInteractAtEntityEvent	Interaction hit position, hand and cancellation
+player.PlayerInteractEntityEvent	Player.interactOn; common inherited HandlerList
+player.PlayerInteractEvent	Left click block and right click item/block; physical/pressure plate interactions pending
+player.PlayerItemHeldEvent	Valid incoming slot change; cancellation sends previous slot to client
+player.PlayerJoinEvent	Original join broadcast; mutable Adventure message
+player.PlayerLevelChangeEvent	Joined player's level change observed at player tick
+player.PlayerQuitEvent	Original quit broadcast; disconnected reason; cause classification pending
+player.PlayerToggleFlightEvent	Incoming change to flying state and abilities resynchronization
+server.PluginDisableEvent	Before plugin disable and handler cleanup
+server.PluginEnableEvent	Plugin enable transition
+server.ServerLoadEvent	STARTUP after world/plugin enable; runtime plugin reload pending
+world.ChunkLoadEvent	LevelChunk block entities registered; proto/full distinction
+world.ChunkUnloadEvent	Unload save branch; false skips this unload write
+world.WorldInitEvent	Server adds the world before initial world preparation
+world.WorldLoadEvent	Initial world preparation completed
+world.WorldSaveEvent	ServerLevel.save before level data write
+world.WorldUnloadEvent	Lifecycle notification only; cancellable dynamic world unload pending

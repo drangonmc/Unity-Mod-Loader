@@ -16,7 +16,7 @@ import uuid
 import zipfile
 from urllib.parse import unquote, urlsplit
 
-VERSION = "0.2.3-Beta"
+VERSION = "0.2.4-Beta"
 ROOT = Path(__file__).resolve().parents[2]
 DIST = ROOT / "versions" / VERSION
 EVIDENCE = ROOT / "evidence" / VERSION
@@ -37,7 +37,8 @@ def clean_env():
 
 
 class Server:
-    def __init__(self, game, name, jar, bundle, cache, command=None):
+    def __init__(self, game, name, jar, bundle, cache, command=None, *, private_console=False):
+        self.allowed_exit_codes={0,130,0xC000013A} if private_console else {0}
         self.name = name
         self.checks = []
         self.queue = queue.Queue()
@@ -45,7 +46,15 @@ class Server:
         args = ["java","-Xms256m","-Xmx2g","-Dmc.unity.contentQA=true","-Dstdout.encoding=UTF-8","-Dstderr.encoding=UTF-8",
                 f"-Dmc.unity.dualQA={str(name.startswith('dual-')).lower()}",f"-Xlog:class+load=info:file={name}-classes.log","-jar",str(jar),
                 "--server-jar",str(bundle),"--runtime-dir",str(cache),"nogui"]
-        self.process = subprocess.Popen(command or args,cwd=game,env=clean_env(),creationflags=getattr(subprocess,"CREATE_NO_WINDOW",0),stdin=subprocess.PIPE,stdout=subprocess.PIPE,
+        flags=getattr(subprocess,"CREATE_NO_WINDOW",0)
+        startup=None
+        if private_console:
+            if os.name!="nt":raise ValueError("A Windows console is required")
+            flags=subprocess.CREATE_NEW_CONSOLE
+            startup=subprocess.STARTUPINFO()
+            startup.dwFlags|=subprocess.STARTF_USESHOWWINDOW
+            startup.wShowWindow=subprocess.SW_HIDE
+        self.process = subprocess.Popen(command or args,cwd=game,env=clean_env(),creationflags=flags,startupinfo=startup,stdin=subprocess.PIPE,stdout=subprocess.PIPE,
                                         stderr=subprocess.STDOUT,text=True,encoding="utf8",errors="replace",bufsize=1)
         self.thread = threading.Thread(target=self.read,daemon=True)
         self.thread.start()
@@ -88,7 +97,7 @@ class Server:
         finally:
             self.thread.join(5)
             self.log.close()
-        if self.process.returncode!=0: raise RuntimeError(f"{self.name}: exit {self.process.returncode}")
+        if self.process.returncode not in self.allowed_exit_codes: raise RuntimeError(f"{self.name}: exit {self.process.returncode}")
 
 
 def class_audit(log, allowed, required, nested=None, capture_prefixes=()):

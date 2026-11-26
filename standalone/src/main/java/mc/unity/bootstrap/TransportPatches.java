@@ -120,22 +120,20 @@ final class TransportPatches {
                            if (hits[0] == 0 && e instanceof Instruction) {
                                hits[0]++;
                                b.aload(1);
-                               if (!client)
-                                   b.invokevirtual(cls(type), "payload", mt("()L" + PAYLOAD + ";"));
-                               b.aload(0).getfield(cls(handler), "connection", cls(CONN));
-                               if (client)
-                                   b.aconst_null().aload(0).getfield(cls(handler), "minecraft",
-                                                                     cls("net/minecraft/client/Minecraft"));
-                               else
-                                   b.aload(0)
-                                       .getfield(cls(handler), "player", cls(PLAYER))
-                                       .aload(0)
-                                       .getfield(cls(handler), "server", cls(SERVER));
                                var next = b.newLabel();
-                               b.invokestatic(
-                                    NETWORK, "dispatch",
-                                    mt("(L" + PAYLOAD + ";L" + CONN + ";L" + PLAYER + ";L" + EXEC + ";)Z"))
-                                   .ifeq(next)
+                               if (client) {
+                                   b.aload(0).getfield(cls(handler), "connection", cls(CONN))
+                                       .aconst_null().aload(0).getfield(cls(handler), "minecraft",
+                                                                       cls("net/minecraft/client/Minecraft"))
+                                       .invokestatic(NETWORK,"dispatch",
+                                            mt("(L"+PAYLOAD+";L"+CONN+";L"+PLAYER+";L"+EXEC+";)Z"));
+                               } else {
+                                   b.aload(0).aload(0).getfield(cls(handler),"connection",cls(CONN))
+                                       .aload(0).getfield(cls(handler),"server",cls(SERVER))
+                                       .invokestatic(NETWORK,"dispatchServer",
+                                            mt("(L"+type+";L"+handler+";L"+CONN+";L"+SERVER+";)Z"));
+                               }
+                               b.ifeq(next)
                                    .return_()
                                    .labelBinding(next);
                            }

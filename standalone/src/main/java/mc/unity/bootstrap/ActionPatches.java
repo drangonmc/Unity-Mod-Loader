@@ -86,14 +86,23 @@ final class ActionPatches {
         });
     }
     static void add(TransformPlan plan, boolean client) {
+        Consumer<CodeBuilder> suppressDrop = b -> {
+            var keep = b.newLabel();
+            game(b.aload(0).aload(1), "skipBlockDrop", "(" + t(L) + t(POS) + ")Z");
+            b.ifeq(keep).return_().labelBinding(keep);
+        };
+        head(plan, N + "world/level/block/Block", "popResource", "(" + t(L) + t(POS) + t(STACK) + ")V",
+             suppressDrop);
+        head(plan, N + "world/level/block/Block", "popResourceFromFace",
+             "(" + t(L) + t(POS) + t(N + "core/Direction") + t(STACK) + ")V", suppressDrop);
         String dmg = "(" + t(SL) + t(SRC) + "F)", hook = "(" + t(LE) + t(SRC) + "F)";
         for (String cls : List.of(P, LE)) {
             head(plan, cls, "hurtServer", dmg + "Z", b -> {
                 var skip = b.newLabel();
                 if (cls.equals(LE))
                     b.aload(0).instanceOf(ClassDesc.ofInternalName(P)).ifne(skip);
-                game(b.aload(0).aload(2).fload(3), "attacked", hook + "Z");
-                fail(b, true);
+                game(b.aload(0).aload(2).fload(3), "attackAmount", hook + "F");
+                b.fstore(3).fload(3).fconst_0().fcmpg().ifge(skip).iconst_0().ireturn();
                 b.labelBinding(skip);
             });
             patch(plan, cls, "actuallyHurt", dmg + "V", 2, (b, e, k) -> {

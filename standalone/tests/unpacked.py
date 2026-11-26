@@ -12,10 +12,18 @@ import zipfile
 from acceptance import ROOT, VERSION, DIST, EVIDENCE, Server, clean_env, digest
 
 
+def delivered_archive(version="0.2.5-Beta"):
+    directory=ROOT/"versions"/version
+    preview = directory / f"Unity-{version.split('-')[0]}-Development-Preview-MC26.2.zip"
+    standalone = directory / f"Unity-{version}-MC26.2-Standalone.zip"
+    return standalone if standalone.is_file() or not preview.is_file() else preview
+
+
 def run(options):
-    archive = DIST / f"Unity-{VERSION}-MC26.2-Standalone.zip"
-    candidate=archive.with_name(archive.name+".candidate")
-    if candidate.exists(): archive=candidate
+    version = getattr(options,"version",VERSION)
+    archive = options.archive or delivered_archive(version)
+    if not archive.is_file():
+        raise FileNotFoundError(archive)
     bundle = options.bundle.resolve()
     home = options.client_home.resolve()
     eula = options.eula_from.read_text()
@@ -32,7 +40,7 @@ def run(options):
             raise AssertionError("Instance data included in distribution")
         game.mkdir()
         (game / "eula.txt").write_text(eula)
-        cache = extracted / "cache" / VERSION
+        cache = extracted / "cache" / version
         cache.mkdir(parents=True)
         shutil.copy2(bundle, cache / "mojang-server-26.2.jar")
         sample_hashes={}
@@ -48,7 +56,7 @@ def run(options):
                 observed={p.name:digest(p,"sha512") for p in (game_path/"mods").glob("*.jar")}
                 if observed!={sp["filename"]:sp["sha512"] for sp in expected}:raise AssertionError("Packaged samples: "+str(game_path))
                 sample_hashes[game_path.name]=observed
-        jar = extracted / "versions" / VERSION / f"unity-loader-{VERSION}.jar"
+        jar = extracted / "versions" / version / f"unity-loader-{version}.jar"
         hashes = {p.name: digest(p) for p in jar.parent.glob("*.jar")}
         checks = {}
         for phase in ("packaged-start", "packaged-restart"):
@@ -74,7 +82,7 @@ def run(options):
                     server.send(f"item replace block 1 300 3 container.0 with minecraft:{item}")
                     label="TAG_OK_"+item
                     server.send(f"execute if items block 1 300 3 container.0 #c:{tag} run say {label}",r"\[Server\] "+label)
-                server.send("save-all flush", "Saved the game")
+                server.send("save-all flush", "Saved the game", 180)
             finally:
                 server.close()
             checks[phase] = server.checks
@@ -85,6 +93,14 @@ def run(options):
             raise AssertionError(profile)
         if digest(next((launcher/"libraries").rglob("*.jar"))) != digest(jar):
             raise AssertionError("Wrong client executable installed")
+        if "UnityEditRegions.jar" in hashes:
+            provider_inputs = options.worldedit_jar
+            if provider_inputs is None: raise ValueError("WorldEdit and WorldGuard originals required for the integration rebuild")
+            rebuilt_regions = extracted/"rebuilt-edit-regions.jar"
+            subprocess.run([sys.executable,"standalone/adapters/editregions/build.py",
+                            provider_inputs.resolve().parent,rebuilt_regions],cwd=extracted,env=clean_env(),check=True)
+            if digest(rebuilt_regions) != hashes["UnityEditRegions.jar"]:
+                raise AssertionError("Region policy plugin source rebuild differed")
         if digest(extracted / "standalone-client/unity-mods/unity-client-witness.jar") != hashes["unity-client-witness.jar"]:
             raise AssertionError("Wrong client example installed")
         subprocess.run(["java", "standalone/Build.java", ".", str(bundle), str(home)], cwd=extracted, env=clean_env(), check=True)
@@ -100,7 +116,9 @@ def run(options):
         if digest(adapter)!=digest(rebuilt):raise AssertionError("Puzzles platform adapter source rebuild differs")
         client_api=extracted/"client-api-from-source.jar"
         subprocess.run(["python","standalone/adapters/client14/build.py",jar,home,client_api],cwd=extracted,env=clean_env(),check=True)
-        if digest(client_api)!=digest(extracted/"standalone/lib/unity-client-api-0.2.3.jar"):raise AssertionError("Client renderer API source rebuild differed")
+        lib=extracted/"standalone/lib"
+        shipped_client,=(lib/row.split("  ",1)[1] for row in (lib/"SHA256SUMS").read_text().splitlines() if "  unity-client-api-" in row)
+        if digest(client_api)!=digest(shipped_client):raise AssertionError("Client renderer API source rebuild differed")
         probes=extracted/"world-probes-from-source"
         subprocess.run(["python","standalone/tests/worlds/build.py",options.world_refs.resolve(),options.fabric_refs.resolve(),cache,probes,home],cwd=extracted,env=clean_env(),check=True)
         fixture_hashes={p.relative_to(probes).as_posix():digest(p) for p in probes.rglob("*.jar")}
@@ -118,7 +136,18 @@ def run(options):
             subprocess.run([sys.executable,"tools/unity.py","fabric-api","--game-dir",str(api_game)],cwd=extracted,env=clean_env(),check=True)
         installed_api=digest(api_game/"mods"/fabric_name,"sha512")
         if installed_api!=json.loads((extracted/"standalone/beta-gameplay.json").read_bytes())["fabricApi"]["sha512"]:raise AssertionError("Packaged full API install differs")
-        results = dict(installedFabricApi=installed_api,newAdapterRebuild=adapter_hashes,worldFixtureRebuild=fixture_hashes,clientApiRebuildSHA256=digest(client_api),adapterRebuildSHA256=digest(rebuilt), archiveSHA256=digest(archive), serverStarts=2, worldCount=1, checks=checks, installedSamples=sample_hashes, clientProfile=profile["mainClass"],
+        worldedit=getattr(options,"worldedit_jar",None)
+        we_hash=None
+        if worldedit is not None:
+            provider=extracted/"worldedit-rebuilt.jar"
+            subprocess.run([sys.executable,"standalone/adapters/worldedit/build.py",worldedit.resolve(),
+                            cache/"versions/26.2/server-26.2.jar",cache/"libraries",provider],cwd=extracted,env=clean_env(),check=True)
+            with zipfile.ZipFile(jar) as engine:
+                import io,hashlib
+                with zipfile.ZipFile(io.BytesIO(engine.read("META-INF/unity/bukkit/unity-bukkit.jar"))) as host:
+                    we_hash=hashlib.sha256(host.read("META-INF/unity/worldedit-7.4.6.jar")).hexdigest()
+            if digest(provider)!=we_hash:raise AssertionError("WorldEdit adapter source rebuild differed")
+        results = dict(worldEditAdapter=we_hash,installedFabricApi=installed_api,newAdapterRebuild=adapter_hashes,worldFixtureRebuild=fixture_hashes,clientApiRebuildSHA256=digest(client_api),adapterRebuildSHA256=digest(rebuilt), archiveSHA256=digest(archive), serverStarts=2, worldCount=1, checks=checks, installedSamples=sample_hashes, clientProfile=profile["mainClass"],
                        byteIdenticalRebuild=hashes, logSHA256={name:digest(EVIDENCE/name) for name in ("packaged-start.log","packaged-restart.log")})
     out = EVIDENCE/"unpacked.tmp"
     out.write_text(json.dumps(results,indent=2), encoding="utf8")
@@ -130,6 +159,9 @@ if __name__ == "__main__":
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ("bundle","eula-from","client-home"):
         parser.add_argument("--"+name,required=True,type=Path)
+    parser.add_argument("--version",default="0.2.5-Beta")
+    parser.add_argument("--worldedit-jar",type=Path)
+    parser.add_argument("--archive",type=Path,help="Exact delivered ZIP or packaging candidate to verify")
     parser.add_argument("--fabric-refs",required=True,type=Path)
     parser.add_argument("--world-refs",required=True,type=Path)
     parser.add_argument("--adapter-refs",required=True,type=Path)

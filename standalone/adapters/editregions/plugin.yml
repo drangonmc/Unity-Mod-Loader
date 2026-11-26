@@ -1,0 +1,6 @@
+name: UnityEditRegions
+main: mc.unity.editregions.EditRegions
+version: 0.2.6
+api-version: '26.2'
+depend: [WorldEdit, WorldGuard]
+description: Applies WorldGuard build rules to WorldEdit block changes and history replay.

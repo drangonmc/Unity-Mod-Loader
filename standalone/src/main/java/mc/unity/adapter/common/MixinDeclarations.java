@@ -8,8 +8,10 @@ import java.util.regex.*;
 public final class MixinDeclarations {
     public static List<String> read(JarFile jar, boolean client) throws IOException {
         var names = new LinkedHashSet<String>();
+        var choice = PlatformChoice.read(jar);
+        if (!client && choice.kind()==mc.unity.adapter.Entry.Kind.FORGE && FmlDescriptor.clientSideOnly(jar)) return null;
         var mf = jar.getManifest();
-        if (mf != null) {
+        if (mf != null && (!choice.multiple() || choice.kind() == mc.unity.adapter.Entry.Kind.FORGE)) {
             String value = mf.getMainAttributes().getValue("MixinConfigs");
             if (value != null)
                 for (String n : value.split(","))
@@ -17,10 +19,6 @@ public final class MixinDeclarations {
         }
         var fabric = jar.getJarEntry("fabric.mod.json");
         var neo = jar.getJarEntry("META-INF/neoforge.mods.toml");
-        int descriptors = (fabric == null ? 0 : 1) + (neo == null ? 0 : 1) +
-                          (jar.getJarEntry("META-INF/mods.toml") == null ? 0 : 1);
-        if (descriptors > 1 && !UniversalData.matches(jar))
-            throw new IOException("Ambiguous platform descriptors in " + jar.getName());
         if (fabric != null)
             try (var reader = new InputStreamReader(jar.getInputStream(fabric), StandardCharsets.UTF_8)) {
                 var obj = JsonParser.parseReader(reader).getAsJsonObject();
@@ -34,7 +32,7 @@ public final class MixinDeclarations {
                             names.add(value.getAsJsonObject().get("config").getAsString());
                     }
             }
-        if (neo != null)
+        if (choice.kind() == mc.unity.adapter.Entry.Kind.NEOFORGE && neo != null)
             names.addAll(FmlDescriptor.transformFiles(jar, "mixins", "config"));
         for (var name : names)
             if (name.isBlank() || name.startsWith("/") || name.contains("..") || name.contains("\\") ||

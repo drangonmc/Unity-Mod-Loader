@@ -45,6 +45,12 @@ public final class FmlDescriptor {
             return parsed;
         }
     }
+    public static boolean clientSideOnly(JarFile jar) throws IOException {
+        Object value=document(jar,false).getRaw("clientSideOnly");
+        if(value==null)return false;
+        if(value instanceof Boolean flag)return flag;
+        throw new IOException("Expected a boolean clientSideOnly in "+jar.getName());
+    }
     static List<UnmodifiableConfig> tables(UnmodifiableConfig doc, String key) throws IOException {
         Object raw = doc.getRaw(List.of(key));
         if (raw == null)

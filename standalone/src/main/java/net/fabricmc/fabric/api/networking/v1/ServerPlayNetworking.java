@@ -21,15 +21,17 @@ public final class ServerPlayNetworking {
         ServerPlayer player();
         PacketSender responseSender();
     }
-    private record Message(MinecraftServer server, ServerPlayer player, PacketSender responseSender)
-        implements Context {}
+    private record Message(PlayNetwork.Context ctx) implements Context {
+        public MinecraftServer server() { return (MinecraftServer)ctx.executor(); }
+        public ServerPlayer player() { return ctx.sender(); }
+        public PacketSender responseSender() { return PacketSender.play(ctx.connection()); }
+    }
     public static <T extends CustomPacketPayload>
         boolean registerGlobalReceiver(CustomPacketPayload.Type<T> type, PlayPayloadHandler<T> handler) {
         return PlayNetwork.receiver(PacketFlow.SERVERBOUND, type)
             .bind(handler,
                   (value, ctx)
-                      -> handler.receive(value, new Message((MinecraftServer)ctx.executor(), ctx.sender(),
-                                                            getSender(ctx.sender()))));
+                      -> handler.receive(value, new Message(ctx)));
     }
     public static PlayPayloadHandler<?> unregisterGlobalReceiver(Identifier id) {
         return (PlayPayloadHandler<?>)PlayNetwork

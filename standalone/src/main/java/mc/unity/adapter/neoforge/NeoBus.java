@@ -4,24 +4,110 @@ import java.util.function.Consumer;
 import mc.unity.core.Events;
 import net.neoforged.bus.api.*;
 import net.neoforged.neoforge.event.*;
+import net.neoforged.neoforge.event.server.*;
+import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 public final class NeoBus implements IEventBus {
     private final String owner;
     private final Events.Signal<Event> handlers = new Events.Signal<>();
     private final Map<Class<?>, Runnable> bridges = new HashMap<>();
     private static final Set<NeoBus> sessions = Collections.newSetFromMap(new IdentityHashMap<>());
+    private final Map<Object, List<Runnable>> subscriptions = new IdentityHashMap<>();
+
+    @Override public void register(Object target) { register(target, false); }
+
+    public void register(Object target, boolean splitByBus) {
+        Objects.requireNonNull(target);
+        boolean statics = target instanceof Class<?>;
+        var type = statics ? (Class<?>) target : target.getClass();
+        synchronized (sessions) {
+            if (subscriptions.containsKey(target)) return;
+            List<Runnable> removed = new ArrayList<>();
+            try {
+                var methods = new LinkedHashSet<>(Arrays.asList(type.getMethods()));
+                methods.addAll(Arrays.asList(type.getDeclaredMethods()));
+                for (var method : methods) {
+                    var annotation = method.getAnnotation(SubscribeEvent.class);
+                    if (annotation == null || method.isBridge() || method.isSynthetic()) continue;
+                    if (statics != java.lang.reflect.Modifier.isStatic(method.getModifiers())) continue;
+                    if (method.getParameterCount() != 1 || method.getReturnType() != void.class
+                            || !Event.class.isAssignableFrom(method.getParameterTypes()[0]))
+                        throw new IllegalArgumentException("Invalid NeoForge listener " + method);
+                    var event = method.getParameterTypes()[0].asSubclass(Event.class);
+                    if (splitByBus && (owner != null) != net.neoforged.fml.event.IModBusEvent.class.isAssignableFrom(event)) continue;
+                    var handle = java.lang.invoke.MethodHandles.privateLookupIn(method.getDeclaringClass(),
+                            java.lang.invoke.MethodHandles.lookup()).unreflect(method);
+                    var callback = statics ? handle : handle.bindTo(target);
+                    removed.add(listen(annotation.priority(), annotation.receiveCanceled(), event, value -> {
+                        try { callback.invoke(value); }
+                        catch (RuntimeException | Error e) { throw e; }
+                        catch (Throwable e) { throw new IllegalStateException("NeoForge listener " + method, e); }
+                    }));
+                }
+                if (!removed.isEmpty()) subscriptions.put(target, removed);
+            } catch (IllegalAccessException | RuntimeException | Error e) {
+                removed.forEach(Runnable::run);
+                if (e instanceof RuntimeException failure) throw failure;
+                if (e instanceof Error failure) throw failure;
+                throw new IllegalArgumentException("Cannot register " + type, e);
+            }
+        }
+    }
+
+    @Override public void unregister(Object target) {
+        synchronized (sessions) {
+            var removed = subscriptions.remove(target);
+            if (removed != null) removed.forEach(Runnable::run);
+        }
+    }
+
     public NeoBus(String owner) {
         this.owner = owner;
     }
     public String owner() {
         return owner;
     }
+    private record
+        Lifecycle(Class<? extends ServerLifecycleEvent> type, Events.Signal<MinecraftServer> signal,
+                  java.util.function.Function<MinecraftServer, ServerLifecycleEvent> create) {}
+    private static final List<Lifecycle> LIFECYCLE =
+        List.of(new Lifecycle(ServerAboutToStartEvent.class, Events.SERVER_ABOUT_TO_START,
+                              ServerAboutToStartEvent::new),
+                new Lifecycle(ServerStartingEvent.class, Events.SERVER_STARTING, ServerStartingEvent::new),
+                new Lifecycle(ServerStartedEvent.class, Events.SERVER_STARTED, ServerStartedEvent::new),
+                new Lifecycle(ServerStoppingEvent.class, Events.SERVER_STOPPING, ServerStoppingEvent::new),
+                new Lifecycle(ServerStoppedEvent.class, Events.SERVER_STOPPED, ServerStoppedEvent::new));
     public <T extends Event> void addListener(EventPriority priority, boolean receive, Class<T> kind,
                                               Consumer<T> cb) {
+        synchronized (sessions) {
+            subscriptions.computeIfAbsent(cb, key -> new ArrayList<>()).add(listen(priority, receive, kind, cb));
+        }
+    }
+
+    private <T extends Event> Runnable listen(EventPriority priority, boolean receive, Class<T> kind, Consumer<T> cb) {
         Objects.requireNonNull(cb);
         synchronized (sessions) {
             sessions.add(this);
             boolean supported = false;
+            if (owner == null)
+                for (var phase : LIFECYCLE) {
+                    if (kind.isAssignableFrom(phase.type)) {
+                        bridges.computeIfAbsent(
+                            phase.type, k -> phase.signal.listen(server -> post(phase.create.apply(server))));
+                        supported = true;
+                    }
+                }
+
+            if (owner == null && kind.isAssignableFrom(net.neoforged.neoforge.event.tick.ServerTickEvent.Pre.class)) {
+                bridges.computeIfAbsent(net.neoforged.neoforge.event.tick.ServerTickEvent.Pre.class,
+                    k -> Events.SERVER_TICK_PRE.listenScoped((s,t) -> post(new net.neoforged.neoforge.event.tick.ServerTickEvent.Pre(t,s))));
+                supported = true;
+            }
+            if (owner == null && kind.isAssignableFrom(net.neoforged.neoforge.event.tick.ServerTickEvent.Post.class)) {
+                bridges.computeIfAbsent(net.neoforged.neoforge.event.tick.ServerTickEvent.Post.class,
+                    k -> Events.SERVER_TICK_POST.listenScoped((s,t) -> post(new net.neoforged.neoforge.event.tick.ServerTickEvent.Post(t,s))));
+                supported = true;
+            }
             if (owner == null && kind.isAssignableFrom(AddServerReloadListenersEvent.class)) {
                 bridges.computeIfAbsent(AddServerReloadListenersEvent.class,
                                         k -> mc.unity.core.Reloads.COLLECT.listen((byte)1, r -> {
@@ -93,7 +179,7 @@ public final class NeoBus implements IEventBus {
                    kind == net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent.class)) &&
                 kind.getName().startsWith("net.neoforged."))
                 throw new IllegalArgumentException("Unsupported NeoForge event or bus: " + kind);
-            handlers.listen((byte)(2 - priority.ordinal()), e -> {
+            return handlers.listen((byte)(2 - priority.ordinal()), e -> {
                 if (!kind.isInstance(e) || !receive && e instanceof ICancellableEvent c && c.isCanceled())
                     return;
                 if (owner == null) {
@@ -117,6 +203,7 @@ public final class NeoBus implements IEventBus {
     public static void clear() {
         synchronized (sessions) {
             for (var bus : sessions) {
+                bus.subscriptions.clear();
                 bus.handlers.clear();
                 bus.bridges.values().forEach(Runnable::run);
                 bus.bridges.clear();

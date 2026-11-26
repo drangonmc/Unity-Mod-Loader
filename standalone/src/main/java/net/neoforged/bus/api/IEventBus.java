@@ -2,6 +2,8 @@ package net.neoforged.bus.api;
 import java.util.function.Consumer;
 import mc.unity.adapter.neoforge.ListenerTypes;
 public interface IEventBus {
+    void register(Object target);
+    void unregister(Object target);
     <T extends Event> void addListener(
         EventPriority priority, boolean receiveCanceled, Class<T> type, Consumer<T> listener);
     default<T extends Event> void addListener(Class<T> type, Consumer<T> cb) {

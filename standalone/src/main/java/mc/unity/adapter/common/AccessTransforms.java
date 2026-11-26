@@ -129,10 +129,14 @@ public final class AccessTransforms {
             var fab = NestedArchives.json(jar, "fabric.mod.json");
             if (fab != null && fab.has("accessWidener"))
                 plan.parse(jar, fab.get("accessWidener").getAsString(), true);
+            var choice = PlatformChoice.read(jar);
+            if (choice.multiple() && choice.kind() == mc.unity.adapter.Entry.Kind.FABRIC)
+                continue;
             var at = new LinkedHashSet<String>();
             if (jar.getJarEntry("META-INF/accesstransformer.cfg") != null)
                 at.add("META-INF/accesstransformer.cfg");
-            if (jar.getManifest() != null) {
+            if (jar.getManifest() != null &&
+                (!choice.multiple() || choice.kind() == mc.unity.adapter.Entry.Kind.FORGE)) {
                 var list = jar.getManifest().getMainAttributes().getValue("FMLAT");
                 if (list != null && !list.isBlank())
                     for (String name : list.trim().split("\\s+"))

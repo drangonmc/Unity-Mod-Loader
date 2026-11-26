@@ -20,8 +20,6 @@ public final class GameLoader extends URLClassLoader {
     private boolean mixinStarted;
     private static final String PUZZLES_SHA =
         "643643086780874780e7586e10b08c16cb14965c0fef18088bd1ee1b07e3cc95";
-    private static final String FABRIC_API_SHA =
-        "1083ce79231f9d358d7b172dd43553234e2f3834993a3ae42a1ec976af5ce418";
     private static final Set<String> upstreamFabricModules = moduleHashes();
     private boolean fullFabricApi;
     private Map<Path, Path> containers = Map.of();
@@ -53,6 +51,7 @@ public final class GameLoader extends URLClassLoader {
             throw new ExceptionInInitializerError(ex);
         }
     }
+    private final Set<Path> neoMods = new HashSet<>();
     private Path puzzles;
     private java.util.function.UnaryOperator<byte[]> puzzlesGuard;
     public boolean usesPuzzlesSpi(Path file) {
@@ -132,16 +131,13 @@ public final class GameLoader extends URLClassLoader {
             dependencyStamps = (Map<Path, String>)resolver.getMethod("fingerprints").invoke(nested);
             {
                 var selected = (List<Path>)resolver.getMethod("files").invoke(nested);
-                for (Path candidate : selected) {
-                    if (Files.size(candidate) == 2501570 &&
-                        FABRIC_API_SHA.equals(VanillaBundle.hash(candidate))) {
-                        fullFabricApi = true;
-                        break;
-                    }
-                }
+                fullFabricApi = (boolean)resolver.getMethod("officialFabricApi").invoke(nested);
                 for (var file : selected) {
                     var jar = new JarFile(file.toFile(), true, JarFile.OPEN_READ, Runtime.version());
                     mods.put(file, jar);
+                    if (jar.getJarEntry("fabric.mod.json") == null &&
+                        jar.getJarEntry("META-INF/neoforge.mods.toml") != null)
+                        neoMods.add(file);
                     if (jar.getEntry("META-INF/services/fuzs.puzzleslib.common.impl.core.proxy.ProxyImpl") !=
                             null &&
                         PUZZLES_SHA.equals(VanillaBundle.hash(file)))
@@ -258,6 +254,7 @@ public final class GameLoader extends URLClassLoader {
             }
         }
         mods.clear();
+        neoMods.clear();
         resources = Map.of();
         mixinOwners.clear();
         mounted = null;
@@ -431,7 +428,7 @@ public final class GameLoader extends URLClassLoader {
             bytes = patches.getOrDefault(key, bytes);
             if (owners != null && puzzlesGuard != null && Path.of(jar.getName()).equals(puzzles))
                 bytes = puzzlesGuard.apply(bytes);
-            if (owners != null && jar.getJarEntry("META-INF/neoforge.mods.toml") != null)
+            if (owners != null && neoMods.contains(Path.of(jar.getName())))
                 bytes = TypedListeners.adapt(bytes, this);
             if (mixin != null) {
                 try {

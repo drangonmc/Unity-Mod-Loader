@@ -25,6 +25,11 @@ public final class Content {
     public static void dependencies(Map<Path, String> values) {
         dependencyStamps = Map.copyOf(values);
     }
+    private static final Map<String, String> versions = new HashMap<>();
+    static volatile LoginInventory inventory = LoginInventory.snapshot(Map.of(), Map.of());
+    public static void version(String id, String version) {
+        versions.put(id, version);
+    }
     private static boolean frozen;
     private static volatile String digest = "";
     private static int nextColumn = 7;
@@ -161,11 +166,16 @@ public final class Content {
         try {
             var hash = MessageDigest.getInstance("SHA-256");
             line(hash, "unity:content/8 " + mc.unity.bootstrap.VanillaBundle.hash(coreArchive()));
+            var owners = new TreeMap<String, String>();
+            var registriesByName = new TreeMap<String, String>();
             for (var entry : packs.entrySet()) {
                 if (localResourcePacks.contains(entry.getKey()))
                     continue;
-                line(hash, entry.getKey() + " " + mc.unity.bootstrap.VanillaBundle.hash(entry.getValue()) +
-                               " " + dependencyStamps.getOrDefault(entry.getValue(), ""));
+                var archiveHash = mc.unity.bootstrap.VanillaBundle.hash(entry.getValue());
+                owners.put(entry.getKey(),
+                           versions.getOrDefault(entry.getKey(), "?") + "@" + archiveHash.substring(0, 12));
+                line(hash, entry.getKey() + " " + archiveHash + " " +
+                               dependencyStamps.getOrDefault(entry.getValue(), ""));
             }
             for (Block block : BuiltInRegistries.BLOCK) {
                 for (var state : block.getStateDefinition().getPossibleStates()) {
@@ -176,10 +186,18 @@ public final class Content {
                     line(hash, "S " + Block.getId(state) + " " + state);
                 }
             }
-            for (Registry registry : registries())
-                for (Object value : registry)
-                    line(hash, registry.key().identifier() + " " + registry.getId(value) + " " +
-                                   registry.getKey(value));
+            for (Registry registry : registries()) {
+                var byName = MessageDigest.getInstance("SHA-256");
+                for (Object value : registry) {
+                    String row = registry.key().identifier() + " " + registry.getId(value) + " " +
+                                 registry.getKey(value);
+                    line(hash, row);
+                    line(byName, row);
+                }
+                registriesByName.put(registry.key().identifier().toString(),
+                                     HexFormat.of().formatHex(byName.digest()));
+            }
+            inventory = LoginInventory.snapshot(owners, registriesByName);
             for (var key : WorldRegistries.networkKeys())
                 line(hash, "world registry " + key);
             for (String channel : ConfigurationNetwork.manifest())
@@ -232,12 +250,13 @@ public final class Content {
     }
     private static final Set<Path> dataArchives = new HashSet<>();
     private static final Set<Path> assetArchives = new HashSet<>();
-    public static void dataArchive(String id, Path file, boolean assets) {
+    public static void dataArchive(String id, Path file, boolean assets, boolean data) {
         if (assets)
             assetArchives.add(file);
         source(id, file, true);
         localResources(id);
-        dataArchives.add(file);
+        if (data)
+            dataArchives.add(file);
     }
     public static void packs(Map<String, Pack> target, Set<RepositorySource> sources) {
         var type = sources.stream().anyMatch(ServerPacksSource.class ::isInstance)
@@ -260,7 +279,7 @@ public final class Content {
         mount(target, "unity_common_tags", "Unity common item tags", coreArchive());
         var mounted = new HashSet<Path>();
         packs.forEach((id, file) -> {
-            if (!dataArchives.contains(file) && mounted.add(file))
+            if (!dataArchives.contains(file) && !assetArchives.contains(file) && mounted.add(file))
                 mount(target, "unity/" + id, id, file);
         });
     }
@@ -298,6 +317,8 @@ public final class Content {
         dataArchives.clear();
         assetArchives.clear();
         localResourcePacks.clear();
+        versions.clear();
+        inventory = LoginInventory.snapshot(Map.of(), Map.of());
         dependencyStamps = Map.of();
         frozen = false;
         digest = "";
