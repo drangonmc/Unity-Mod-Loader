@@ -84,6 +84,8 @@ final class GamePatches {
         LevelPatches.add(plan);
         BukkitPatches.add(plan);
         ActionPatches.add(plan, client);
+        NeoFuelPatches.add(plan);
+        NeoBlockEntityPatches.add(plan);
         NeoDataPatches.add(plan);
         NeoGameplayPatches.add(plan, client);
         if (client) {

@@ -88,7 +88,7 @@ public final class NeoBus implements IEventBus {
         Objects.requireNonNull(cb);
         synchronized (sessions) {
             sessions.add(this);
-            boolean supported = false;
+            boolean supported = owner == null && kind.isAssignableFrom(net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent.class);
             if (owner == null)
                 for (var phase : LIFECYCLE) {
                     if (kind.isAssignableFrom(phase.type)) {
@@ -172,6 +172,7 @@ public final class NeoBus implements IEventBus {
                    kind.getName().equals(
                        "net.neoforged.neoforge.client.event.EntityRenderersEvent$RegisterRenderers") ||
                    kind.getName().equals("net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent") ||
+                   kind.getName().equals("net.neoforged.neoforge.client.event.RegisterMenuScreensEvent") ||
                    kind == net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.class ||
                    kind == net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent.class ||
                    kind == net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent.class ||

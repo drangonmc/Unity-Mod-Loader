@@ -70,7 +70,42 @@ public final class UnityWorldEdit implements BukkitImplAdapter {
             public boolean hasContainer(){return s.hasBlockEntity();}
         };
     }
-    public BlockState getBlock(Location at){return com.sk89q.worldedit.bukkit.BukkitAdapter.adapt(at.getBlock().getBlockData());}
+    @Override public void initializeRegistries() {
+        for (var block : BuiltInRegistries.BLOCK) {
+            String id = BuiltInRegistries.BLOCK.getKey(block).toString();
+            if (BlockType.REGISTRY.get(id) == null)
+                BlockType.REGISTRY.register(id, new BlockType(id, seed -> convert(seed.getBlockType(), block.defaultBlockState())));
+        }
+        for (var item : BuiltInRegistries.ITEM) {
+            String id = BuiltInRegistries.ITEM.getKey(item).toString();
+            var registry = com.sk89q.worldedit.world.item.ItemType.REGISTRY;
+            if (registry.get(id) == null) registry.register(id, new com.sk89q.worldedit.world.item.ItemType(id));
+        }
+    }
+
+    private static <V extends Comparable<V>> String propertyValue(
+            net.minecraft.world.level.block.state.BlockState state,
+            net.minecraft.world.level.block.state.properties.Property<V> property) {
+        return property.getName(state.getValue(property));
+    }
+
+    private static BlockState convert(BlockType type, net.minecraft.world.level.block.state.BlockState nativeState) {
+        var values = new LinkedHashMap<Property<?>, Object>();
+        for (var property : nativeState.getProperties()) {
+            var target = type.getProperty(property.getName());
+            values.put(target, target.getValueFor(propertyValue(nativeState, property)));
+        }
+        return type.getState(values);
+    }
+
+    public BlockState getBlock(Location at) {
+        var access = access(at.getWorld());
+        return access.onServer(() -> {
+            var state = access.level.getBlockState(new BlockPos(at.getBlockX(), at.getBlockY(), at.getBlockZ()));
+            String id = BuiltInRegistries.BLOCK.getKey(state.getBlock()).toString();
+            return convert(Objects.requireNonNull(BlockType.REGISTRY.get(id), id), state);
+        });
+    }
     public BaseBlock getFullBlock(Location at){
         var access = access(at.getWorld());
         return access.onServer(() -> {

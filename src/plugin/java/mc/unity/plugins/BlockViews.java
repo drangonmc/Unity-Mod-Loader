@@ -22,6 +22,8 @@ final class BlockViews {
             if (value != null)
                 return value;
         }
+        var modded = Material.matchMaterial(id.toString());
+        if (modded != null && modded.getKey().toString().equals(id.toString())) return modded;
         throw Views.unsupported("Material","mapping for " + id);
     }
     static final class Stack extends org.bukkit.inventory.ItemStack {

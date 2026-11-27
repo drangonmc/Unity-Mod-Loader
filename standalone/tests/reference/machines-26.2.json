@@ -1,0 +1,24 @@
+[
+  {
+    "project": "advancedfurnacey",
+    "projectId": "87PuDuCS",
+    "versionId": "D0goCfZL",
+    "version": "1.0.2",
+    "filename": "advanced-furnace-neoforge-26.2-1.0.2.jar",
+    "url": "https://cdn.modrinth.com/data/87PuDuCS/versions/D0goCfZL/advanced-furnace-neoforge-26.2-1.0.2.jar",
+    "size": 47482,
+    "sha512": "8a3198a8b956b55e29042c99340e7a42fc0dda3ed49556a7e729c66cb27baaf4c3c047113176ec6ae32c7fbeceb1ba8dc158e98f1fe6147d2aba55994ce25a3b",
+    "dependencies": []
+  },
+  {
+    "project": "copper-hopper",
+    "projectId": "mTI5Xg5F",
+    "versionId": "4JMEDg1g",
+    "version": "0.24.1+26.2",
+    "filename": "copperhopper-neoforge-0.24.1+26.2.jar",
+    "url": "https://cdn.modrinth.com/data/mTI5Xg5F/versions/4JMEDg1g/copperhopper-neoforge-0.24.1%2B26.2.jar",
+    "size": 57259,
+    "sha512": "1a86f3fe19d04417d727ef480fdcf30f7befc4ec5b929865fe0065a05384fac4ab53c90aeb755463507e44c59ae8fa9cc426e6018dc53b7f4bf4db11db65243a",
+    "dependencies": []
+  }
+]

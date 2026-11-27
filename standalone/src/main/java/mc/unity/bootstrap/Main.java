@@ -6,7 +6,7 @@ import java.nio.file.*;
 import java.util.*;
 
 public final class Main {
-    public static final String VERSION = "0.2.6-Beta";
+    public static final String VERSION = "0.2.7-Beta";
     public static void main(String[] args) throws Throwable {
         if (args.length > 0 && args[0].equals("--client-home")) {
             if (args.length < 2)

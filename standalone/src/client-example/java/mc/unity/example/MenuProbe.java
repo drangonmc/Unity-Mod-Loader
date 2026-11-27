@@ -121,6 +121,7 @@ final class MenuProbe {
         for (var slot : menu.slots) {
             var value = stack(slot.getItem());
             value.addProperty("index", slot.index);
+            value.addProperty("containerSlot", slot.getContainerSlot());
             value.addProperty(
                 "inventory", slot.container == player.getInventory() ? slot.getContainerSlot() : -1);
             slots.add(value);
@@ -133,6 +134,8 @@ final class MenuProbe {
         JsonObject r = new JsonObject();
         r.addProperty("id", BuiltInRegistries.ITEM.getKey(stack.getItem()).toString());
         r.addProperty("count", stack.getCount());
+        var custom = stack.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
+        if (custom != null) r.addProperty("custom", custom.copyTag().toString());
         return r;
     }
 }

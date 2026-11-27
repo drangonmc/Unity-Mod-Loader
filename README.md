@@ -1,28 +1,37 @@
-# Unity 0.2.6 Beta · Minecraft Java 26.2
+# Unity 0.2.7 Beta · Minecraft Java 26.2
 
-Unity 使用独立内核，服务端入口为 `mc.unity.bootstrap.Main`，运行需要 Java 25。本版支持下表中经过验证的子集。首次试用请使用测试世界，保留原有存档备份。
+Unity 使用独立内核，Java 25 为运行环境。专服由 `mc.unity.bootstrap.Main` 启动。本页列出已通过实机验收的兼容子集。
 
 ## 安装
 
-1. 解压完整的 Standalone ZIP。服务端运行 `Start-Unity.cmd`，按 Minecraft 的流程处理 EULA。客户端先安装原版 26.2，再运行 `Install-Unity-Client.cmd`，在启动器中选择生成的 Unity 配置。
-2. 将作者发布的 WorldEdit 7.4.6 和 WorldGuard 7.0.19 Bukkit JAR 放入 `standalone-instance/plugins/`。需要让 WorldGuard 的区域规则约束 WorldEdit 批量写入时，将随包的 `versions/0.2.6-Beta/UnityEditRegions.jar` 也复制到这个目录。三份插件都安装在服务端。
-3. 为需要复制箱子内容的编辑者授予 WorldEdit 的编辑命令权限和 `worldedit.setnbt`。区域保护组件逐个检查目标坐标的 WorldGuard build 规则，并尊重 WorldGuard 授予该玩家的区域绕过权限。验收使用了普通非 OP 编辑者。
+1. 解压完整 Standalone ZIP，在独立测试目录运行 `Start-Unity.cmd`。客户端先安装原版 26.2，再用 `Install-Unity-Client.cmd` 安装 Unity 配置。
+2. 将下面两个 NeoForge 作者原包放到服务端及每个客户端的 `mods/`。发行包附有版本标识、下载地址和 SHA-512，见 `standalone/tests/reference/machines-26.2.json`。
+3. 将 WorldEdit 7.4.6、WorldGuard 7.0.19 的 Bukkit 作者 JAR 和随包的 `versions/0.2.7-Beta/UnityEditRegions.jar` 放入 `standalone-instance/plugins/`。两个上游插件的校验值在 `standalone/tests/reference/protection-originals.json`。为获准复制容器内容的编辑者配置 WorldEdit 命令权限和 `worldedit.setnbt`。
 
-## 已验证的编辑行为
+| NeoForge 原包 | 实测玩法 | 用于存档核对的字段 |
+| --- | --- | --- |
+| AdvancedFurnaceY 1.0.2 | 高级熔炉用煤将粗铁烧成铁锭。连接铜漏斗后，侧面燃料槽收到 2 个煤。 | 注册 ID、朝向、机器名称、`lit_total_time`、槽号、物品数量和自定义物品组件 |
+| Copper Hopper 0.24.1 | 铜漏斗按过滤条件输送 4 个绿宝石，留下 1 个过滤样品，输入端的 3 个钻石保持原样。 | 方块 ID、独立的方块实体 ID、朝向、机器名称、过滤槽物品和自定义物品组件 |
 
-Paper 26.2 build 121 和 Unity 使用相同的 WorldEdit、WorldGuard、区域保护组件和测试权限。两个隐藏窗口均运行真正的 Minecraft 图形客户端。Unity 服务端加载 77 个锁定样本，两名客户端各 75 个，另外安装官方完整 Fabric API 和 NeoForge 测试模组。
+作者版本：[AdvancedFurnaceY](https://modrinth.com/mod/advancedfurnacey/version/D0goCfZL) · [Copper Hopper，由 pcal.net 发布](https://modrinth.com/mod/copper-hopper/version/4JMEDg1g)
 
-| 场景 | 两端和服务器的核对结果 |
+## WorldEdit 区域编辑和重启读档
+
+Paper 26.2 build 121 和 Unity 使用相同的原版箱子、插件原包、区域组件和权限做对照。两个真实客户端分别在首次启动和重启后进服，核对方块、双方背包和血量。Unity 的机器用例另外装入两个候选模组。按作者样本 JAR 计，服务端共 79 个、每个客户端 77 个，另有官方 Fabric API 与验收见证模组。
+
+| 操作 | 实际结果 |
 | --- | --- |
-| 跨界 `//set`、`//undo`、`//redo` | 六格中，区域内三格始终为平滑石。区域外三格变为金块，撤销还原平滑石，重做后恢复金块。 |
-| 区域内粘贴 | 对有 7 个青金石的受保护箱子执行粘贴，数量和槽位保持原样，重启后仍能读回。 |
-| 区域外箱子复制粘贴 | 源箱第 4 格有 11 个绿宝石，并带 `minecraft:custom_data`。目标箱同一格原有 3 个钻石。粘贴、撤销和重做依次得到绿宝石、钻石、绿宝石。两个客户端分别打开箱子检查物品和数量，服务端核对完整组件；重启后再次检查源箱与目标箱。 |
-| 玩家存档 | 玩家 A 的 3 个黑曜石、玩家 B 的 5 个燧石、双方 UUID 和 20 点血量在重启后与服务端一致。 |
+| 箱子对照 | 跨界设置六格方块，区内三格保持原样。区外箱子粘贴后有 11 个带自定义数据的绿宝石，撤销恢复 3 个钻石，重做再恢复绿宝石。 |
+| 编辑者 A 从区外复制机器 | 将向东的机器粘贴到区内，原来的向北机器保留 7 个青金石与原始数据。粘贴到区外后，目标由向西、3 个钻石变成向东、11 个绿宝石。撤销和重做均恢复了对应朝向、槽位、名称与组件。 |
+| 编辑者 B 从区内复制机器 | B 有读取剪贴板内容的命令权限。粘贴到获准写入的空地后，两端读到向北的副本、7 个青金石和原始标记。B 撤销后该处变为空气，重做后机器与内容恢复。 |
+| 专服重启 | 从同一世界读回两台机器的源和目标、区内原件及区外副本。两个客户端分别打开区外机器的作者菜单，读取槽位与组件。服务端同时核对区内原件以及所有目标的方块实体 ID 与 NBT。两位玩家的背包和 20 点血量与重启前一致。 |
 
-## NeoForge API
+上述区域启用 WorldGuard 的 `build: deny`，两位非 OP 编辑者均有 WorldEdit 读取和复制的权限。区域内的写入保护由 UnityEditRegions 执行。对于需要限制读取剪贴板的部署，还需单独配置并验收读取权限。
 
-本版增加 `@SubscribeEvent`、按物理端筛选的 `@EventBusSubscriber`、模组和游戏事件总线的自动分发、`IEventBus.register/unregister`、`ServerTickEvent.Pre/Post` 与加载上下文扩展点。使用上游 NeoForge SDK 编译的独立测试模组，在混装服首次启动和重启时均验证了扩展点读取、监听优先级、服务端线程和注销行为。
+## NeoForge 新增能力
 
-本轮涵盖方块编辑和箱子方块实体。实体剪贴板、跨维度编辑、离线编辑者、任意模组机器数据及整个 WorldGuard 保护事件集仍需分别验收。单项 NeoForge 总线支持也取决于 Unity 是否接入了对应的游戏事件。
+- `RegisterMenuScreensEvent` 在客户端将模组菜单工厂接入实际屏幕注册表，检测重复注册并在关闭时释放本会话添加的工厂。
+- 支持 NeoForge 的方块实体构造重载、有效方块集合和仅管理员可写 NBT 标志。WorldEdit 通过游戏注册键和原生方块属性转换状态。Bukkit 插件可以用注册键识别本服的模组物品与方块。
+- 物品与物品栈的 `getBurnTime`、`EventHooks.getItemBurnTime` 和 `FurnaceFuelBurnTimeEvent` 接入了熔炉燃料检查。由上游 SDK 编译的见证模组将带标记的黏土球燃料时间设为 240 tick，测试验证了监听优先级、取消语义和原版熔炉实际产出金锭。
 
-完整对照数据和运行散列随包保存在 `evidence/0.2.6-Beta/`，每个平台的 `observations.txt` 保留客户端和服务端的关键观测。
+验证范围限于锁定的两个机器版本及本次混装。其他机器的能量、流体、跨区块多方块结构及离线编辑仍需各自验证。可复查的发行散列、两端结果和运行日志摘录在 `evidence/0.2.7-Beta/`。

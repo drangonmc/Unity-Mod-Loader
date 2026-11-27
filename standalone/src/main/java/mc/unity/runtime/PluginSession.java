@@ -17,6 +17,25 @@ final class PluginSession implements AutoCloseable {
         Domain(URL[] urls, ClassLoader parent) {
             super("Unity Bukkit 26.2", urls, parent);
         }
+        @Override protected Class<?> findClass(String name) throws ClassNotFoundException {
+            if (!name.equals("org.bukkit.Material")) return super.findClass(name);
+            var url = findResource("org/bukkit/Material.class");
+            if (url == null) throw new ClassNotFoundException(name);
+            try {
+                var connection = (JarURLConnection)url.openConnection();
+                connection.setUseCaches(false);
+                try (var jar = connection.getJarFile()) {
+                    var entry = jar.getJarEntry("org/bukkit/Material.class");
+                    byte[] data;
+                    try (var in = jar.getInputStream(entry)) { data = BukkitMaterialPatch.apply(in.readAllBytes(),this); }
+                    var location = connection.getJarFileURL();
+                    synchronized (this) {
+                        if (getDefinedPackage("org.bukkit") == null) definePackage("org.bukkit",jar.getManifest(),location);
+                    }
+                    return defineClass(name,data,0,data.length,new java.security.CodeSource(location,entry.getCodeSigners()));
+                }
+            } catch (IOException e) { throw new ClassNotFoundException(name,e); }
+        }
         private static boolean owned(String n) {
             return n.startsWith("org.bukkit.") || n.startsWith("io.papermc.paper.") ||
                 n.startsWith("com.destroystokyo.paper.") || n.startsWith("net.kyori.") ||

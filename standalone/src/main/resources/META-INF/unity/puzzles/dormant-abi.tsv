@@ -229,7 +229,8 @@ fuzs/puzzleslib/neoforge/impl/client/renderer/NeoForgeMutableBakedQuad	Unsupport
 fuzs/puzzleslib/neoforge/impl/client/renderer/NeoForgeMutableBakedQuad	Unsupported platform type: net/neoforged/neoforge/client/model/quad/BakedNormals
 fuzs/puzzleslib/neoforge/impl/core/NeoForgeCommonProxy	Unsupported platform type: net/neoforged/neoforge/common/extensions/ICommonPacketListener
 fuzs/puzzleslib/neoforge/impl/core/NeoForgeCommonProxy	Unsupported platform type: net/neoforged/neoforge/entity/PartEntity
-fuzs/puzzleslib/neoforge/impl/core/NeoForgeCommonProxy	Unsupported platform type: net/neoforged/neoforge/event/EventHooks
+fuzs/puzzleslib/neoforge/impl/core/NeoForgeCommonProxy	Unsupported platform member: net/neoforged/neoforge/event/EventHooks.onPlayerDestroyItem(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/InteractionHand;)V
+fuzs/puzzleslib/neoforge/impl/core/NeoForgeCommonProxy	Unsupported platform member: net/neoforged/neoforge/event/EventHooks.canEntityGrief(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/Entity;)Z
 fuzs/puzzleslib/neoforge/impl/core/NeoForgeCommonProxy	Unsupported platform type: net/neoforged/neoforge/server/ServerLifecycleHooks
 fuzs/puzzleslib/neoforge/impl/core/NeoForgeModConstructor	Unsupported platform type: net/neoforged/neoforge/event/AddPackFindersEvent
 fuzs/puzzleslib/neoforge/impl/core/NeoForgeModConstructor	Unsupported platform type: net/neoforged/neoforge/event/AddServerReloadListenersEvent

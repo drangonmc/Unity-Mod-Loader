@@ -80,7 +80,7 @@ final class BukkitViews {
         return Views.of(Server.class, "Unity", (m, a) -> switch (m) {
             case "getName" -> "Unity";
             case "createBlockData" -> createBlockData(a);
-            case "getVersion" -> "Unity 0.2.6-Beta (MC: 26.2)";
+            case "getVersion" -> "Unity 0.2.7-Beta (MC: 26.2)";
             case "getBukkitVersion" -> "26.2-R0.1-SNAPSHOT";
             case "getMinecraftVersion" -> "26.2";
             case "getLogger" -> Host.LOG;
@@ -141,7 +141,7 @@ final class BukkitViews {
                 Set<Keyed> values=new LinkedHashSet<>();
                 holders.stream().map(h->h.unwrapKey().orElseThrow().identifier()).forEach(id->{
                     var k=NamespacedKey.fromString(id.toString());
-                    Keyed v=type==Material.class ? (id.getNamespace().equals("minecraft")?Material.getMaterial(id.getPath().toUpperCase(Locale.ROOT)):null)
+                    Keyed v=type==Material.class ? BlockViews.material(id)
                         : switch(kind){
                             case "fluids" -> org.bukkit.Registry.FLUID.get(k);
                             case "entity_types" -> org.bukkit.Registry.ENTITY_TYPE.get(k);

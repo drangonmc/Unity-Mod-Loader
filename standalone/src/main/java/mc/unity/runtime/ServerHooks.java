@@ -127,7 +127,7 @@ public final class ServerHooks {
         dispatcher.register(Commands.literal("unity").executes(c -> {
             c.getSource().sendSuccess(
                 ()
-                    -> Component.literal("Unity 0.2.6-Beta standalone | MC 26.2 | native " + names() +
+                    -> Component.literal("Unity 0.2.7-Beta standalone | MC 26.2 | native " + names() +
                                          " | platform mods " + forge.ids() + " | plugins " +
                                          (plugins == null ? List.of() : plugins.host().names())),
                 false);

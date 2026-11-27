@@ -234,6 +234,7 @@ def run(o):
         for row in rows:assert digest(g/"plugins"/row["filename"],"sha512")==row["sha512"],row["filename"]
         for game in [g,*games]:
             for filename,h in corpus.get(game.name,{}).items():assert digest(game/"mods"/filename,"sha512")==h
+        if getattr(o,"check_installed",None): o.check_installed(g)
         record["logs"]={f.name:digest(f) for f in [*out.glob("*.log"),out/"events.tsv"]}
         (out/"result.json").write_text(json.dumps(record,indent=2),"utf8")
         print("PASS",o.host,"region" if o.regions else "core")

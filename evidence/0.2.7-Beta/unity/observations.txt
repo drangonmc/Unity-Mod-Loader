@@ -1,0 +1,228 @@
+[first-VolumeA-client.log]
+[17:32:17] [Render thread/INFO]: [System] [CHAT] §dOperation completed (6 blocks affected).
+[17:32:17] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:18] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:18] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:18] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:18] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:19] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:19] [Render thread/INFO]: [System] [CHAT] §dUndid 1 available edits.
+[17:32:19] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:19] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:20] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:20] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:20] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:20] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:21] [Render thread/INFO]: [System] [CHAT] §dRedid 1 available edits.
+[17:32:21] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:21] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:21] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:22] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:22] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:22] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:23] [Render thread/INFO]: [System] [CHAT] §dThe clipboard has been pasted at (9, 80, 4)
+[17:32:23] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[17:32:23] [Render thread/INFO]: [System] [CHAT] §dThe clipboard has been pasted at (30, 80, 4)
+[17:32:24] [Render thread/INFO]: [System] [CHAT] §dUndid 1 available edits.
+[17:32:25] [Render thread/INFO]: [System] [CHAT] §dRedid 1 available edits.
+[17:32:26] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[17:32:27] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:27] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:27] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:28] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:28] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:28] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:31] [Render thread/INFO]: [System] [CHAT] [Server] FURNACE_COOKED
+[17:32:31] [Render thread/INFO]: [System] [CHAT] [Server] CUSTOM_FUEL_COOKED
+[17:32:31] [Render thread/INFO]: [System] [CHAT] [Server] MACHINE_FUEL_TRANSFER
+[17:32:31] [Render thread/INFO]: [System] [CHAT] [Server] MACHINE_FUEL_FILTER
+[17:32:31] [Render thread/INFO]: [System] [CHAT] [Server] HOPPER_OUTPUT
+[17:32:31] [Render thread/INFO]: [System] [CHAT] [Server] HOPPER_FILTER
+[17:32:31] [Render thread/INFO]: [System] [CHAT] [Server] HOPPER_REJECTED
+[17:32:35] [Render thread/INFO]: [System] [CHAT] §dThe clipboard has been pasted at (10, 80, 9)
+[17:32:35] [Render thread/INFO]: [System] [CHAT] §dThe clipboard has been pasted at (34, 80, 9)
+[17:32:36] [Render thread/INFO]: [System] [CHAT] §dUndid 1 available edits.
+[17:32:37] [Render thread/INFO]: [System] [CHAT] §dRedid 1 available edits.
+[17:32:46] [Render thread/INFO]: [System] [CHAT] §dThe clipboard has been pasted at (13, 80, 9)
+[17:32:46] [Render thread/INFO]: [System] [CHAT] §dThe clipboard has been pasted at (39, 80, 9)
+[17:32:47] [Render thread/INFO]: [System] [CHAT] §dUndid 1 available edits.
+[17:32:49] [Render thread/INFO]: [System] [CHAT] §dRedid 1 available edits.
+[first-VolumeB-client.log]
+[17:32:17] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:18] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:18] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:18] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:18] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:19] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:19] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:19] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:20] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:20] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:20] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:20] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:21] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:21] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:21] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:22] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:22] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:22] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:23] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[17:32:26] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[17:32:27] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:27] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:27] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:32:28] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:28] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:28] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:32:31] [Render thread/INFO]: [System] [CHAT] [Server] FURNACE_COOKED
+[17:32:31] [Render thread/INFO]: [System] [CHAT] [Server] CUSTOM_FUEL_COOKED
+[17:32:31] [Render thread/INFO]: [System] [CHAT] [Server] MACHINE_FUEL_TRANSFER
+[17:32:31] [Render thread/INFO]: [System] [CHAT] [Server] MACHINE_FUEL_FILTER
+[17:32:31] [Render thread/INFO]: [System] [CHAT] [Server] HOPPER_OUTPUT
+[17:32:31] [Render thread/INFO]: [System] [CHAT] [Server] HOPPER_FILTER
+[17:32:31] [Render thread/INFO]: [System] [CHAT] [Server] HOPPER_REJECTED
+[17:32:38] [Render thread/INFO]: [System] [CHAT] §dThe clipboard has been pasted at (42, 80, 9)
+[17:32:39] [Render thread/INFO]: [System] [CHAT] §dUndid 1 available edits.
+[17:32:40] [Render thread/INFO]: [System] [CHAT] §dRedid 1 available edits.
+[17:32:49] [Render thread/INFO]: [System] [CHAT] §dThe clipboard has been pasted at (44, 80, 9)
+[17:32:50] [Render thread/INFO]: [System] [CHAT] §dUndid 1 available edits.
+[17:32:51] [Render thread/INFO]: [System] [CHAT] §dRedid 1 available edits.
+[first.log]
+[17:31:11] [Server thread/INFO]: [STDOUT]: UNITY_NEO26_TICKS_OK extension priority thread unregister
+[17:31:11] [Server thread/INFO]: [STDOUT]: UNITY_NEO27_FUEL_OK duration=240
+[17:31:21] [Server thread/INFO]: [Not Secure] [Server] FURNACE_COOKED
+[17:31:21] [Server thread/INFO]: [Not Secure] [Server] CUSTOM_FUEL_COOKED
+[17:31:21] [Server thread/INFO]: [Not Secure] [Server] MACHINE_FUEL_TRANSFER
+[17:31:21] [Server thread/INFO]: [Not Secure] [Server] MACHINE_FUEL_FILTER
+[17:31:21] [Server thread/INFO]: [Not Secure] [Server] HOPPER_OUTPUT
+[17:31:21] [Server thread/INFO]: [Not Secure] [Server] HOPPER_FILTER
+[17:31:21] [Server thread/INFO]: [Not Secure] [Server] HOPPER_REJECTED
+[17:32:17] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:32:18] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:32:18] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:32:18] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[17:32:18] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[17:32:19] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[17:32:19] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:32:19] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:32:20] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:32:20] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:32:20] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:32:20] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:32:21] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:32:21] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:32:21] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:32:22] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[17:32:22] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[17:32:22] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[17:32:23] [Server thread/INFO]: [Not Secure] [Server] REGION_CHEST_INTACT
+[17:32:23] [Server thread/INFO]: 30, 80, 7 has the following block data: {components: {}, x: 30, y: 80, Items: [{components: {"minecraft:custom_data": {unity_copy: 1}}, count: 11, Slot: 3b, id: "minecraft:emerald"}], z: 7, id: "minecraft:chest"}
+[17:32:23] [Server thread/INFO]: 30, 80, 7 has the following block data: [{components: {"minecraft:custom_data": {unity_copy: 1}}, count: 11, Slot: 3b, id: "minecraft:emerald"}]
+[17:32:24] [Server thread/INFO]: 30, 80, 7 has the following block data: {components: {}, x: 30, y: 80, Items: [{components: {"minecraft:custom_data": {unity_copy: 1}}, count: 3, Slot: 3b, id: "minecraft:diamond"}], z: 7, id: "minecraft:chest"}
+[17:32:24] [Server thread/INFO]: 30, 80, 7 has the following block data: [{components: {"minecraft:custom_data": {unity_copy: 1}}, count: 3, Slot: 3b, id: "minecraft:diamond"}]
+[17:32:25] [Server thread/INFO]: 30, 80, 7 has the following block data: {components: {}, x: 30, y: 80, Items: [{components: {"minecraft:custom_data": {unity_copy: 1}}, count: 11, Slot: 3b, id: "minecraft:emerald"}], z: 7, id: "minecraft:chest"}
+[17:32:25] [Server thread/INFO]: 30, 80, 7 has the following block data: [{components: {"minecraft:custom_data": {unity_copy: 1}}, count: 11, Slot: 3b, id: "minecraft:emerald"}]
+[17:32:26] [Server thread/INFO]: [Not Secure] [Server] REGION_CHEST_INTACT
+[17:32:27] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:32:27] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:32:27] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:32:28] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[17:32:28] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[17:32:28] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[17:32:28] [Server thread/INFO]: 24, 80, 7 has the following block data: {components: {}, x: 24, y: 80, Items: [{components: {"minecraft:custom_data": {unity_copy: 1}}, count: 11, Slot: 3b, id: "minecraft:emerald"}], z: 7, id: "minecraft:chest"}
+[17:32:28] [Server thread/INFO]: 24, 80, 7 has the following block data: [{components: {"minecraft:custom_data": {unity_copy: 1}}, count: 11, Slot: 3b, id: "minecraft:emerald"}]
+[17:32:29] [Server thread/INFO]: 30, 80, 7 has the following block data: {components: {}, x: 30, y: 80, Items: [{components: {"minecraft:custom_data": {unity_copy: 1}}, count: 11, Slot: 3b, id: "minecraft:emerald"}], z: 7, id: "minecraft:chest"}
+[17:32:29] [Server thread/INFO]: 30, 80, 7 has the following block data: [{components: {"minecraft:custom_data": {unity_copy: 1}}, count: 11, Slot: 3b, id: "minecraft:emerald"}]
+[17:32:30] [Server thread/INFO]: VolumeA has the following entity data: [{count: 3, Slot: 4b, id: "minecraft:obsidian"}]
+[17:32:30] [Server thread/INFO]: VolumeB has the following entity data: [{count: 5, Slot: 4b, id: "minecraft:flint"}]
+[17:32:30] [Server thread/INFO]: VolumeA has the following entity data: 20.0f
+[17:32:30] [Server thread/INFO]: VolumeB has the following entity data: 20.0f
+[17:32:31] [Server thread/INFO]: [Not Secure] [Server] FURNACE_COOKED
+[17:32:31] [Server thread/INFO]: [Not Secure] [Server] CUSTOM_FUEL_COOKED
+[17:32:31] [Server thread/INFO]: [Not Secure] [Server] MACHINE_FUEL_TRANSFER
+[17:32:31] [Server thread/INFO]: [Not Secure] [Server] MACHINE_FUEL_FILTER
+[17:32:31] [Server thread/INFO]: [Not Secure] [Server] HOPPER_OUTPUT
+[17:32:31] [Server thread/INFO]: [Not Secure] [Server] HOPPER_FILTER
+[17:32:31] [Server thread/INFO]: [Not Secure] [Server] HOPPER_REJECTED
+[17:32:31] [Server thread/INFO]: 22, 80, 12 has the following block data: {components: {}, cooking_total_time_3: 0s, cooking_total_time_2: 0s, cooking_time_spent_3: 0s, cooking_time_spent_2: 0s, cooking_time_spent_1: 0s, cooking_time_spent_0: 0s, lit_total_time: 73s, CustomName: "Machine-source", cooking_total_time_1: 0s, x: 22, cooking_total_time_0: 200s, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 73}}, count: 11, Slot: 1b, id: "minecraft:emerald"}], z: 12, id: "advancedfurnace:advanced_furnace", lit_time_remaining: 0s, RecipesUsed: {}}
+[17:32:32] [Server thread/INFO]: 34, 80, 12 has the following block data: {components: {}, cooking_total_time_3: 0s, cooking_total_time_2: 0s, cooking_time_spent_3: 0s, cooking_time_spent_2: 0s, cooking_time_spent_1: 0s, cooking_time_spent_0: 0s, lit_total_time: 41s, CustomName: "Machine-previous", cooking_total_time_1: 0s, x: 34, cooking_total_time_0: 200s, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 41}}, count: 3, Slot: 1b, id: "minecraft:diamond"}], z: 12, id: "advancedfurnace:advanced_furnace", lit_time_remaining: 0s, RecipesUsed: {}}
+[17:32:35] [Server thread/INFO]: 10, 80, 12 has the following block data: {components: {}, cooking_total_time_3: 0s, cooking_total_time_2: 0s, cooking_time_spent_3: 0s, cooking_time_spent_2: 0s, cooking_time_spent_1: 0s, cooking_time_spent_0: 0s, lit_total_time: 19s, CustomName: "Machine-protected", cooking_total_time_1: 0s, x: 10, cooking_total_time_0: 200s, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 19}}, count: 7, Slot: 1b, id: "minecraft:lapis_lazuli"}], z: 12, id: "advancedfurnace:advanced_furnace", lit_time_remaining: 0s, RecipesUsed: {}}
+[17:32:35] [Server thread/INFO]: 34, 80, 12 has the following block data: {components: {}, cooking_total_time_3: 0s, cooking_total_time_2: 0s, cooking_time_spent_3: 0s, cooking_time_spent_2: 0s, cooking_time_spent_1: 0s, cooking_time_spent_0: 0s, lit_total_time: 73s, CustomName: "Machine-source", cooking_total_time_1: 0s, x: 34, cooking_total_time_0: 200s, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 73}}, count: 11, Slot: 1b, id: "minecraft:emerald"}], z: 12, id: "advancedfurnace:advanced_furnace", lit_time_remaining: 0s, RecipesUsed: {}}
+[17:32:36] [Server thread/INFO]: 34, 80, 12 has the following block data: {components: {}, cooking_total_time_3: 0s, cooking_total_time_2: 0s, cooking_time_spent_3: 0s, cooking_time_spent_2: 0s, cooking_time_spent_1: 0s, cooking_time_spent_0: 0s, lit_total_time: 41s, CustomName: "Machine-previous", cooking_total_time_1: 0s, x: 34, cooking_total_time_0: 200s, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 41}}, count: 3, Slot: 1b, id: "minecraft:diamond"}], z: 12, id: "advancedfurnace:advanced_furnace", lit_time_remaining: 0s, RecipesUsed: {}}
+[17:32:38] [Server thread/INFO]: 42, 80, 12 has the following block data: {components: {}, cooking_total_time_3: 0s, cooking_total_time_2: 0s, cooking_time_spent_3: 0s, cooking_time_spent_2: 0s, cooking_time_spent_1: 0s, cooking_time_spent_0: 0s, lit_total_time: 19s, CustomName: "Machine-protected", cooking_total_time_1: 0s, x: 42, cooking_total_time_0: 200s, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 19}}, count: 7, Slot: 1b, id: "minecraft:lapis_lazuli"}], z: 12, id: "advancedfurnace:advanced_furnace", lit_time_remaining: 0s, RecipesUsed: {}}
+[17:32:40] [Server thread/INFO]: 22, 80, 12 has the following block data: {components: {}, cooking_total_time_3: 0s, cooking_total_time_2: 0s, cooking_time_spent_3: 0s, cooking_time_spent_2: 0s, cooking_time_spent_1: 0s, cooking_time_spent_0: 0s, lit_total_time: 73s, CustomName: "Machine-source", cooking_total_time_1: 0s, x: 22, cooking_total_time_0: 200s, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 73}}, count: 11, Slot: 1b, id: "minecraft:emerald"}], z: 12, id: "advancedfurnace:advanced_furnace", lit_time_remaining: 0s, RecipesUsed: {}}
+[17:32:41] [Server thread/INFO]: 34, 80, 12 has the following block data: {components: {}, cooking_total_time_3: 0s, cooking_total_time_2: 0s, cooking_time_spent_3: 0s, cooking_time_spent_2: 0s, cooking_time_spent_1: 0s, cooking_time_spent_0: 0s, lit_total_time: 73s, CustomName: "Machine-source", cooking_total_time_1: 0s, x: 34, cooking_total_time_0: 200s, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 73}}, count: 11, Slot: 1b, id: "minecraft:emerald"}], z: 12, id: "advancedfurnace:advanced_furnace", lit_time_remaining: 0s, RecipesUsed: {}}
+[17:32:42] [Server thread/INFO]: 10, 80, 12 has the following block data: {components: {}, cooking_total_time_3: 0s, cooking_total_time_2: 0s, cooking_time_spent_3: 0s, cooking_time_spent_2: 0s, cooking_time_spent_1: 0s, cooking_time_spent_0: 0s, lit_total_time: 19s, CustomName: "Machine-protected", cooking_total_time_1: 0s, x: 10, cooking_total_time_0: 200s, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 19}}, count: 7, Slot: 1b, id: "minecraft:lapis_lazuli"}], z: 12, id: "advancedfurnace:advanced_furnace", lit_time_remaining: 0s, RecipesUsed: {}}
+[17:32:42] [Server thread/INFO]: 42, 80, 12 has the following block data: {components: {}, cooking_total_time_3: 0s, cooking_total_time_2: 0s, cooking_time_spent_3: 0s, cooking_time_spent_2: 0s, cooking_time_spent_1: 0s, cooking_time_spent_0: 0s, lit_total_time: 19s, CustomName: "Machine-protected", cooking_total_time_1: 0s, x: 42, cooking_total_time_0: 200s, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 19}}, count: 7, Slot: 1b, id: "minecraft:lapis_lazuli"}], z: 12, id: "advancedfurnace:advanced_furnace", lit_time_remaining: 0s, RecipesUsed: {}}
+[17:32:43] [Server thread/INFO]: 25, 80, 12 has the following block data: {components: {}, TransferCooldown: -1, CustomName: "Machine-source", x: 25, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 73}}, count: 11, Slot: 2b, id: "minecraft:emerald"}], z: 12, id: "copperhopper:copper_hopper_entity"}
+[17:32:44] [Server thread/INFO]: 39, 80, 12 has the following block data: {components: {}, TransferCooldown: 0, CustomName: "Machine-previous", x: 39, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 41}}, count: 3, Slot: 2b, id: "minecraft:diamond"}], z: 12, id: "copperhopper:copper_hopper_entity"}
+[17:32:46] [Server thread/INFO]: 13, 80, 12 has the following block data: {components: {}, TransferCooldown: 0, CustomName: "Machine-protected", x: 13, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 19}}, count: 7, Slot: 2b, id: "minecraft:lapis_lazuli"}], z: 12, id: "copperhopper:copper_hopper_entity"}
+[17:32:46] [Server thread/INFO]: 39, 80, 12 has the following block data: {components: {}, TransferCooldown: 0, CustomName: "Machine-source", x: 39, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 73}}, count: 11, Slot: 2b, id: "minecraft:emerald"}], z: 12, id: "copperhopper:copper_hopper_entity"}
+[17:32:47] [Server thread/INFO]: 39, 80, 12 has the following block data: {components: {}, TransferCooldown: 0, CustomName: "Machine-previous", x: 39, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 41}}, count: 3, Slot: 2b, id: "minecraft:diamond"}], z: 12, id: "copperhopper:copper_hopper_entity"}
+[17:32:49] [Server thread/INFO]: 44, 80, 12 has the following block data: {components: {}, TransferCooldown: 0, CustomName: "Machine-protected", x: 44, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 19}}, count: 7, Slot: 2b, id: "minecraft:lapis_lazuli"}], z: 12, id: "copperhopper:copper_hopper_entity"}
+[17:32:51] [Server thread/INFO]: 25, 80, 12 has the following block data: {components: {}, TransferCooldown: 0, CustomName: "Machine-source", x: 25, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 73}}, count: 11, Slot: 2b, id: "minecraft:emerald"}], z: 12, id: "copperhopper:copper_hopper_entity"}
+[17:32:52] [Server thread/INFO]: 39, 80, 12 has the following block data: {components: {}, TransferCooldown: 0, CustomName: "Machine-source", x: 39, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 73}}, count: 11, Slot: 2b, id: "minecraft:emerald"}], z: 12, id: "copperhopper:copper_hopper_entity"}
+[17:32:53] [Server thread/INFO]: 13, 80, 12 has the following block data: {components: {}, TransferCooldown: 0, CustomName: "Machine-protected", x: 13, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 19}}, count: 7, Slot: 2b, id: "minecraft:lapis_lazuli"}], z: 12, id: "copperhopper:copper_hopper_entity"}
+[17:32:53] [Server thread/INFO]: 44, 80, 12 has the following block data: {components: {}, TransferCooldown: 0, CustomName: "Machine-protected", x: 44, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 19}}, count: 7, Slot: 2b, id: "minecraft:lapis_lazuli"}], z: 12, id: "copperhopper:copper_hopper_entity"}
+[restart-VolumeA-client.log]
+[17:34:42] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[17:34:43] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:34:43] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:34:43] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:34:44] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:34:44] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:34:44] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:34:48] [Render thread/INFO]: [System] [CHAT] [Server] FURNACE_COOKED
+[17:34:48] [Render thread/INFO]: [System] [CHAT] [Server] CUSTOM_FUEL_COOKED
+[17:34:48] [Render thread/INFO]: [System] [CHAT] [Server] MACHINE_FUEL_TRANSFER
+[17:34:48] [Render thread/INFO]: [System] [CHAT] [Server] MACHINE_FUEL_FILTER
+[17:34:48] [Render thread/INFO]: [System] [CHAT] [Server] HOPPER_OUTPUT
+[17:34:48] [Render thread/INFO]: [System] [CHAT] [Server] HOPPER_FILTER
+[17:34:48] [Render thread/INFO]: [System] [CHAT] [Server] HOPPER_REJECTED
+[restart-VolumeB-client.log]
+[17:34:42] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[17:34:43] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:34:43] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:34:43] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_smooth_stone
+[17:34:44] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:34:44] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:34:44] [Render thread/INFO]: [System] [CHAT] [Server] BLOCK_OK_gold_block
+[17:34:48] [Render thread/INFO]: [System] [CHAT] [Server] FURNACE_COOKED
+[17:34:48] [Render thread/INFO]: [System] [CHAT] [Server] CUSTOM_FUEL_COOKED
+[17:34:48] [Render thread/INFO]: [System] [CHAT] [Server] MACHINE_FUEL_TRANSFER
+[17:34:48] [Render thread/INFO]: [System] [CHAT] [Server] MACHINE_FUEL_FILTER
+[17:34:48] [Render thread/INFO]: [System] [CHAT] [Server] HOPPER_OUTPUT
+[17:34:48] [Render thread/INFO]: [System] [CHAT] [Server] HOPPER_FILTER
+[17:34:48] [Render thread/INFO]: [System] [CHAT] [Server] HOPPER_REJECTED
+[restart.log]
+[17:34:04] [Server thread/INFO]: [STDOUT]: UNITY_NEO26_TICKS_OK extension priority thread unregister
+[17:34:42] [Server thread/INFO]: [Not Secure] [Server] REGION_CHEST_INTACT
+[17:34:43] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:34:43] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:34:43] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_smooth_stone
+[17:34:44] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[17:34:44] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[17:34:44] [Server thread/INFO]: [Not Secure] [Server] BLOCK_OK_gold_block
+[17:34:45] [Server thread/INFO]: 24, 80, 7 has the following block data: {components: {}, x: 24, y: 80, Items: [{components: {"minecraft:custom_data": {unity_copy: 1}}, count: 11, Slot: 3b, id: "minecraft:emerald"}], z: 7, id: "minecraft:chest"}
+[17:34:45] [Server thread/INFO]: 24, 80, 7 has the following block data: [{components: {"minecraft:custom_data": {unity_copy: 1}}, count: 11, Slot: 3b, id: "minecraft:emerald"}]
+[17:34:46] [Server thread/INFO]: 30, 80, 7 has the following block data: {components: {}, x: 30, y: 80, Items: [{components: {"minecraft:custom_data": {unity_copy: 1}}, count: 11, Slot: 3b, id: "minecraft:emerald"}], z: 7, id: "minecraft:chest"}
+[17:34:46] [Server thread/INFO]: 30, 80, 7 has the following block data: [{components: {"minecraft:custom_data": {unity_copy: 1}}, count: 11, Slot: 3b, id: "minecraft:emerald"}]
+[17:34:47] [Server thread/INFO]: VolumeA has the following entity data: [{count: 3, Slot: 4b, id: "minecraft:obsidian"}]
+[17:34:47] [Server thread/INFO]: VolumeB has the following entity data: [{count: 5, Slot: 4b, id: "minecraft:flint"}]
+[17:34:47] [Server thread/INFO]: VolumeA has the following entity data: 20.0f
+[17:34:47] [Server thread/INFO]: VolumeB has the following entity data: 20.0f
+[17:34:48] [Server thread/INFO]: [Not Secure] [Server] FURNACE_COOKED
+[17:34:48] [Server thread/INFO]: [Not Secure] [Server] CUSTOM_FUEL_COOKED
+[17:34:48] [Server thread/INFO]: [Not Secure] [Server] MACHINE_FUEL_TRANSFER
+[17:34:48] [Server thread/INFO]: [Not Secure] [Server] MACHINE_FUEL_FILTER
+[17:34:48] [Server thread/INFO]: [Not Secure] [Server] HOPPER_OUTPUT
+[17:34:48] [Server thread/INFO]: [Not Secure] [Server] HOPPER_FILTER
+[17:34:48] [Server thread/INFO]: [Not Secure] [Server] HOPPER_REJECTED
+[17:34:48] [Server thread/INFO]: 22, 80, 12 has the following block data: {components: {}, cooking_total_time_3: 0s, cooking_total_time_2: 0s, cooking_time_spent_3: 0s, cooking_time_spent_2: 0s, cooking_time_spent_1: 0s, cooking_time_spent_0: 0s, lit_total_time: 73s, CustomName: "Machine-source", cooking_total_time_1: 0s, x: 22, cooking_total_time_0: 200s, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 73}}, count: 11, Slot: 1b, id: "minecraft:emerald"}], z: 12, id: "advancedfurnace:advanced_furnace", lit_time_remaining: 0s, RecipesUsed: {}}
+[17:34:49] [Server thread/INFO]: 34, 80, 12 has the following block data: {components: {}, cooking_total_time_3: 0s, cooking_total_time_2: 0s, cooking_time_spent_3: 0s, cooking_time_spent_2: 0s, cooking_time_spent_1: 0s, cooking_time_spent_0: 0s, lit_total_time: 73s, CustomName: "Machine-source", cooking_total_time_1: 0s, x: 34, cooking_total_time_0: 200s, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 73}}, count: 11, Slot: 1b, id: "minecraft:emerald"}], z: 12, id: "advancedfurnace:advanced_furnace", lit_time_remaining: 0s, RecipesUsed: {}}
+[17:34:50] [Server thread/INFO]: 10, 80, 12 has the following block data: {components: {}, cooking_total_time_3: 0s, cooking_total_time_2: 0s, cooking_time_spent_3: 0s, cooking_time_spent_2: 0s, cooking_time_spent_1: 0s, cooking_time_spent_0: 0s, lit_total_time: 19s, CustomName: "Machine-protected", cooking_total_time_1: 0s, x: 10, cooking_total_time_0: 200s, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 19}}, count: 7, Slot: 1b, id: "minecraft:lapis_lazuli"}], z: 12, id: "advancedfurnace:advanced_furnace", lit_time_remaining: 0s, RecipesUsed: {}}
+[17:34:51] [Server thread/INFO]: 42, 80, 12 has the following block data: {components: {}, cooking_total_time_3: 0s, cooking_total_time_2: 0s, cooking_time_spent_3: 0s, cooking_time_spent_2: 0s, cooking_time_spent_1: 0s, cooking_time_spent_0: 0s, lit_total_time: 19s, CustomName: "Machine-protected", cooking_total_time_1: 0s, x: 42, cooking_total_time_0: 200s, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 19}}, count: 7, Slot: 1b, id: "minecraft:lapis_lazuli"}], z: 12, id: "advancedfurnace:advanced_furnace", lit_time_remaining: 0s, RecipesUsed: {}}
+[17:34:52] [Server thread/INFO]: 25, 80, 12 has the following block data: {components: {}, TransferCooldown: 0, CustomName: "Machine-source", x: 25, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 73}}, count: 11, Slot: 2b, id: "minecraft:emerald"}], z: 12, id: "copperhopper:copper_hopper_entity"}
+[17:34:54] [Server thread/INFO]: 39, 80, 12 has the following block data: {components: {}, TransferCooldown: 0, CustomName: "Machine-source", x: 39, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 73}}, count: 11, Slot: 2b, id: "minecraft:emerald"}], z: 12, id: "copperhopper:copper_hopper_entity"}
+[17:34:55] [Server thread/INFO]: 13, 80, 12 has the following block data: {components: {}, TransferCooldown: 0, CustomName: "Machine-protected", x: 13, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 19}}, count: 7, Slot: 2b, id: "minecraft:lapis_lazuli"}], z: 12, id: "copperhopper:copper_hopper_entity"}
+[17:34:56] [Server thread/INFO]: 44, 80, 12 has the following block data: {components: {}, TransferCooldown: 0, CustomName: "Machine-protected", x: 44, y: 80, Items: [{components: {"minecraft:custom_data": {unity_machine: 19}}, count: 7, Slot: 2b, id: "minecraft:lapis_lazuli"}], z: 12, id: "copperhopper:copper_hopper_entity"}

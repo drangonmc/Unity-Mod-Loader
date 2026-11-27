@@ -37,6 +37,7 @@ public final class Renderers {
         }
     }
     public static void setup() {
+        net.neoforged.neoforge.client.event.RegisterMenuScreensEvent.fire();
         net.minecraftforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions.fire();
         net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers.fire();
         var list = net.neoforged.fml.ModList.get();
@@ -49,6 +50,7 @@ public final class Renderers {
         }
     }
     public static void close() {
+        net.neoforged.neoforge.client.event.RegisterMenuScreensEvent.clear();
         net.minecraftforge.client.event.RegisterKeyMappingsEvent.clear();
         net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers.clear();
         net.minecraftforge.client.event.EntityRenderersEvent.RegisterLayerDefinitions.clear();

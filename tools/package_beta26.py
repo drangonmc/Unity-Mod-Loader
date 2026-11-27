@@ -17,10 +17,8 @@ import unpacked
 from acceptance import digest
 
 VERSION = "0.2.6-Beta"
-LOADER = f"unity-loader-{VERSION}.jar"
-MAIN_JARS = [LOADER,"unity-world-marker.jar","unity-client-witness.jar","UnityEditRegions.jar"]
 
-def validated(options):
+def validated(options, version=VERSION):
     reports = {}
     for host in ("unity","paper"):
         folder = options.runs/host
@@ -28,7 +26,7 @@ def validated(options):
         for name,h in result["logs"].items():
             if Path(name).name != name or digest(folder/name) != h:
                 raise ValueError(f"Changed {host} evidence: {name}")
-        assert result["client"] == digest(options.dist/LOADER)
+        assert result["client"] == digest(options.dist/f"unity-loader-{version}.jar")
         assert result["witness"] == digest(options.dist/"unity-client-witness.jar")
         assert result["regionIntegration"] == digest(options.dist/"UnityEditRegions.jar")
         assert len(result["runs"])==2 and result["runs"][0]==result["runs"][1]
@@ -38,22 +36,47 @@ def validated(options):
     assert unity["runtime"]==unity["client"] and unity["neoForgeWitness"]
     assert len(unity["mixed"]["server"])>=73 and all(len(unity["mixed"][n])>=71 for n in ("VolumeA","VolumeB"))
     assert not paper["mixed"] and paper["runtime"]=="0de30efb024bc8b83c9c7d507d11802897ad8056b6110ec09fe1a91d126ccb54"
-    for key in ("authors","runs","plugin"):
+    for key in ("authors","plugin"):
         assert unity[key]==paper[key],key
+    for live,reference in zip(unity["runs"],paper["runs"]):
+        common=dict(live)
+        if version == "0.2.7-Beta":
+            machine_pins=json.loads((ROOT/"standalone/tests/reference/machines-26.2.json").read_bytes())
+            assert unity["machineOriginals"]=={r["project"]:r["sha512"] for r in machine_pins}
+            for phase in ("first","restart"):
+                log=(options.runs/"unity"/(phase+".log")).read_text("utf8",errors="replace")
+                if phase=="first": assert "UNITY_NEO27_FUEL_OK duration=240" in log
+                for marker in ("FURNACE_COOKED","CUSTOM_FUEL_COOKED","MACHINE_FUEL_TRANSFER","MACHINE_FUEL_FILTER",
+                               "HOPPER_OUTPUT","HOPPER_FILTER","HOPPER_REJECTED"):
+                    assert re.search(r"\[Server\] "+marker+r"\b",log), (phase,marker)
+            machines=common.pop("machines")
+            assert set(machines)=={"advancedfurnace:advanced_furnace","copperhopper:copper_hopper"}
+            for machine in machines.values():
+                assert machine["destination"]==machine["source"]
+                assert machine["region"]["name"]=="Machine-protected"
+                regional_copy=machine["regionalCopy"]
+                for key in ("item","count","slot","name","marker","facing"):
+                    assert regional_copy[key]==machine["region"][key],key
+                assert len(regional_copy["clients"])==2 and len(machine["source"]["clients"])==2
+                assert all(c["marker"]==machine["source"]["marker"] for c in machine["source"]["clients"])
+        assert common==reference
     pins=json.loads((ROOT/"standalone/tests/reference/protection-originals.json").read_bytes())
     assert unity["authors"]=={p["slug"]:p["sha512"] for p in pins if p["slug"] in ("worldedit","worldguard")}
     return reports
 
 def main(o):
-    reports=validated(o)
-    evidence=ROOT/"evidence"/VERSION
-    stage=ROOT/".work/v26/distribution"
+    version=getattr(o,"version",VERSION)
+    number=version.split("-")[0]
+    jars=[f"unity-loader-{version}.jar","unity-world-marker.jar","unity-client-witness.jar","UnityEditRegions.jar"]
+    reports=validated(o, version)
+    evidence=ROOT/"evidence"/version
+    stage=ROOT/".work"/version/"distribution"
     stage.mkdir(parents=True,exist_ok=True)
     evidence.mkdir(parents=True,exist_ok=True)
-    target=ROOT/"versions"/VERSION
-    archive=stage/f"Unity-{VERSION}-MC26.2-Standalone.zip"
-    verified={"minecraft":"26.2","version":VERSION,
-              "artifacts":{n:digest(o.dist/n) for n in MAIN_JARS},
+    target=ROOT/"versions"/version
+    archive=stage/f"Unity-{version}-MC26.2-Standalone.zip"
+    verified={"minecraft":"26.2","version":version,
+              "artifacts":{n:digest(o.dist/n) for n in jars},
               "reports":{h:digest(o.runs/h/"result.json") for h in reports}}
     (evidence/"verified.json").write_text(json.dumps(verified,indent=2),"utf8")
     for host in reports:
@@ -69,10 +92,12 @@ def main(o):
                 line = re.sub(r"\x1b\[[0-9;]*m","",raw)
                 if any(s in line for s in ("Operation completed", "available edits", "clipboard has been pasted",
                           "has the following block data:", "REGION_CHEST_INTACT", "UNITY_NEO26_TICKS_OK",
-                          "has the following entity data:", "BLOCK_OK_gold_block", "BLOCK_OK_smooth_stone")):
+                          "has the following entity data:", "BLOCK_OK_gold_block", "BLOCK_OK_smooth_stone",
+                          "UNITY_NEO27_FUEL_OK", "[Server] MACHINE_FUEL", "[Server] CUSTOM_FUEL_COOKED",
+                          "[Server] FURNACE_COOKED", "[Server] HOPPER_OUTPUT", "[Server] HOPPER_FILTER", "[Server] HOPPER_REJECTED")):
                     excerpts.append(line)
         (out/"observations.txt").write_text("\n".join(excerpts)+"\n","utf8")
-    readme=(ROOT/"standalone/BETA-0.2.6.md").read_bytes()
+    readme=(ROOT/f"standalone/BETA-{number}.md").read_bytes()
     files={"README.md":readme}
     for n in ("LICENSE",".clang-format","Install-Unity-Samples.cmd","Install-Unity-Fabric-API.cmd",
               "tools/unity.py","tools/plugin-api.lock.json","tools/plugins.lock.json","tools/package_beta26.py",
@@ -80,29 +105,29 @@ def main(o):
               "src/main/java/mc/unity/loader/NativeLoader.java","src/main/java/net/minecraftforge/fml/common/Mod.java"):
         files[n]=(ROOT/n).read_bytes()
     for n in ("Install-Unity-Client.cmd","Start-Unity.cmd"):
-        files[n]=re.sub(rb"0\.2\.\d+-Beta",VERSION.encode(),(ROOT/n).read_bytes())
+        files[n]=re.sub(rb"0\.2\.\d+-Beta",version.encode(),(ROOT/n).read_bytes())
     for base in ("standalone","src/plugin"):
         for f in sorted((ROOT/base).rglob("*")):
             if not f.is_file() or any(p.startswith(".") or p=="__pycache__" for p in f.relative_to(ROOT).parts):continue
-            if f.parent==ROOT/"standalone" and f.suffix==".md" and f.name!="BETA-0.2.6.md":continue
+            if f.parent==ROOT/"standalone" and f.suffix==".md" and f.name!=f"BETA-{number}.md":continue
             if f.parent==ROOT/"standalone/lib" and f.suffix==".jar" and not any(
                     row.endswith("  "+f.name) for row in (f.parent/"SHA256SUMS").read_text().splitlines()):continue
             files[f.relative_to(ROOT).as_posix()]=f.read_bytes()
-    for n in MAIN_JARS: files[f"versions/{VERSION}/{n}"]=(o.dist/n).read_bytes()
+    for n in jars: files[f"versions/{version}/{n}"]=(o.dist/n).read_bytes()
     for n in ("verified.json","unity/result.json","paper/result.json","unity/observations.txt","paper/observations.txt"):
-        files[f"evidence/{VERSION}/{n}"]=(evidence/n).read_bytes()
+        files[f"evidence/{version}/{n}"]=(evidence/n).read_bytes()
     with zipfile.ZipFile(archive,"w") as z:
         for n,data in sorted(files.items()):
             z.writestr(zipfile.ZipInfo(n,(2026,1,1,0,0,0)),data,compress_type=zipfile.ZIP_DEFLATED)
     with zipfile.ZipFile(archive) as z: assert z.testzip() is None
     unpacked.EVIDENCE=acceptance.EVIDENCE=evidence
-    unpacked.run(SimpleNamespace(version=VERSION,archive=archive,bundle=o.cache/"mojang-server-26.2.jar",
+    unpacked.run(SimpleNamespace(version=version,archive=archive,bundle=o.cache/"mojang-server-26.2.jar",
         client_home=o.cache/"client-home",eula_from=o.eula,samples=o.cache/"samples",adapter_refs=o.adapter_refs,
         world_refs=o.world_refs,fabric_refs=o.adapter_refs,worldedit_jar=o.worldedit))
     check=json.loads((evidence/"unpacked.json").read_bytes())
     assert check["archiveSHA256"]==digest(archive) and check["byteIdenticalRebuild"]==verified["artifacts"]
     target.mkdir(parents=True,exist_ok=True)
-    for f in [*(o.dist/n for n in MAIN_JARS),archive]:
+    for f in [*(o.dist/n for n in jars),archive]:
         pending=target/(f.name+".tmp")
         shutil.copy2(f,pending)
         os.replace(pending,target/f.name)
@@ -110,6 +135,7 @@ def main(o):
     print("Verified",delivered,digest(delivered))
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
+    parser.add_argument("--version",choices=("0.2.6-Beta","0.2.7-Beta"),default=VERSION)
     for k in ("runs","dist","cache","eula","adapter-refs","world-refs","worldedit"):
         parser.add_argument("--"+k,type=lambda s:Path(s).resolve(),required=True)
     main(parser.parse_args())
