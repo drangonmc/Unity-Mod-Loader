@@ -1,6 +1,10 @@
-# Unity 0.2.8 Beta · Minecraft Java 26.2
+# Unity 0.3.0 Beta · Minecraft Java 26.2
 
 Unity 使用独立内核，服务端入口是 `mc.unity.bootstrap.Main`。解压 Standalone ZIP，使用 Java 25 运行 `Start-Unity.cmd`。客户端先安装原版 26.2，再运行 `Install-Unity-Client.cmd`。模组放在相应游戏目录的 `mods/`，Bukkit 插件放在 `standalone-instance/plugins/`。
+
+## NeoForge 玩法事件
+
+新增 NeoActionAdapter，把 NeoForge 的方块破坏、方块放置、左右键交互、实体交互和实体攻击事件桥接到 Unity Actions。预先取消会传入后续平台，监听优先级和 Bukkit 的 ALLOW、DEFAULT、DENY 回写都保留。
 
 ## 注册表与依赖
 

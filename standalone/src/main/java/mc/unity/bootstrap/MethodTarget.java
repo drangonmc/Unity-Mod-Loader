@@ -28,7 +28,7 @@ record MethodTarget(String origin,String description, Predicate<MethodModel> bod
         var handles=new HashSet<String>();
         for(var method:model.methods())if(method.methodName().equalsString(origin))
             method.code().stream().flatMap(c->c.elementStream()).forEach(e->{
-                if(e instanceof InvokeDynamicInstruction indy && indy.bootstrapMethod().owner().displayName().equals("LambdaMetafactory")
+                if(e instanceof InvokeDynamicInstruction indy && indy.bootstrapMethod().owner().equals(java.lang.constant.ClassDesc.of("java.lang.invoke.LambdaMetafactory"))
                         && indy.bootstrapArgs().size()>1 && indy.bootstrapArgs().get(1) instanceof DirectMethodHandleDesc impl
                         && impl.owner().equals(model.thisClass().asSymbol()))
                     handles.add(impl.methodName()+impl.lookupDescriptor());

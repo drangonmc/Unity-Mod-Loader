@@ -1,0 +1,20 @@
+{
+  "minecraft": "26.2",
+  "version": "0.3.0-Beta",
+  "artifacts": {
+    "unity-loader-0.3.0-Beta.jar": "b65818d503306b8da688ceef36fdb6bebdaff04d6c4fa6cd478e1cf383d36833",
+    "unity-world-marker.jar": "635ac8142b421d04bdd98dc240e7da855d5b2022e83665ac6b500457038fd9be",
+    "unity-client-witness.jar": "f2ed45cea11c71a903e13a2ddf799121c2edd9ee326288202309e6f341ccee2c",
+    "UnityEditRegions.jar": "7175974a1d4d0a3bf3ffc18c8bbc284dfe59954cc371cb6746e78859f283deb8"
+  },
+  "reports": {
+    "unity": "cb77332258401b83218c9c3af7580287049950a427ea97eddab08cdecb58ccb9",
+    "paper": "441ae4513e272d4a6de9767488abf6aa211d74a866dd67369d4ba8ac66b03ae7"
+  },
+  "additionalReceipts": {
+    "alternate/unity/result.json": "722acac282993c5c96af39c8872b418131f7c1dd533160f58a75f02e9d6bc4d4",
+    "alternate/paper/result.json": "9bfbd424f71ec9309546f236bf20012fc1f86e980b592f603109932aab27f032",
+    "contracts/result.json": "12fef6fda41a94bf06ff0cf378fe36fbb0f5700e7dd305d34f424e9772dc8c03",
+    "contracts/contracts.log": "432309eb761a0791340d7f3984c75c1fc956760dc48d3ba5d551650ee87cbe37"
+  }
+}

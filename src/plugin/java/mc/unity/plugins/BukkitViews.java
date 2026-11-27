@@ -44,7 +44,7 @@ final class BukkitViews {
         UUID id = entity.getUUID();
         String key = (String)args[0];
         if (method.equals("setMetadata")) {
-            metadata.computeIfAbsent(id, ignored -> new EntityMetadata(entity)).setMetadata(id,key,(org.bukkit.metadata.MetadataValue)args[1]);
+            metadata.compute(id,(ignored,store) -> { if(store==null)store=new EntityMetadata(entity); store.setMetadata(id,key,(org.bukkit.metadata.MetadataValue)args[1]); return store; });
             return null;
         }
         var store = metadata.get(id);
@@ -113,7 +113,7 @@ final class BukkitViews {
         return Views.of(Server.class, "Unity", (m, a) -> switch (m) {
             case "getName" -> "Unity";
             case "createBlockData" -> createBlockData(a);
-            case "getVersion" -> "Unity 0.2.8-Beta (MC: 26.2)";
+            case "getVersion" -> "Unity 0.3.0-Beta (MC: 26.2)";
             case "getBukkitVersion" -> "26.2-R0.1-SNAPSHOT";
             case "getMinecraftVersion" -> "26.2";
             case "getLogger" -> Host.LOG;

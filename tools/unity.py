@@ -11,7 +11,7 @@ import shutil
 import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = "0.2.8-Beta"
+VERSION = "0.3.0-Beta"
 DIST = ROOT / "versions" / VERSION
 CACHE = ROOT / "cache" / VERSION
 JAR = DIST / f"unity-loader-{VERSION}.jar"
@@ -30,9 +30,9 @@ def install_samples(cache_only=False):
 
     specs=sum((json.loads((ROOT/"standalone"/name).read_bytes()) for name in ("forge-content.json","forge-containers.json","ecosystem.json","creative-content.json")),[])
     commands=json.loads((ROOT/"standalone/forge-samples.json").read_bytes())
-    if selected in ("0.1.3-Beta","0.1.4-Beta","0.2.0-Beta","0.2.1-Beta","0.2.2-Beta","0.2.3-Beta","0.2.4-Beta","0.2.5-Beta","0.2.6-Beta","0.2.7-Beta","0.2.8-Beta"):
+    if selected in ("0.1.3-Beta","0.1.4-Beta","0.2.0-Beta","0.2.1-Beta","0.2.2-Beta","0.2.3-Beta","0.2.4-Beta","0.2.5-Beta","0.2.6-Beta","0.2.7-Beta","0.3.0-Beta"):
         specs.extend(beta_samples(ROOT))
-    if selected in ("0.2.0-Beta","0.2.1-Beta","0.2.2-Beta","0.2.3-Beta","0.2.4-Beta","0.2.5-Beta","0.2.6-Beta","0.2.7-Beta","0.2.8-Beta"):
+    if selected in ("0.2.0-Beta","0.2.1-Beta","0.2.2-Beta","0.2.3-Beta","0.2.4-Beta","0.2.5-Beta","0.2.6-Beta","0.2.7-Beta","0.3.0-Beta"):
         specs.extend(json.loads((ROOT/"standalone/ecology-modules.json").read_bytes()))
     for spec in [*specs,*commands]:
         cache=cache_root/"samples"/spec["filename"]

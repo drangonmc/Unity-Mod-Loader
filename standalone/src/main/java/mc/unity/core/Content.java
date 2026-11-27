@@ -139,7 +139,7 @@ public final class Content {
     }
     public static void attach(String owner, ResourceKey<?> type, Consumer<Registry<?>> reg) {
         checkOpen();
-        if (!BuiltInRegistries.REGISTRY.containsKey(type.identifier()) && ExtraRegistries.all().stream().noneMatch(registry -> registry.key().equals(type)))
+        if (!type.isFor(BuiltInRegistries.REGISTRY.key()) && ExtraRegistries.all().stream().noneMatch(registry -> registry.key().equals(type)))
             throw new IllegalArgumentException("Unsupported registry " + type);
         if (groups.stream().anyMatch(g -> g.register == reg))
             throw new IllegalStateException("Duplicate register " + owner);

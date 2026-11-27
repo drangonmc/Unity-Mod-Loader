@@ -16,7 +16,7 @@ import acceptance
 import unpacked
 from acceptance import digest
 
-VERSION = "0.2.6-Beta"
+VERSION = "0.3.0-Beta"
 
 def validated(options, version=VERSION, alternate=False):
     reports = {}
@@ -41,7 +41,7 @@ def validated(options, version=VERSION, alternate=False):
         assert unity[key]==paper[key],key
     for live,reference in zip(unity["runs"],paper["runs"]):
         common=dict(live)
-        if version in ("0.2.7-Beta","0.2.8-Beta"):
+        if version in ("0.2.7-Beta","0.3.0-Beta"):
             machine_pins=json.loads((ROOT/"standalone/tests/reference/machines-26.2.json").read_bytes())
             assert unity["machineOriginals"]=={r["project"]:r["sha512"] for r in machine_pins}
             for phase in ("first","restart"):
@@ -60,7 +60,7 @@ def validated(options, version=VERSION, alternate=False):
                     assert regional_copy[key]==machine["region"][key],key
                 assert len(regional_copy["clients"])==2 and len(machine["source"]["clients"])==2
                 assert all(c["marker"]==machine["source"]["marker"] for c in machine["source"]["clients"])
-        if version=="0.2.8-Beta":
+        if version=="0.3.0-Beta":
             review=common.pop("review28")
             assert review["bukkitObserved"]==2 and review["restoredByBukkit"]==1 and review["effect"]=="unity28registry:marked"
             first=(runs/"unity/first.log").read_text("utf8",errors="replace")
@@ -90,7 +90,7 @@ def main(o):
     target=ROOT/"versions"/version
     archive=stage/f"Unity-{version}-MC26.2-Standalone.zip"
     more={}
-    if version=="0.2.8-Beta":
+    if version=="0.3.0-Beta":
         validated(o,version,True)
         for host in ("unity","paper"):more[f"alternate/{host}/result.json"]=o.variant_runs/host/"result.json"
         contract=json.loads(o.contract_result.read_bytes())
@@ -161,7 +161,7 @@ def main(o):
     print("Verified",delivered,digest(delivered))
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
-    parser.add_argument("--version",choices=("0.2.6-Beta","0.2.7-Beta","0.2.8-Beta"),default=VERSION)
+    parser.add_argument("--version",choices=("0.2.6-Beta","0.2.7-Beta","0.3.0-Beta"),default=VERSION)
     parser.add_argument("--variant-runs",type=lambda s:Path(s).resolve())
     parser.add_argument("--contract-result",type=lambda s:Path(s).resolve())
     for k in ("runs","dist","cache","eula","adapter-refs","world-refs","worldedit"):

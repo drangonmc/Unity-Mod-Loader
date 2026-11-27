@@ -64,6 +64,8 @@ public final class NeoBus implements IEventBus {
     public NeoBus(String owner) {
         this.owner = owner;
     }
+    public boolean hasListeners() { return !handlers.empty(); }
+
     public String owner() {
         return owner;
     }

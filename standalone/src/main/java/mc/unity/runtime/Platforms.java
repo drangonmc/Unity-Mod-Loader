@@ -425,6 +425,7 @@ public final class Platforms implements AutoCloseable {
                 }
             } finally { net.neoforged.fml.ModLoadingContext.enter(previous); }
         }
+        if (!client) mc.unity.core.Actions.attachScoped(new mc.unity.adapter.neoforge.NeoActionAdapter());
         net.minecraftforge.registries.DataPackRegistryEvent.NewRegistry.fire();
         for (var container : neoContainers.values()) {
             var previous = net.neoforged.fml.ModLoadingContext.enter(container);

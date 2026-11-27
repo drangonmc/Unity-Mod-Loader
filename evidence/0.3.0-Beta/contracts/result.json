@@ -1,0 +1,14 @@
+{
+  "loader": "b65818d503306b8da688ceef36fdb6bebdaff04d6c4fa6cd478e1cf383d36833",
+  "rootRegistries": 95,
+  "strictRejected": true,
+  "worldEdit": [
+    "1fe3975132857093f971fed9efc601299bfa76fa7885f52a542fee41e7a0165ca9cb3cbcf5ae244474887d774d650b0db6f8f79aa80f98b245dea44f1c1b4152",
+    "a383492fac6bfb4d43a257dfa7b5fc076aae503a71151b463de4fe80e6f3d5fc11209eaf4097baa115f3febf0adc40ca0a1ecda227b8439b429d0a4ba3a63a4f"
+  ],
+  "logs": {
+    "contracts.log": "432309eb761a0791340d7f3984c75c1fc956760dc48d3ba5d551650ee87cbe37",
+    "strict.log": "65779da7ab50f4d1d43fb8b1565acd6148f650d11ac594b85af39edd654b5cd0",
+    "lightweight.log": "d549e552849ea50eea0d2f00a7b40c6b58833158303ee01a1132a46cd82bcd6f"
+  }
+}

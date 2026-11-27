@@ -21,7 +21,7 @@ def build(o,root):
             z.writestr(zipfile.ZipInfo(descriptor),data or ('modLoader="javafml"\nloaderVersion="[1,)"\nlicense="MIT"\n[[mods]]\nmodId="'+key+'"\nversion="1"\n'))
         built[key]=path
     classes=root/"native-classes";classes.mkdir()
-    cp=[o.dist/"unity-loader-0.2.8-Beta.jar",*common]
+    cp=[o.dist/"unity-loader-0.3.0-Beta.jar",*common]
     subprocess.run(["javac","-proc:none","--release","25","-g:none","-cp",os.pathsep.join(map(str,cp)),
                     "-d",classes,SRC/"DropProbe.java"],check=True)
     path=root/"unity28drop.jar"

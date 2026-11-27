@@ -36,7 +36,7 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
             if (raw.containsKey("bootstrapper") || raw.containsKey("loader") || raw.containsKey("libraries"))
                 throw new IOException(
                     desc.getName() +
-                    " requires a custom bootstrap, loader or library resolver outside this Alpha");
+                    " requires a custom bootstrap, loader or library resolver outside this Beta");
             var needs = new ArrayList<String>(desc.getDepend());
             var after = new ArrayList<String>(desc.getSoftDepend());
             var before = new ArrayList<String>(desc.getLoadBefore());

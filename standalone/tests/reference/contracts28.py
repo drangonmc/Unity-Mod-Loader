@@ -6,7 +6,7 @@ from review28.probes import build
 def main(o):
     o.project=qa.ROOT
     o.out.mkdir(parents=True,exist_ok=True)
-    loader=o.dist/"unity-loader-0.2.8-Beta.jar"
+    loader=o.dist/"unity-loader-0.3.0-Beta.jar"
     cp=[loader,o.cache/"versions/26.2/server-26.2.jar",*sorted((o.cache/"libraries").rglob("*.jar"))]
     with (o.out/"contracts.log").open("wb") as log:
         subprocess.run(["java","-cp",os.pathsep.join(map(str,cp)),Path(__file__).with_name("review28")/"Contracts.java",
