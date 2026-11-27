@@ -65,7 +65,11 @@ def setup_game(o,root,reference,probe):
     rows=[]
     if o.regions:
         rows=[r for r in json.loads((HERE/"protection-originals.json").read_bytes()) if r["slug"] in ("worldedit","worldguard")]
-        use_originals(rows,o.authors,pl)
+        if getattr(o,"edit_version",None):
+            rows=[o.edit_version if r["slug"]=="worldedit" else r for r in rows]
+        for row in rows:
+            origin=o.alternates if row["slug"]=="worldedit" and getattr(o,"edit_version",None) else o.authors
+            use_originals([row],origin,pl)
         guard=pl/"WorldGuard/worlds/world";guard.mkdir(parents=True)
         (guard/"regions.yml").write_text("regions:\n  protected:\n    min: {x: 0, y: 60, z: 0}\n    max: {x: 15, y: 110, z: 15}\n    members: {}\n    owners: {}\n    flags: {build: deny, pvp: deny}\n    type: cuboid\n    priority: 10\n")
     with socket.socket() as sock:sock.bind(("127.0.0.1",0));port=sock.getsockname()[1]

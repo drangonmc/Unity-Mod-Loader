@@ -87,8 +87,6 @@ public final class Actions {
     }
     static Action post(Action e) {
         for (var a : adapters) {
-            if (e.cancelled)
-                break;
             if (a.adapter.handles(e.kind))
                 a.adapter.accept(e);
         }
@@ -127,14 +125,14 @@ public final class Actions {
     }
     public static boolean replaceXP(Level level, BlockPos pos) {
         var e = replacingXP.get();
-        return e != null && e.level == level && e.pos.equals(pos);
+        return e != null && e.experience != null && e.level == level && e.pos.equals(pos);
     }
     public static void harvested(net.minecraft.world.level.block.Block block, Level level, Player player,
                                  BlockPos pos, BlockState state,
                                  net.minecraft.world.level.block.entity.BlockEntity be,
                                  net.minecraft.world.item.ItemStack tool, Action decision) {
         if (!(level instanceof ServerLevel server) || !(player instanceof ServerPlayer) || decision == null ||
-            decision.experience == null) {
+            (decision.experience == null && decision.dropItems)) {
             block.playerDestroy(level, player, pos, state, be, tool);
             return;
         }
@@ -148,7 +146,7 @@ public final class Actions {
             else
                 replacingXP.set(previous);
         }
-        net.minecraft.world.level.block.UnityBlockExperience.award(block, server, pos, decision.experience);
+        if (decision.experience != null) net.minecraft.world.level.block.UnityBlockExperience.award(block, server, pos, decision.experience);
     }
     public static void resync(Player p, BlockPos... positions) {
         if (!(p instanceof net.minecraft.server.level.ServerPlayer sp) || sp.connection == null)

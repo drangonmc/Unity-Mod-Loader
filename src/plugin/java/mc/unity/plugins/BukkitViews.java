@@ -31,10 +31,43 @@ final class BukkitViews {
     }
     final BlockViews blocks = new BlockViews(this);
     private final Host host;
-    private final org.bukkit.metadata.MetadataStoreBase<UUID> metadata=new org.bukkit.metadata.MetadataStoreBase<>(){
-        protected String disambiguate(UUID id,String key){return id+":"+key;}
-    };
-    private final Map<ServerLevel, World> worlds = new IdentityHashMap<>();
+    private static final class EntityMetadata extends org.bukkit.metadata.MetadataStoreBase<UUID> {
+        final boolean player;
+        final java.lang.ref.WeakReference<net.minecraft.world.entity.Entity> owner;
+        EntityMetadata(net.minecraft.world.entity.Entity entity) { player = entity instanceof ServerPlayer; owner = new java.lang.ref.WeakReference<>(entity); }
+        protected String disambiguate(UUID id, String key) { return key; }
+    }
+    private final Map<UUID, EntityMetadata> metadata = new java.util.concurrent.ConcurrentHashMap<>();
+    private final Map<ServerLevel, World> worlds = new java.util.concurrent.ConcurrentHashMap<>();
+    private int metadataTicks;
+    private Object metadata(net.minecraft.world.entity.Entity entity, String method, Object[] args) {
+        UUID id = entity.getUUID();
+        String key = (String)args[0];
+        if (method.equals("setMetadata")) {
+            metadata.computeIfAbsent(id, ignored -> new EntityMetadata(entity)).setMetadata(id,key,(org.bukkit.metadata.MetadataValue)args[1]);
+            return null;
+        }
+        var store = metadata.get(id);
+        return switch (method) {
+            case "hasMetadata" -> store != null && store.hasMetadata(id,key);
+            case "getMetadata" -> store == null ? List.of() : store.getMetadata(id,key);
+            case "removeMetadata" -> { if (store != null) store.removeMetadata(id,key,(Plugin)args[1]); yield null; }
+            default -> throw new AssertionError(method);
+        };
+    }
+    void close() { try { tasks.close(); } finally { worlds.clear();metadata.clear(); } }
+    void forget(net.minecraft.world.entity.Entity entity) {
+        var store=metadata.get(entity.getUUID());
+        if(store!=null && store.owner.get()==entity) metadata.remove(entity.getUUID(),store);
+    }
+    void forget(UUID player) { metadata.remove(player); }
+    void forget(ServerLevel world) {
+        worlds.remove(world);
+        metadata.entrySet().removeIf(entry -> {
+            var entity = entry.getValue().owner.get();
+            return !entry.getValue().player && (entity == null || entity.level()==world);
+        });
+    }
     final PluginHelp help;
     final PluginTasks tasks = new PluginTasks();
     private final Map<String, Permission> permissions = new HashMap<>();
@@ -80,7 +113,7 @@ final class BukkitViews {
         return Views.of(Server.class, "Unity", (m, a) -> switch (m) {
             case "getName" -> "Unity";
             case "createBlockData" -> createBlockData(a);
-            case "getVersion" -> "Unity 0.2.7-Beta (MC: 26.2)";
+            case "getVersion" -> "Unity 0.2.8-Beta (MC: 26.2)";
             case "getBukkitVersion" -> "26.2-R0.1-SNAPSHOT";
             case "getMinecraftVersion" -> "26.2";
             case "getLogger" -> Host.LOG;
@@ -253,10 +286,7 @@ final class BukkitViews {
             }
             case "getVelocity" -> { var v=raw.getDeltaMovement(); yield new org.bukkit.util.Vector(v.x,v.y,v.z); }
             case "setVelocity" -> { var v=(org.bukkit.util.Vector)a[0];v.checkFinite();raw.setDeltaMovement(v.getX(),v.getY(),v.getZ());raw.hurtMarked=true;yield null; }
-            case "hasMetadata" -> metadata.hasMetadata(raw.getUUID(),(String)a[0]);
-            case "getMetadata" -> metadata.getMetadata(raw.getUUID(),(String)a[0]);
-            case "setMetadata" -> {metadata.setMetadata(raw.getUUID(),(String)a[0],(org.bukkit.metadata.MetadataValue)a[1]);yield null;}
-            case "removeMetadata" -> {metadata.removeMetadata(raw.getUUID(),(String)a[0],(Plugin)a[1]);yield null;}
+            case "hasMetadata", "getMetadata", "setMetadata", "removeMetadata" -> metadata(raw,m,a);
             case "getEntityId" -> raw.getId();
             case "getUniqueId" -> raw.getUUID();
             case "getName" -> raw.getName().getString();
@@ -327,10 +357,7 @@ final class BukkitViews {
             case "isValid" -> !p.isRemoved();
             case "isSneaking" -> p.isShiftKeyDown();
             case "getEntityId" -> p.getId();
-            case "hasMetadata" -> metadata.hasMetadata(p.getUUID(),(String)a[0]);
-            case "getMetadata" -> metadata.getMetadata(p.getUUID(),(String)a[0]);
-            case "setMetadata" -> {metadata.setMetadata(p.getUUID(),(String)a[0],(org.bukkit.metadata.MetadataValue)a[1]);yield null;}
-            case "removeMetadata" -> {metadata.removeMetadata(p.getUUID(),(String)a[0],(Plugin)a[1]);yield null;}
+            case "hasMetadata", "getMetadata", "setMetadata", "removeMetadata" -> metadata(p,m,a);
             case "isPlayerTimeRelative" -> true;
             case "getPlayerTimeOffset" -> 0L;
             case "getPlayerWeather" -> null;
@@ -514,5 +541,15 @@ final class BukkitViews {
             default -> throw Views.unsupported("Chunk", m);
         });
     }
-    void tick(){tasks.tick();}
+    void tick() {
+        tasks.tick();
+        if (++metadataTicks == 20) {
+            metadataTicks = 0;
+            metadata.entrySet().removeIf(entry -> {
+                var entity = entry.getValue().owner.get();
+                if (host.game.getPlayerList().getPlayer(entry.getKey()) != null) return false;
+                return entity == null || entity.isRemoved();
+            });
+        }
+    }
 }

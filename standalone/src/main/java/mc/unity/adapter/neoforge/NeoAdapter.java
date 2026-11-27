@@ -34,6 +34,18 @@ public final class NeoAdapter {
             .map(e -> ((AnnotationValue.OfString)e.value()).stringValue()).findFirst().orElse("");
     }
 
+    public static java.lang.reflect.Constructor<?> constructor(Class<?> type) throws IOException {
+        var supported = Set.<Class<?>>of(net.neoforged.bus.api.IEventBus.class, net.neoforged.fml.ModContainer.class,
+                                        net.neoforged.api.distmarker.Dist.class);
+        var choices = Arrays.stream(type.getConstructors()).filter(c -> {
+            var params=Arrays.asList(c.getParameterTypes());
+            return supported.containsAll(params) && new HashSet<>(params).size()==params.size();
+        }).sorted(Comparator.comparingInt((java.lang.reflect.Constructor<?> c)->c.getParameterCount()).reversed()).toList();
+        if (choices.isEmpty() || choices.size()>1 && choices.get(0).getParameterCount()==choices.get(1).getParameterCount())
+            throw new IOException("No unique injectable NeoForge constructor: "+type.getName()+" "+choices);
+        return choices.getFirst();
+    }
+
     public static Entry read(Path file, String side, List<ClassModel> annotated, FmlDescriptor.Meta meta)
         throws IOException {
         var names = new ArrayList<String>();

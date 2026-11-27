@@ -55,7 +55,11 @@ final class ActionPatches {
     }
     private static void patch(TransformPlan plan, String cls, String method, String sig, int expected,
                               Edit edit) {
-        plan.add(cls, 135, "Unity gameplay", method + sig, (cf, model) -> {
+        patch(plan,cls,MethodTarget.named(method),sig,expected,edit);
+    }
+    private static void patch(TransformPlan plan,String cls,MethodTarget target,String sig,int expected,Edit edit) {
+        plan.add(cls, 135, "Unity gameplay", target.origin() + sig, (cf, model) -> {
+            String method=target.resolve(model);
             int[] hits = {0}, state = {-1, 0, 0, 0};
             var bytes = cf.transformClass(
                 model,
@@ -175,7 +179,7 @@ final class ActionPatches {
                         m,
                         ClassTransform.endHandler(
                             b -> b.withField("unity$denyBlockAttack", CD_boolean, ClassFile.ACC_PRIVATE))));
-            patch(plan, CLIENT, "lambda$startDestroyBlock$1",
+            patch(plan, CLIENT, MethodTarget.callback("startDestroyBlock","attack"),
                   "(" + t(S) + t(POS) + t(DIR) + "I)" + t(N + "network/protocol/Packet"), 1, (b, e, k) -> {
                       if (!invoke(e, "attack"))
                           return false;

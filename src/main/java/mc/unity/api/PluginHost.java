@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerLevel;
 
 public interface PluginHost extends UnityMod, AutoCloseable {
     void tick(MinecraftServer server);
+    default void entityUntracked(net.minecraft.world.entity.Entity entity) {}
     void worldEvent(ServerLevel level, boolean loaded);
     void aboutToStart(MinecraftServer server);
     net.minecraft.network.chat.Component playerMessage(net.minecraft.network.chat.Component text,

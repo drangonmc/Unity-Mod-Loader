@@ -49,7 +49,9 @@ def inspect(s,windows,x,kind,screen,slot,tag,open_menu):
             menu=w.act("menuOpen",handSlot=0,x=x,y=80,z=12)
             try:
                 assert menu["screen"]==screen,menu["screen"]
-                cells=[c for c in menu["slots"] if c["inventory"]==-1 and c["count"]>0]
+                def contents(m):return [c for c in m["slots"] if c["inventory"]==-1 and c["count"]>0]
+                cells=contents(menu)
+                if not cells:cells=eventually(lambda:contents(w.act("menuInfo")),bool,8)
                 assert len(cells)==1,cells
                 cell=cells[0]
                 assert (cell["containerSlot"],cell["id"],cell["count"])==(slot,"minecraft:"+item,count),cell
@@ -131,6 +133,7 @@ def run(o):
     receipts={}
     def configure(game):
         shutil.copy2(o.dist/"UnityEditRegions.jar",game/"plugins")
+        if getattr(o,"install_review",None):o.install_review(game)
         if o.host=="unity":
             target=game/"mods/unity-neo26-probe.jar"
             neo26.fixture(qa.ROOT,o.cache,o.sdk,target,[Path(__file__).with_name('Neo27FuelProbe.java')])
@@ -148,18 +151,23 @@ def run(o):
         if o.host=="unity":
             for base in [game,*(game.parent/p for p in qa.NAMES)]:
                 for row in pins: assert qa.digest(base/"mods"/row["filename"],"sha512")==row["sha512"]
-    o.check_installed=check_installed
+    def check_all(game):
+        check_installed(game)
+        if getattr(o,"check_review",None):o.check_review(game)
+    o.check_installed=check_all
     def cases(s,ws,file,first):
+        review=o.review_cases(s,ws,first) if o.host=="unity" and getattr(o,"review_cases",None) else None
         data=beta26.cases(s,ws,file,first)
         if o.host=="unity":
             data["machines"]=machine_cases(s,ws,first)
+            if review is not None:data["review28"]=review
         return data
     prepare_world=qa.prepare
     def prepare(server):
         prepare_world(server)
         if o.host=="unity": running_machines(server,True)
     qa.prepare=prepare
-    o.version="0.2.7-Beta";o.regions=True;o.plain=False;o.configure=configure
+    o.version=getattr(o,"version","0.2.7-Beta");o.regions=True;o.plain=False;o.configure=configure
     qa.observer=beta26.observer;qa.regions=cases;qa.run(o)
     result=o.out/o.host/"result.json"
     data=json.loads(result.read_bytes())

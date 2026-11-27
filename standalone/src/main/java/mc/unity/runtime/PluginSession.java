@@ -39,7 +39,7 @@ final class PluginSession implements AutoCloseable {
         private static boolean owned(String n) {
             return n.startsWith("org.bukkit.") || n.startsWith("io.papermc.paper.") ||
                 n.startsWith("com.destroystokyo.paper.") || n.startsWith("net.kyori.") ||
-                n.startsWith("net.md_5.bungee.") || n.startsWith("mc.unity.plugins.");
+                n.startsWith("org.yaml.snakeyaml.") || n.startsWith("net.md_5.bungee.") || n.startsWith("mc.unity.plugins.");
         }
         @Override
         protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
@@ -141,23 +141,30 @@ final class PluginSession implements AutoCloseable {
         return host;
     }
     public void close() throws IOException {
-        subscriptions.reversed().forEach(Runnable::run);
+        List<AutoCloseable> resources = new ArrayList<>();
+        subscriptions.reversed().forEach(remove -> resources.add(remove::run));
         subscriptions.clear();
-        try {
-            try {
-                if (host != null)
-                    host.close();
-            } finally {
-                if (api != null)
-                    api.close();
+        if (host != null) resources.add(host);
+        if (api != null) resources.add(api);
+        resources.add(() -> {
+            if (Files.exists(temporary)) try (var files = Files.list(temporary)) {
+                List<AutoCloseable> deletes = new ArrayList<>();
+                files.forEach(path -> deletes.add(() -> Files.deleteIfExists(path)));
+                closeAll(deletes);
             }
-        } finally {
-            if (Files.exists(temporary))
-                try (var files = Files.list(temporary)) {
-                    for (var file : files.toList())
-                        Files.delete(file);
-                }
-            Files.deleteIfExists(temporary);
+        });
+        resources.add(() -> Files.deleteIfExists(temporary));
+        closeAll(resources);
+    }
+    private static void closeAll(List<AutoCloseable> resources) throws IOException {
+        Throwable first = null;
+        for (var resource : resources) try { resource.close(); }
+        catch (Exception | LinkageError e) {
+            if (first == null) first = e; else first.addSuppressed(e);
         }
+        if (first instanceof IOException e) throw e;
+        if (first instanceof RuntimeException e) throw e;
+        if (first instanceof Error e) throw e;
+        if (first != null) throw new IOException(first);
     }
 }

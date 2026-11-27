@@ -24,6 +24,7 @@ public final class ClientEntry {
         for (var file : files) urls.add(file.toUri().toURL());
         Path client = files.getFirst();
         var loader = new GameLoader(urls.toArray(URL[] ::new), client);
+        var previous = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(loader);
         try (loader) {
             GamePatches.installClient(loader, client);
@@ -46,7 +47,7 @@ public final class ClientEntry {
                 Class.forName("mc.unity.runtime.ClientHooks", true, loader).getMethod("finish").invoke(null);
             }
         } finally {
-            Thread.currentThread().setContextClassLoader(ClientEntry.class.getClassLoader());
+            Thread.currentThread().setContextClassLoader(previous);
         }
     }
     static void installProfile(Path root) throws Exception {

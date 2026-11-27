@@ -50,6 +50,7 @@ final class WorldRegistryPatches {
             "net/minecraft/core/RegistrySynchronization", 145, "World registry synchronization",
             "network tags and empty maps", (cf, m) -> {
                 int[] hits = {0, 0};
+                String callback=MethodTarget.callback("packRegistry","accept").resolve(m);
                 var bytes = cf.transformClass(m, (b, element) -> {
                     if (!(element instanceof MethodModel method)) {
                         b.with(element);
@@ -63,7 +64,7 @@ final class WorldRegistryPatches {
                                 MethodTypeDesc.ofDescriptor("(ZLnet/minecraft/resources/ResourceKey;)Z"));
                             hits[0]++;
                         }
-                        if (method.methodName().equalsString("lambda$packRegistry$0") &&
+                        if (method.methodName().equalsString(callback) &&
                             e instanceof InvokeInstruction i && i.name().equalsString("accept") &&
                             i.owner().asInternalName().equals("java/util/function/BiConsumer")) {
                             code.invokestatic(

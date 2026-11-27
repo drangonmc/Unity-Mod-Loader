@@ -15,7 +15,11 @@ final class BukkitPatches {
         boolean apply(CodeBuilder b, CodeElement e);
     }
     static void method(TransformPlan plan, String owner, String method, String anchor, Edit edit) {
-        plan.add(owner, 210, "Bukkit events", method + " " + anchor, (cf, model) -> {
+        method(plan,owner,MethodTarget.named(method),anchor,edit);
+    }
+    static void method(TransformPlan plan,String owner,MethodTarget target,String anchor,Edit edit) {
+        plan.add(owner, 210, "Bukkit events", target.origin() + " " + anchor, (cf, model) -> {
+            String method=target.resolve(model);
             int[] hits = {0};
             byte[] bytes = cf.transformClass(model, ClassTransform.transformingMethodBodies(
                                                         m -> m.methodName().equalsString(method), (b, e) -> {
@@ -31,6 +35,20 @@ final class BukkitPatches {
         });
     }
     static void add(TransformPlan plan) {
+        String callbacks="net/minecraft/server/level/ServerLevel$EntityCallbacks";
+        String sig="(Lnet/minecraft/world/entity/Entity;)V";
+        for (var name:java.util.List.of("onTrackingEnd","onDestroyed")) {
+            plan.add(callbacks,210,"Bukkit metadata",name,(cf,model)->{
+                int[] hits={0};
+                var bytes=cf.transformClass(model,ClassTransform.transformingMethodBodies(
+                    m->m.methodName().equalsString(name) && m.methodType().equalsString(sig),(b,e)->{
+                        if(e instanceof ReturnInstruction){hits[0]++;b.aload(1).invokestatic(HOOK,"entityUntracked",MethodTypeDesc.ofDescriptor(sig));}
+                        b.with(e);
+                    }));
+                if(hits[0]!=1)throw new IOException("Changed entity lifecycle "+name);
+                return bytes;
+            });
+        }
         join(plan);
         quit(plan);
         acceptedDamage(plan);
@@ -95,7 +113,7 @@ final class BukkitPatches {
                 .with(e);
             return true;
         });
-        method(plan, "net/minecraft/server/level/ChunkMap", "lambda$scheduleUnload$0", "save", (b, e) -> {
+        method(plan, "net/minecraft/server/level/ChunkMap", MethodTarget.callback("scheduleUnload","save"), "save", (b, e) -> {
             if (!(e instanceof InvokeInstruction i) || !i.name().equalsString("save"))
                 return false;
             var save = b.newLabel();

@@ -193,7 +193,7 @@ public final class AccessTransforms {
             var applies = e.getValue();
             if (!owner.matches("[A-Za-z_$][A-Za-z0-9_$]*(/[A-Za-z_$][A-Za-z0-9_$]*)*"))
                 throw new IOException("Invalid JVM access owner " + owner);
-            if (owner.startsWith("java/") || owner.startsWith("mc/unity/") ||
+            if (owner.startsWith("java/") || owner.startsWith("javax/") || owner.startsWith("jdk/") || owner.startsWith("sun/") || owner.startsWith("com/sun/") || owner.startsWith("mc/unity/") ||
                 owner.startsWith("org/spongepowered/asm/"))
                 throw new IOException("Unsupported access target " + owner);
             try (var in = domain.getResourceAsStream(owner + ".class")) {
@@ -285,7 +285,7 @@ public final class AccessTransforms {
                                     .anyMatch(r -> r.widen && r.changeFinal == 0) &&
                                 matching(applies, Target.METHOD, n, d)
                                     .stream()
-                                    .noneMatch(r -> r.changeFinal < 0))
+                                    .noneMatch(r -> r.changeFinal < 0 || !r.widen && r.changeFinal == 0 && r.visibility == ACC_PUBLIC))
                                 adjusted |= ACC_FINAL;
                             var output = super.visitMethod(adjusted, n, d, s, ex);
                             if (virtual.isEmpty())

@@ -18,10 +18,9 @@ public final class GameLoader extends URLClassLoader {
     private final URL origin;
     private Map<String, byte[]> patches = Map.of();
     private boolean mixinStarted;
-    private static final String PUZZLES_SHA =
-        "643643086780874780e7586e10b08c16cb14965c0fef18088bd1ee1b07e3cc95";
-    private static final Set<String> upstreamFabricModules = moduleHashes();
     private boolean fullFabricApi;
+    private BiFunction<String,byte[],byte[]> optionalGuard;
+    public boolean alreadyDefined(String name) {return findLoadedClass(name)!=null;}
     private Map<Path, Path> containers = Map.of();
     public Path vanillaPath() {
         return Path.of(vanilla.getName());
@@ -39,21 +38,19 @@ public final class GameLoader extends URLClassLoader {
     public boolean fullFabricApi() {
         return fullFabricApi;
     }
-    private static Set<String> moduleHashes() {
-        try (var in = Objects.requireNonNull(
-                 GameLoader.class.getResourceAsStream("/META-INF/unity/fabric-api-modules.sha256"));
-             var reader =
-                 new BufferedReader(new InputStreamReader(in, java.nio.charset.StandardCharsets.UTF_8))) {
-            return reader.lines()
-                .map(row -> row.split(" ", 2)[0])
-                .collect(java.util.stream.Collectors.toUnmodifiableSet());
-        } catch (IOException ex) {
-            throw new ExceptionInInitializerError(ex);
-        }
-    }
     private final Set<Path> neoMods = new HashSet<>();
     private Path puzzles;
     private java.util.function.UnaryOperator<byte[]> puzzlesGuard;
+    private boolean puzzlesContract(JarFile jar) throws IOException {
+        var consumers = new ArrayList<byte[]>();
+        for (var name:List.of("CommonPlatform","ClientPlatform","PuzzlesLifecycle","PuzzlesClient"))
+            try (var in=super.getResourceAsStream("mc/unity/adapter/puzzles/"+name+".class")) {
+                if (in==null) throw new IOException("Missing Unity Puzzles Lib adapter " +name);
+                consumers.add(in.readAllBytes());
+            }
+        JarContract.check(jar,consumers,"fuzs/puzzleslib/");
+        return true;
+    }
     public boolean usesPuzzlesSpi(Path file) {
         return file.equals(puzzles);
     }
@@ -131,7 +128,8 @@ public final class GameLoader extends URLClassLoader {
             dependencyStamps = (Map<Path, String>)resolver.getMethod("fingerprints").invoke(nested);
             {
                 var selected = (List<Path>)resolver.getMethod("files").invoke(nested);
-                fullFabricApi = (boolean)resolver.getMethod("officialFabricApi").invoke(nested);
+                var upstreamModules = (Set<Path>)resolver.getMethod("fabricProviders").invoke(nested);
+                fullFabricApi = !upstreamModules.isEmpty();
                 for (var file : selected) {
                     var jar = new JarFile(file.toFile(), true, JarFile.OPEN_READ, Runtime.version());
                     mods.put(file, jar);
@@ -140,7 +138,8 @@ public final class GameLoader extends URLClassLoader {
                         neoMods.add(file);
                     if (jar.getEntry("META-INF/services/fuzs.puzzleslib.common.impl.core.proxy.ProxyImpl") !=
                             null &&
-                        PUZZLES_SHA.equals(VanillaBundle.hash(file)))
+                        (boolean)resolver.getMethod("puzzles",Path.class).invoke(nested,file) &&
+                        puzzlesContract(jar))
                         puzzles = file;
                     Boolean fabricModule = null;
                     @SuppressWarnings("unchecked") var list = (List<String>)reader.invoke(null, jar, client);
@@ -170,8 +169,7 @@ public final class GameLoader extends URLClassLoader {
                         if (fabricClass && fabricModule == null)
                             fabricModule =
                                 jar.getEntry("fabric.mod.json") != null &&
-                                (trustedFabricModules.contains(VanillaBundle.hash(file)) ||
-                                 fullFabricApi && upstreamFabricModules.contains(VanillaBundle.hash(file)));
+                                (upstreamModules.contains(file) || trustedFabricModules.contains(VanillaBundle.hash(file)));
                         if (n.endsWith(".class") &&
                             ((reserved(n) && !(fabricClass && Boolean.TRUE.equals(fabricModule))) ||
                              index.containsKey(n) ||
@@ -203,6 +201,8 @@ public final class GameLoader extends URLClassLoader {
                 patches = Map.copyOf(updated);
                 System.out.println("[Unity] Access transforms " + overlay.keySet());
             }
+            optionalGuard=(BiFunction<String,byte[],byte[]>)Class.forName("mc.unity.adapter.common.OptionalLinkage",true,this)
+                .getMethod("transformer").invoke(null);
             if (puzzles != null) {
                 @SuppressWarnings("unchecked")
                 var guard = (java.util.function.UnaryOperator<byte[]>)Class
@@ -262,6 +262,7 @@ public final class GameLoader extends URLClassLoader {
         containers = Map.of();
         puzzles = null;
         puzzlesGuard = null;
+        optionalGuard = null;
         plainLibraries = Set.of();
         dependencyStamps = Map.of();
         try (Closeable nestedArchives = this::closeNested; Closeable modFiles = () -> closeAll(handles)) {
@@ -385,8 +386,24 @@ public final class GameLoader extends URLClassLoader {
         }
         return jar;
     }
+    private final Set<String> invalidMixinClasses=java.util.concurrent.ConcurrentHashMap.newKeySet();
+    public void invalidMixin(String name){invalidMixinClasses.add(name.replace('/','.'));}
+    public byte[] beforeMixins(String name,byte[] bytes) {
+        if(bytes==null)return null;
+        String key=name.replace('.','/');
+        var owners=resources.get(key+".class");
+        Path file=owners==null?null:Path.of(owners.getFirst().getName());
+        bytes = patches.getOrDefault(key, bytes);
+        if (owners != null && optionalGuard != null) bytes=optionalGuard.apply(file.getFileName().toString(),bytes);
+        if (owners != null && puzzlesGuard != null && file.equals(puzzles))
+            bytes = puzzlesGuard.apply(bytes);
+        if (owners != null && neoMods.contains(file))
+            bytes = TypedListeners.adapt(bytes, this);
+        return bytes;
+    }
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
+        if(invalidMixinClasses.contains(name)) throw new ClassNotFoundException("Mixin class may not be loaded directly: "+name);
         String key = name.replace('.', '/'), path = key + ".class";
         int dot = name.lastIndexOf('.');
         try {
@@ -425,11 +442,7 @@ public final class GameLoader extends URLClassLoader {
             try (var in = jar.getInputStream(entry)) {
                 bytes = in.readAllBytes();
             }
-            bytes = patches.getOrDefault(key, bytes);
-            if (owners != null && puzzlesGuard != null && Path.of(jar.getName()).equals(puzzles))
-                bytes = puzzlesGuard.apply(bytes);
-            if (owners != null && neoMods.contains(Path.of(jar.getName())))
-                bytes = TypedListeners.adapt(bytes, this);
+            bytes = beforeMixins(name,bytes);
             if (mixin != null) {
                 try {
                     bytes = mixin.apply(name, bytes);

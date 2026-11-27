@@ -16,12 +16,14 @@ final class MenuViews {
     final InventoryView view;
     final PlayerInventory bottom;
     final Inventory top;
+    final List<Slot> upperSlots;
     final org.bukkit.entity.Player owner;
     final InventoryType type;
 
     MenuViews(Host host, ServerPlayer player) {
         this.player = player;
         menu = player.containerMenu;
+        upperSlots = menu.slots.stream().filter(s -> s.container != player.getInventory()).toList();
         owner = host.views.player(player);
         type = type(menu);
         bottom = Views.of(PlayerInventory.class, "player inventory", player.getUUID(), (m,a) -> inventory(false,m,a));
@@ -33,7 +35,7 @@ final class MenuViews {
             case "getType" -> type;
             case "countSlots" -> menu.slots.size();
             case "getInventory" -> !valid((int)a[0]) ? null : playerSlot((int)a[0]) ? bottom : top;
-            case "convertSlot" -> valid((int)a[0]) && playerSlot((int)a[0]) ? menu.getSlot((int)a[0]).getContainerSlot() : (int)a[0];
+            case "convertSlot" -> valid((int)a[0]) && playerSlot((int)a[0]) ? menu.getSlot((int)a[0]).getContainerSlot() : valid((int)a[0]) ? upperSlots.indexOf(menu.getSlot((int)a[0])) : (int)a[0];
             case "getSlotType" -> slotType((int)a[0]);
             case "getItem" -> valid((int)a[0]) ? slotItem(menu.getSlot((int)a[0])) : null;
             case "setItem" -> { menu.getSlot((int)a[0]).setByPlayer(nativeItem(a[1])); yield null; }
@@ -76,15 +78,15 @@ final class MenuViews {
     private Object inventory(boolean upper,String m,Object[] a) {
         return switch(m) {
             case "getType" -> upper ? type : InventoryType.PLAYER;
-            case "getSize" -> upper ? (int)menu.slots.stream().filter(s -> s.container != player.getInventory()).count() : player.getInventory().getContainerSize();
+            case "getSize" -> upper ? upperSlots.size() : player.getInventory().getContainerSize();
             case "getHolder" -> upper ? null : owner;
             case "getItem" -> a[0] instanceof org.bukkit.inventory.EquipmentSlot slot ?
                 playerItem(player.getItemBySlot(equipment(slot))) :
-                upper ? slotItem(menu.getSlot((int)a[0])) : playerItem(player.getInventory().getItem((int)a[0]));
+                upper ? ((int)a[0] >= 0 && (int)a[0] < upperSlots.size() ? slotItem(upperSlots.get((int)a[0])) : null) : playerItem(player.getInventory().getItem((int)a[0]));
             case "setItem" -> {
                 if(a[0] instanceof org.bukkit.inventory.EquipmentSlot slot)
                     player.setItemSlot(equipment(slot),nativeItem(a[1]));
-                else if (upper) menu.getSlot((int)a[0]).setByPlayer(nativeItem(a[1]));
+                else if (upper) upperSlots.get((int)a[0]).setByPlayer(nativeItem(a[1]));
                 else player.getInventory().setItem((int)a[0],nativeItem(a[1]));
                 yield null;
             }

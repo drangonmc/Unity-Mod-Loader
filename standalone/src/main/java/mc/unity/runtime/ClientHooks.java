@@ -28,29 +28,7 @@ public final class ClientHooks {
         }
         ServerHooks.attachClient(mods,forge);
         mc.unity.client.ClientEvents.wire();
-        mc.unity.core.PlayNetwork.bindPlayer(() -> {
-            try {
-                var mc = Class.forName("net.minecraft.client.Minecraft");
-                return (net.minecraft.world.entity.player.Player) mc.getField("player").get(
-                    mc.getMethod("getInstance").invoke(null));
-            } catch (ReflectiveOperationException e) {
-                throw new IllegalStateException(e);
-            }
-        });
-        mc.unity.core.PlayNetwork.bindClient(() -> {
-            try {
-                var minecraft = Class.forName("net.minecraft.client.Minecraft");
-                var instance = minecraft.getMethod("getInstance").invoke(null);
-                var listener = minecraft.getMethod("getConnection").invoke(instance);
-                if (listener == null)
-                    throw new IllegalStateException("Client is disconnected");
-                return (net.minecraft.network.Connection) listener.getClass()
-                    .getMethod("getConnection")
-                    .invoke(listener);
-            } catch (ReflectiveOperationException e) {
-                throw new IllegalStateException(e);
-            }
-        });
+        mc.unity.client.ClientEvents.bindNetwork();
         callbacks = mods.mods()
                         .stream()
                         .map(NativeLoader.Loaded::mod)

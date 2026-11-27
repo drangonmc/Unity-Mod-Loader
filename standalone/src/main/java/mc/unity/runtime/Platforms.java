@@ -22,7 +22,7 @@ public final class Platforms implements AutoCloseable {
     private Set<String> ids = Set.of();
     private boolean closed;
     public static boolean present(String id) {
-        return id.equals("minecraft") || id.equals("forge") || active != null && active.ids.contains(id);
+        return "minecraft".equals(id) || active != null && active.ids.contains(id);
     }
     public List<String> ids() {
         return ordered.stream().map(Entry::id).toList();
@@ -110,13 +110,19 @@ public final class Platforms implements AutoCloseable {
                     for (var model : models)
                         if (!inactive.contains(model.thisClass().asInternalName())) {
                             try {
-                                if (alternateProvider)
-                                    abi.verify(model,
-                                               reason
-                                               -> PuzzlesModules.deferred(model.thisClass().asInternalName(),
-                                                                          reason));
-                                else
-                                    abi.verify(model);
+                                String name=model.thisClass().asInternalName();
+                                java.util.function.Predicate<String> dormant=reason->alternateProvider && PuzzlesModules.deferred(name,reason);
+                                try { abi.verify(model,dormant); }
+                                catch (IOException first) {
+                                    String archive=file.getFileName().toString();
+                                    try(var input=jar.getInputStream(jar.getJarEntry(name+".class"))) {
+                                        OptionalLinkage.check(archive,model,input.readAllBytes(),abi,dormant);
+                                    }
+                                    if (!OptionalLinkage.transformed(archive,name) &&
+                                            (boolean)domain().getClass().getMethod("alreadyDefined",String.class).invoke(domain(),name.replace('/','.')))
+                                        throw new IOException("Optional ABI guard required after early definition: "+name);
+                                    System.out.println("[Unity] Optional ABI guard "+archive+" "+name+" — "+first.getMessage());
+                                }
                             } catch (IOException missing) {
                                 unsupported
                                     .computeIfAbsent(file.getFileName().toString(),
@@ -186,6 +192,10 @@ public final class Platforms implements AutoCloseable {
                 });
                 throw new IOException(failures.toString());
             }
+            for (var entry : byId.values()) seen.add(switch (entry.kind()) {
+                case FORGE -> "forge"; case NEOFORGE -> "neoforge"; case FABRIC -> "fabricloader";
+            });
+            OptionalLinkage.finishPreflight();
             session.ids = Set.copyOf(seen);
             session.ordered = order(byId);
             for (var e : session.ordered) {
@@ -289,11 +299,22 @@ public final class Platforms implements AutoCloseable {
         }
     }
     static List<Entry> order(Map<String, Entry> mods) throws IOException {
+        var frameworks=new HashMap<String,String>();
+        for(var entry:mods.values())switch(entry.kind()) {
+            case FABRIC -> frameworks.put("fabricloader",FabricAdapter.fixed("fabricloader"));
+            case FORGE -> frameworks.put("forge","65.1.5");
+            case NEOFORGE -> frameworks.put("neoforge","26.2.0.93");
+        }
         var edges = new TreeMap<String, Set<String>>();
         mods.keySet().forEach(k -> edges.put(k, new TreeSet<>()));
         for (var mod : mods.values())
             for (var d : mod.deps()) {
                 var required = mods.get(d.id());
+                if (required == null && frameworks.containsKey(d.id())) {
+                    if(mod.kind()==Entry.Kind.FABRIC)FabricVersions.check(frameworks.get(d.id()),d.range());
+                    else d.validate(mod.id(),frameworks.get(d.id()));
+                    continue;
+                }
                 if (required == null) {
                     if (d.required())
                         throw new IOException("Missing " + mod.kind() + " dependency " + d.id() + " for " +
@@ -303,7 +324,8 @@ public final class Platforms implements AutoCloseable {
                 if (mod.kind() == Entry.Kind.FABRIC)
                     FabricVersions.check(required.version(), d.range());
                 else
-                    FmlDescriptor.checkRange(required.version(), d.range());
+                    d.validate(mod.id(),required.version());
+                if (d.negative()) continue;
                 switch (d.ordering()) {
                 case "BEFORE" -> edges.get(required.id()).add(mod.id());
                 case "AFTER" -> edges.get(mod.id()).add(required.id());
@@ -350,10 +372,7 @@ public final class Platforms implements AutoCloseable {
                 case NEOFORGE -> {
                     var container = neoContainers.get(e.id());
                     var bus = container.getEventBus();
-                    var constructors = type.getConstructors();
-                    if (constructors.length != 1)
-                        throw new IOException("Ambiguous NeoForge constructor " + entry);
-                    var ctor = constructors[0];
+                    var ctor = NeoAdapter.constructor(type);
                     var args = new ArrayList<Object>();
                     for (var param : ctor.getParameterTypes()) {
                         if (param == net.neoforged.bus.api.IEventBus.class)
@@ -500,6 +519,7 @@ public final class Platforms implements AutoCloseable {
                     SidedItems.bind(null);
                     DataMaps.close();
                     net.neoforged.fml.ModList.bind(Map.of());
+                    OptionalLinkage.clear();
                     neoContainers.clear();
                     net.neoforged.fml.loading.FMLPaths.bind(null);
                     LoaderView.INSTANCE.close();

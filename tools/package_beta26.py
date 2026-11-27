@@ -18,10 +18,11 @@ from acceptance import digest
 
 VERSION = "0.2.6-Beta"
 
-def validated(options, version=VERSION):
+def validated(options, version=VERSION, alternate=False):
     reports = {}
+    runs=options.variant_runs if alternate else options.runs
     for host in ("unity","paper"):
-        folder = options.runs/host
+        folder = runs/host
         result = json.loads((folder/"result.json").read_bytes())
         for name,h in result["logs"].items():
             if Path(name).name != name or digest(folder/name) != h:
@@ -40,11 +41,11 @@ def validated(options, version=VERSION):
         assert unity[key]==paper[key],key
     for live,reference in zip(unity["runs"],paper["runs"]):
         common=dict(live)
-        if version == "0.2.7-Beta":
+        if version in ("0.2.7-Beta","0.2.8-Beta"):
             machine_pins=json.loads((ROOT/"standalone/tests/reference/machines-26.2.json").read_bytes())
             assert unity["machineOriginals"]=={r["project"]:r["sha512"] for r in machine_pins}
             for phase in ("first","restart"):
-                log=(options.runs/"unity"/(phase+".log")).read_text("utf8",errors="replace")
+                log=(runs/"unity"/(phase+".log")).read_text("utf8",errors="replace")
                 if phase=="first": assert "UNITY_NEO27_FUEL_OK duration=240" in log
                 for marker in ("FURNACE_COOKED","CUSTOM_FUEL_COOKED","MACHINE_FUEL_TRANSFER","MACHINE_FUEL_FILTER",
                                "HOPPER_OUTPUT","HOPPER_FILTER","HOPPER_REJECTED"):
@@ -59,9 +60,22 @@ def validated(options, version=VERSION):
                     assert regional_copy[key]==machine["region"][key],key
                 assert len(regional_copy["clients"])==2 and len(machine["source"]["clients"])==2
                 assert all(c["marker"]==machine["source"]["marker"] for c in machine["source"]["clients"])
+        if version=="0.2.8-Beta":
+            review=common.pop("review28")
+            assert review["bukkitObserved"]==2 and review["restoredByBukkit"]==1 and review["effect"]=="unity28registry:marked"
+            first=(runs/"unity/first.log").read_text("utf8",errors="replace")
+            for needle in ("UNITY28_REGISTRIES_OK","UNITY28_BUKKIT_BREAK 35 true","UNITY28_BUKKIT_BREAK 37 false",
+                           "UNITY28_DROP_ONLY","[Server] NO_ITEM_DROP","[Server] NORMAL_ITEM_DROP","[Server] VANILLA_XP"):
+                assert needle in first,needle
         assert common==reference
     pins=json.loads((ROOT/"standalone/tests/reference/protection-originals.json").read_bytes())
-    assert unity["authors"]=={p["slug"]:p["sha512"] for p in pins if p["slug"] in ("worldedit","worldguard")}
+    expected={p["slug"]:p["sha512"] for p in pins if p["slug"] in ("worldedit","worldguard")}
+    if alternate:
+        targets=json.loads((ROOT/"standalone/tests/reference/compat-26.2.json").read_bytes())
+        expected["worldedit"]=targets["worldedit"]["hashes"]["sha512"]
+        for installed in unity["platformJars"].values():
+            for key in ("fabric-api","puzzles-lib"):assert installed[key]["sha512"]==targets[key]["hashes"]["sha512"]
+    assert unity["authors"]==expected
     return reports
 
 def main(o):
@@ -75,9 +89,21 @@ def main(o):
     evidence.mkdir(parents=True,exist_ok=True)
     target=ROOT/"versions"/version
     archive=stage/f"Unity-{version}-MC26.2-Standalone.zip"
+    more={}
+    if version=="0.2.8-Beta":
+        validated(o,version,True)
+        for host in ("unity","paper"):more[f"alternate/{host}/result.json"]=o.variant_runs/host/"result.json"
+        contract=json.loads(o.contract_result.read_bytes())
+        assert contract["loader"]==digest(o.dist/f"unity-loader-{version}.jar") and contract["strictRejected"]
+        for n,checksum in contract["logs"].items():assert digest(o.contract_result.parent/n)==checksum
+        more["contracts/result.json"]=o.contract_result
+        more["contracts/contracts.log"]=o.contract_result.parent/"contracts.log"
+        for n,src in more.items():
+            dest=evidence/n;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dest)
     verified={"minecraft":"26.2","version":version,
               "artifacts":{n:digest(o.dist/n) for n in jars},
               "reports":{h:digest(o.runs/h/"result.json") for h in reports}}
+    if more:verified["additionalReceipts"]={n:digest(path) for n,path in more.items()}
     (evidence/"verified.json").write_text(json.dumps(verified,indent=2),"utf8")
     for host in reports:
         out=evidence/host
@@ -93,7 +119,7 @@ def main(o):
                 if any(s in line for s in ("Operation completed", "available edits", "clipboard has been pasted",
                           "has the following block data:", "REGION_CHEST_INTACT", "UNITY_NEO26_TICKS_OK",
                           "has the following entity data:", "BLOCK_OK_gold_block", "BLOCK_OK_smooth_stone",
-                          "UNITY_NEO27_FUEL_OK", "[Server] MACHINE_FUEL", "[Server] CUSTOM_FUEL_COOKED",
+                          "UNITY28_", "[Server] NO_ITEM_DROP","[Server] NORMAL_ITEM_DROP","[Server] VANILLA_XP","UNITY_NEO27_FUEL_OK", "[Server] MACHINE_FUEL", "[Server] CUSTOM_FUEL_COOKED",
                           "[Server] FURNACE_COOKED", "[Server] HOPPER_OUTPUT", "[Server] HOPPER_FILTER", "[Server] HOPPER_REJECTED")):
                     excerpts.append(line)
         (out/"observations.txt").write_text("\n".join(excerpts)+"\n","utf8")
@@ -114,7 +140,7 @@ def main(o):
                     row.endswith("  "+f.name) for row in (f.parent/"SHA256SUMS").read_text().splitlines()):continue
             files[f.relative_to(ROOT).as_posix()]=f.read_bytes()
     for n in jars: files[f"versions/{version}/{n}"]=(o.dist/n).read_bytes()
-    for n in ("verified.json","unity/result.json","paper/result.json","unity/observations.txt","paper/observations.txt"):
+    for n in (*more,"verified.json","unity/result.json","paper/result.json","unity/observations.txt","paper/observations.txt"):
         files[f"evidence/{version}/{n}"]=(evidence/n).read_bytes()
     with zipfile.ZipFile(archive,"w") as z:
         for n,data in sorted(files.items()):
@@ -135,7 +161,9 @@ def main(o):
     print("Verified",delivered,digest(delivered))
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
-    parser.add_argument("--version",choices=("0.2.6-Beta","0.2.7-Beta"),default=VERSION)
+    parser.add_argument("--version",choices=("0.2.6-Beta","0.2.7-Beta","0.2.8-Beta"),default=VERSION)
+    parser.add_argument("--variant-runs",type=lambda s:Path(s).resolve())
+    parser.add_argument("--contract-result",type=lambda s:Path(s).resolve())
     for k in ("runs","dist","cache","eula","adapter-refs","world-refs","worldedit"):
         parser.add_argument("--"+k,type=lambda s:Path(s).resolve(),required=True)
     main(parser.parse_args())

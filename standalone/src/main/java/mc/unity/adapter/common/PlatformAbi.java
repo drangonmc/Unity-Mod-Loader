@@ -46,6 +46,15 @@ public final class PlatformAbi {
                     missing("Unsupported platform member: " + owner + "." + name + signature);
             }
         }
+        headers(model);
+    }
+    public void headers(ClassModel model,java.util.function.Predicate<String> allowDormant) throws IOException {
+        deferred=allowDormant;
+        try { headers(model); } finally { deferred=reason->false; }
+    }
+    public void headers(ClassModel model) throws IOException {
+        if(model.superclass().isPresent()) descriptor("L"+model.superclass().get().asInternalName()+";");
+        for(var face:model.interfaces()) descriptor("L"+face.asInternalName()+";");
         attributes(model);
         for (var method : model.methods()) {
             descriptor(method.methodType().stringValue());
@@ -74,6 +83,8 @@ public final class PlatformAbi {
             if (a instanceof RuntimeInvisibleParameterAnnotationsAttribute x)
                 for (var list : x.parameterAnnotations())
                     for (var n : list) annotation(n);
+            if (a instanceof ExceptionsAttribute x)
+                for(var exception:x.exceptions()) descriptor("L"+exception.asInternalName()+";");
             if (a instanceof AnnotationDefaultAttribute x)
                 value(x.defaultValue());
             if (a instanceof SignatureAttribute x)

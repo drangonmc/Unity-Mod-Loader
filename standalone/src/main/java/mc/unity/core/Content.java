@@ -89,16 +89,39 @@ public final class Content {
             reset();
         }
     }
+    private static final class RootEntries {
+        private static final java.lang.invoke.VarHandle VALUES;
+        static {
+            try {
+                var lookup=java.lang.invoke.MethodHandles.privateLookupIn(net.minecraft.core.MappedRegistry.class,
+                    java.lang.invoke.MethodHandles.lookup());
+                VALUES=lookup.findVarHandle(net.minecraft.core.MappedRegistry.class,"byValue",Map.class);
+            } catch(ReflectiveOperationException e){throw new ExceptionInInitializerError(e);}
+        }
+        @SuppressWarnings("unchecked")
+        static List<Registry<?>> ordered() {
+            var root=(Registry<Registry<?>>)(Object)BuiltInRegistries.REGISTRY;
+            var values=(Map<Registry<?>,?>)VALUES.get(root);
+            var sorted=new ArrayList<>(values.keySet());
+            sorted.sort(Comparator.comparingInt(root::getId));
+            return sorted;
+        }
+    }
     private static List<Registry<?>> registries() {
-        var base = List.<Registry<?>>of(
-            BuiltInRegistries.SOUND_EVENT, BuiltInRegistries.DATA_COMPONENT_TYPE, BuiltInRegistries.BLOCK,
-            BuiltInRegistries.ENTITY_TYPE, BuiltInRegistries.ITEM, BuiltInRegistries.BLOCK_ENTITY_TYPE,
-            BuiltInRegistries.MENU, BuiltInRegistries.RECIPE_SERIALIZER, BuiltInRegistries.CREATIVE_MODE_TAB);
-        if (ExtraRegistries.all().isEmpty())
-            return base;
-        var all = new ArrayList<>(base);
+        // Dependencies with eager suppliers precede their consumers. The remainder follows Mojang's root order.
+        var all = new java.util.LinkedHashSet<Registry<?>>();
+        Collections.addAll(all, BuiltInRegistries.DATA_COMPONENT_TYPE, BuiltInRegistries.SOUND_EVENT,
+            BuiltInRegistries.FLUID, BuiltInRegistries.BLOCK, BuiltInRegistries.ATTRIBUTE, BuiltInRegistries.MOB_EFFECT,
+            BuiltInRegistries.POTION, BuiltInRegistries.PARTICLE_TYPE, BuiltInRegistries.ENTITY_TYPE,
+            BuiltInRegistries.ITEM, BuiltInRegistries.BLOCK_ENTITY_TYPE, BuiltInRegistries.MENU,
+            BuiltInRegistries.RECIPE_TYPE, BuiltInRegistries.RECIPE_SERIALIZER);
+        // Holder.Reference.value() is unavailable until the root freezes. The registered values
+        // and their assigned numeric IDs already exist at this point.
+        all.addAll(RootEntries.ordered());
+        all.remove(BuiltInRegistries.CREATIVE_MODE_TAB);
         all.addAll(ExtraRegistries.all());
-        return all;
+        all.add(BuiltInRegistries.CREATIVE_MODE_TAB);
+        return List.copyOf(all);
     }
     public static int registrySize() {
         return registries().stream().mapToInt(Registry::size).sum();
@@ -116,7 +139,7 @@ public final class Content {
     }
     public static void attach(String owner, ResourceKey<?> type, Consumer<Registry<?>> reg) {
         checkOpen();
-        if (registries().stream().noneMatch(registry -> registry.key().equals(type)))
+        if (!BuiltInRegistries.REGISTRY.containsKey(type.identifier()) && ExtraRegistries.all().stream().noneMatch(registry -> registry.key().equals(type)))
             throw new IllegalArgumentException("Unsupported registry " + type);
         if (groups.stream().anyMatch(g -> g.register == reg))
             throw new IllegalStateException("Duplicate register " + owner);

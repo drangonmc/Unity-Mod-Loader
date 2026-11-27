@@ -82,7 +82,9 @@ public final class CancelBus<T> implements CancellableEventBus<T> {
         return add(new Slot(type, Byte.MIN_VALUE, null, (o, b) -> c.accept(type.cast(o), b)));
     }
     public boolean post(Event e) {
-        boolean cancelled = false;
+        return post(e,false);
+    }
+    public boolean post(Event e,boolean cancelled) {
         var matches = applicable;
         if (e.getClass() != type) {
             synchronized (family) {

@@ -108,6 +108,10 @@ public final class ServerHooks {
         if (plugins != null && chunk.getLevel() instanceof net.minecraft.server.level.ServerLevel)
             plugins.host().chunkLoad(chunk, fresh);
     }
+    public static void entityUntracked(net.minecraft.world.entity.Entity entity) {
+        if (plugins!=null && entity.isRemoved() && !(entity instanceof net.minecraft.server.level.ServerPlayer))
+            plugins.host().entityUntracked(entity);
+    }
     public static void worldSave(net.minecraft.server.level.ServerLevel level) {
         if (plugins != null)
             plugins.host().worldSave(level);
@@ -127,7 +131,7 @@ public final class ServerHooks {
         dispatcher.register(Commands.literal("unity").executes(c -> {
             c.getSource().sendSuccess(
                 ()
-                    -> Component.literal("Unity 0.2.7-Beta standalone | MC 26.2 | native " + names() +
+                    -> Component.literal("Unity 0.2.8-Beta standalone | MC 26.2 | native " + names() +
                                          " | platform mods " + forge.ids() + " | plugins " +
                                          (plugins == null ? List.of() : plugins.host().names())),
                 false);

@@ -29,7 +29,7 @@ public final class FabricGameEvents implements Actions.Adapter {
             kind == Actions.Kind.RIGHT_ITEM && ((SessionEvent<?>)UseItemCallback.EVENT).subscribed();
     }
     public void accept(Actions.Action a) {
-        if (a.level.isClientSide())
+        if (a.level.isClientSide() || a.cancelled)
             return;
         var result = a.kind == Actions.Kind.RIGHT_BLOCK
                          ? UseBlockCallback.EVENT.invoker().interact(a.player, a.level, a.hand, a.hit)

@@ -32,56 +32,60 @@ public final class ActionAdapter implements Actions.Adapter {
         action.itemPolicy = policy(event.getUseItem());
         action.result = event.getCancellationResult();
     }
+    private static boolean post(Actions.Action action, net.minecraftforge.eventbus.api.bus.CancellableEventBus<?> bus,
+                                net.minecraftforge.eventbus.internal.Event event) {
+        return ((CancelBus<?>)bus).post(event,action.cancelled);
+    }
     public void accept(Actions.Action a) {
         switch (a.kind) {
             case PLACE -> {
                 var snaps = a.changes.stream().map(BlockSnapshot::new).toList();
                 var against = a.level.getBlockState(a.pos.relative(a.face.getOpposite()));
                 a.cancelled = snaps.size() == 1
-                    ? EntityPlaceEvent.BUS.post(new EntityPlaceEvent(snaps.getFirst(), against, a.player))
-                    : EntityMultiPlaceEvent.BUS.post(new EntityMultiPlaceEvent(snaps, against, a.player));
+                    ? post(a,EntityPlaceEvent.BUS,new EntityPlaceEvent(snaps.getFirst(), against, a.player))
+                    : post(a,EntityMultiPlaceEvent.BUS,new EntityMultiPlaceEvent(snaps, against, a.player));
             }
             case BREAK -> {
                 var e = new BreakEvent(
                     a.level, a.pos, a.state, a.player, a.initiallyDenied ? Result.DENY : Result.DEFAULT);
-                a.cancelled = BreakEvent.BUS.post(e) || e.getResult().isDenied();
+                a.cancelled = post(a,BreakEvent.BUS,e) || e.getResult().isDenied();
                 a.experience = e.experienceOverride();
             }
             case LEFT_BLOCK -> {
                 var e = new LeftClickBlock(a.player, a.pos, a.face, LeftClickBlock.Action.valueOf(a.phase));
-                a.cancelled = LeftClickBlock.BUS.post(e);
+                a.cancelled = post(a,LeftClickBlock.BUS,e);
                 use(a, e);
             }
             case RIGHT_BLOCK -> {
                 var e = new RightClickBlock(a.player, a.hand, a.pos, a.hit);
-                a.cancelled = RightClickBlock.BUS.post(e);
+                a.cancelled = post(a,RightClickBlock.BUS,e);
                 use(a, e);
             }
             case RIGHT_ITEM -> {
                 var e = new RightClickItem(a.player, a.hand);
-                a.cancelled = RightClickItem.BUS.post(e);
+                a.cancelled = post(a,RightClickItem.BUS,e);
                 a.result = e.getCancellationResult();
             }
             case INTERACT_ENTITY -> {
                 var e = new EntityInteractSpecific(a.player, a.hand, a.target, a.location);
-                a.cancelled = EntityInteractSpecific.BUS.post(e);
+                a.cancelled = post(a,EntityInteractSpecific.BUS,e);
                 a.result = e.getCancellationResult();
             }
             case LEFT_EMPTY -> LeftClickEmpty.BUS.post(new LeftClickEmpty(a.player));
             case RIGHT_EMPTY -> RightClickEmpty.BUS.post(new RightClickEmpty(a.player, a.hand));
             case ATTACK_ENTITY ->
-                a.cancelled = AttackEntityEvent.BUS.post(new AttackEntityEvent(a.player, a.target));
+                a.cancelled = post(a,AttackEntityEvent.BUS,new AttackEntityEvent(a.player, a.target));
             case ATTACK ->
-                a.cancelled = LivingAttackEvent.BUS.post(
+                a.cancelled = post(a,LivingAttackEvent.BUS,
                     new LivingAttackEvent((LivingEntity) a.target, a.source, a.amount));
             case HURT -> {
                 var e = new LivingHurtEvent((LivingEntity) a.target, a.source, a.amount);
-                a.cancelled = LivingHurtEvent.BUS.post(e);
+                a.cancelled = post(a,LivingHurtEvent.BUS,e);
                 a.amount = e.getAmount();
             }
             case DAMAGE -> {
                 var e = new LivingDamageEvent((LivingEntity) a.target, a.source, a.amount);
-                a.cancelled = LivingDamageEvent.BUS.post(e);
+                a.cancelled = post(a,LivingDamageEvent.BUS,e);
                 a.amount = e.getAmount();
             }
         }

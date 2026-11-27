@@ -1,0 +1,35 @@
+{
+  "fabric-api": {
+    "version": "0.152.2+26.2",
+    "versionId": "vodPC30d",
+    "filename": "fabric-api-0.152.2+26.2.jar",
+    "url": "https://cdn.modrinth.com/data/P7dR8mSH/versions/vodPC30d/fabric-api-0.152.2%2B26.2.jar",
+    "size": 2501396,
+    "hashes": {
+      "sha1": "484396ad53550c267dfe577332e6a56a9cbe9612",
+      "sha512": "9a2619168ee55e5ba0473efcd9c765b668ffa0e3a0cd858e877fff42fe68f9644c9ec3222c73e5734c59fc2cbb0ea01f3ba976ca7a2f009872c9c0885da4a713"
+    }
+  },
+  "worldedit": {
+    "version": "7.4.5",
+    "versionId": "F5ea2ov3",
+    "filename": "worldedit-bukkit-7.4.5.jar",
+    "url": "https://cdn.modrinth.com/data/1u6JkXh5/versions/F5ea2ov3/worldedit-bukkit-7.4.5.jar",
+    "size": 7708742,
+    "hashes": {
+      "sha1": "457add12f5c7eb0dfcb9945e6860e1c9dd8d9a48",
+      "sha512": "a383492fac6bfb4d43a257dfa7b5fc076aae503a71151b463de4fe80e6f3d5fc11209eaf4097baa115f3febf0adc40ca0a1ecda227b8439b429d0a4ba3a63a4f"
+    }
+  },
+  "puzzles-lib": {
+    "version": "26.2.4",
+    "versionId": "7Y7PIhiq",
+    "filename": "PuzzlesLib-v26.2.4-mc26.2.x-NeoForge.jar",
+    "url": "https://cdn.modrinth.com/data/QAGBst4M/versions/7Y7PIhiq/PuzzlesLib-v26.2.4-mc26.2.x-NeoForge.jar",
+    "size": 1080323,
+    "hashes": {
+      "sha512": "f81c3b2c091de5b3a6bad352f1cff22d8e032d7405eb81012b7a1b19a0ebbf60e7cf7b7b9629e0c2ca40a6ecdf25a7efe2b58c5112e77c64d4010fd334cde2cb",
+      "sha1": "fdc239aec7e3600f7d50541a9df041d41d107d18"
+    }
+  }
+}

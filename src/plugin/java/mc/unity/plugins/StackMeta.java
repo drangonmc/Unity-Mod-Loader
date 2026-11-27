@@ -22,16 +22,26 @@ final class StackMeta implements InvocationHandler {
         return meta != null && Proxy.isProxyClass(meta.getClass()) && Proxy.getInvocationHandler(meta) instanceof StackMeta m ? m : null;
     }
 
+    private static net.minecraft.network.chat.Component fromLegacy(String text) {
+        var rich = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(text);
+        var json = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().serializeToTree(rich);
+        return net.minecraft.network.chat.ComponentSerialization.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE,json).getOrThrow();
+    }
+    private static String legacy(net.minecraft.network.chat.Component value) {
+        var json = net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE,value).getOrThrow();
+        return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().serialize(
+            net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().deserializeFromTree(json));
+    }
     public Object invoke(Object self, Method method, Object[] args) {
         var name = item.get(DataComponents.CUSTOM_NAME);
         var lore = item.getOrDefault(DataComponents.LORE, ItemLore.EMPTY);
         return switch (method.getName()) {
             case "clone" -> of(item);
             case "hasDisplayName", "hasCustomName" -> name != null;
-            case "getDisplayName" -> name == null ? "" : name.getString();
+            case "getDisplayName" -> name == null ? "" : legacy(name);
             case "setDisplayName" -> {
                 if (args[0] == null) item.remove(DataComponents.CUSTOM_NAME);
-                else item.set(DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal((String)args[0]));
+                else item.set(DataComponents.CUSTOM_NAME, fromLegacy((String)args[0]));
                 yield null;
             }
             case "hasLore" -> !lore.lines().isEmpty();

@@ -5,6 +5,14 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 public final class ClientEvents {
+    public static void bindNetwork() {
+        mc.unity.core.PlayNetwork.bindPlayer(() -> net.minecraft.client.Minecraft.getInstance().player);
+        mc.unity.core.PlayNetwork.bindClient(() -> {
+            var listener = net.minecraft.client.Minecraft.getInstance().getConnection();
+            if (listener == null) throw new IllegalStateException("Client is disconnected");
+            return listener.getConnection();
+        });
+    }
     public static void wire() {
         if (LoaderView.upstream())
             return;

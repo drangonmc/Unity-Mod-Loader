@@ -170,15 +170,15 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
             this.file = file;
             this.host = host;
             if(file.description().getMain().equals("com.sk89q.worldedit.bukkit.WorldEditPlugin")) {
-                var hash=java.security.MessageDigest.getInstance("SHA-512");
-                try(var in=new java.security.DigestInputStream(Files.newInputStream(file.jar()),hash)){in.transferTo(OutputStream.nullOutputStream());}
-                if(HexFormat.of().formatHex(hash.digest()).equals("1fe3975132857093f971fed9efc601299bfa76fa7885f52a542fee41e7a0165ca9cb3cbcf5ae244474887d774d650b0db6f8f79aa80f98b245dea44f1c1b4152")) {
+                try (var candidate = new java.util.jar.JarFile(file.jar().toFile(),true,java.util.zip.ZipFile.OPEN_READ,Runtime.version())) {
                     try(var in=new java.util.jar.JarInputStream(Objects.requireNonNull(Host.class.getResourceAsStream("/META-INF/unity/worldedit-7.4.6.jar")))) {
                         for(var entry=in.getNextJarEntry();entry!=null;entry=in.getNextJarEntry()){
                             String n=entry.getName();
                             if(n.endsWith(".class"))platformClasses.put(n.substring(0,n.length()-6).replace('/','.'),in.readAllBytes());
                         }
                     }
+                    mc.unity.bootstrap.JarContract.check(candidate, platformClasses.values(),"com/sk89q/worldedit/","org/enginehub/linbus/");
+
                 }
             }
         }

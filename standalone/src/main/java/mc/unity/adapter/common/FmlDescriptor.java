@@ -12,7 +12,22 @@ import com.electronwill.nightconfig.toml.TomlParser;
 /** Decode TOML once per open archive; apply javafml constraints only to fields consumed by Unity. */
 public final class FmlDescriptor {
     private static final Map<JarFile, UnmodifiableConfig> documents = new WeakHashMap<>();
-    public record Dependency(String id, String range, boolean required, String ordering) {}
+    public record Dependency(String id, String range, String kind, String ordering) {
+        public Dependency(String id,String range,boolean required,String ordering) {
+            this(id,range,required ? "required" : "optional",ordering);
+        }
+        public boolean required() { return kind.equals("required"); }
+        public boolean negative() { return kind.equals("incompatible") || kind.equals("discouraged"); }
+        public boolean accepts(String version) throws IOException {
+            boolean match = inRange(version, range);
+            return kind.equals("incompatible") ? !match : kind.equals("discouraged") || match;
+        }
+        public void validate(String owner,String version) throws IOException {
+            if (!accepts(version)) throw new IOException(owner+" "+kind+" dependency "+id+" "+range+"; installed "+version);
+            if (kind.equals("discouraged") && inRange(version,range))
+                System.getLogger("mc.unity").log(System.Logger.Level.WARNING,owner+" discourages "+id+" "+version);
+        }
+    }
     public record
         Meta(String id, String version, List<Dependency> dependencies, String title, String description) {}
     private static UnmodifiableConfig parse(Reader in) throws IOException {
@@ -138,21 +153,17 @@ public final class FmlDescriptor {
                            kind = string(d, "type", "required").toLowerCase(Locale.ROOT);
                     if (!dep.matches("[a-z][a-z0-9_-]{1,63}"))
                         throw new IOException("Invalid dependency ID " + dep + " in " + id);
-                    if (!Set.of("required", "optional").contains(kind))
+                    if (!(neo ? Set.of("required","optional","incompatible","discouraged") : Set.of("required","optional")).contains(kind))
                         throw new IOException("Unsupported dependency type in " + id);
                     Object mandatory = d.getRaw("mandatory");
                     if (mandatory != null && !(mandatory instanceof Boolean))
                         throw new IOException("Expected TOML boolean for mandatory in " + id);
                     String range = string(d, "versionRange", null), order = string(d, "ordering", "NONE");
-                    if (neo && dep.equals("neoforge"))
-                        checkRange("26.2.0.93", range);
-                    else if (dep.equals("forge"))
-                        checkRange("65.1.5", range);
-                    else if (dep.equals("minecraft"))
-                        checkRange("26.2", range);
-                    else
-                        deps.add(new Dependency(
-                            dep, range, kind.equals("required") && !Boolean.FALSE.equals(mandatory), order));
+                    var dependency = new Dependency(dep,range,kind.equals("required") && Boolean.FALSE.equals(mandatory) ? "optional" : kind,order);
+                    if (neo && dep.equals("neoforge")) dependency.validate(id,"26.2.0.93");
+                    else if (!neo && dep.equals("forge")) dependency.validate(id,"65.1.5");
+                    else if (dep.equals("minecraft")) dependency.validate(id,"26.2");
+                    else deps.add(dependency);
                 }
             result.add(new Meta(id, version, List.copyOf(deps), string(table, "displayName", id),
                                 string(table, "description", "")));
@@ -195,27 +206,36 @@ public final class FmlDescriptor {
         return Integer.compare(l.length, r.length);
     }
     public static void checkRange(String v, String range) throws IOException {
-        if (range == null || range.isBlank() || range.equals("*"))
-            return;
-        if (range.length() < 3 || !"[(".contains(range.substring(0, 1)) ||
-            !")]".contains(range.substring(range.length() - 1)))
-            throw new IOException("Unsupported Forge version range: " + range);
-        String[] ends = range.substring(1, range.length() - 1).split(",", -1);
-        // Some published 26.2 jars spell an inclusive upper release as [a,b,).
-        if (ends.length == 3 && ends[2].isEmpty() && !ends[1].isBlank() && range.endsWith(",)")) {
-            range = range.substring(0, range.length() - 2) + "]";
-            ends = new String[] {ends[0], ends[1]};
+        if (!inRange(v, range)) throw new IOException("Version " + v + " does not satisfy " + range);
+    }
+    public static boolean inRange(String v, String range) throws IOException {
+        if (range == null || range.isBlank() || range.equals("*")) return true;
+        String text = range.strip();
+        boolean match = false;
+        for (int start = 0; start < text.length();) {
+            char left = text.charAt(start);
+            if (left != '(' && left != '[') throw new IOException("Invalid version range " + range);
+            int end = start + 1;
+            while (end < text.length() && text.charAt(end) != ')' && text.charAt(end) != ']') end++;
+            if (end == text.length()) throw new IOException("Incomplete version range " + range);
+            char right = text.charAt(end);
+            String[] bounds = text.substring(start+1,end).split(",",-1);
+            if (bounds.length == 3 && bounds[2].isBlank() && !bounds[1].isBlank() && right == ')') {
+                bounds = new String[]{bounds[0],bounds[1]}; right = ']';
+            }
+            if (bounds.length == 1 && left == '[' && right == ']') match |= compare(v,bounds[0].strip()) == 0;
+            else if (bounds.length == 2) {
+                String low=bounds[0].strip(), high=bounds[1].strip();
+                boolean above=low.isEmpty() || compare(v,low) >= (left=='[' ? 0 : 1);
+                boolean below=high.isEmpty() || compare(v,high) <= (right==']' ? 0 : -1);
+                match |= above && below;
+            } else throw new IOException("Invalid version range " + range);
+            start = end + 1;
+            if (start == text.length()) break;
+            if (text.charAt(start++) != ',') throw new IOException("Expected union in "+range);
+            while (start < text.length() && Character.isWhitespace(text.charAt(start))) start++;
+            if (start == text.length()) throw new IOException("Missing interval in "+range);
         }
-        if (ends.length == 1 && range.startsWith("[") && range.endsWith("]") &&
-            compare(v, ends[0].trim()) == 0)
-            return;
-        if (ends.length == 2) {
-            String low = ends[0].trim(), high = ends[1].trim();
-            boolean above = low.isEmpty() || compare(v, low) > (range.startsWith("[") ? -1 : 0);
-            boolean below = high.isEmpty() || compare(v, high) < (range.endsWith("]") ? 1 : 0);
-            if (above && below)
-                return;
-        }
-        throw new IOException("Version " + v + " does not satisfy " + range);
+        return match;
     }
 }

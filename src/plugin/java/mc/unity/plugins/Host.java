@@ -241,43 +241,45 @@ public final class Host implements PluginHost {
     @Override
     public net.minecraft.network.chat.Component playerMessage(net.minecraft.network.chat.Component original,
                                                               ServerPlayer player, boolean join) {
-        if (join)
-            levels.put(player.getUUID(), player.experienceLevel);
-        else
-            levels.remove(player.getUUID());
-        if (views == null || enabled.isEmpty())
-            return original;
-        var handlers = join ? org.bukkit.event.player.PlayerJoinEvent.getHandlerList()
-                            : org.bukkit.event.player.PlayerQuitEvent.getHandlerList();
-        if (handlers.getRegisteredListeners().length == 0)
-            return original;
-        var ops =
-            player.registryAccess().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE);
-        var serializer = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson();
-        var component =
-            original == null
-                ? null
-                : serializer.deserializeFromTree(
-                      net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(ops, original)
-                          .getOrThrow());
-        net.kyori.adventure.text.Component changed;
-        if (join) {
-            var event = new org.bukkit.event.player.PlayerJoinEvent(views.player(player), component);
-            fire(event);
-            changed = event.joinMessage();
-        } else {
-            var event = new org.bukkit.event.player.PlayerQuitEvent(
-                views.player(player), component,
-                org.bukkit.event.player.PlayerQuitEvent.QuitReason.DISCONNECTED);
-            fire(event);
-            changed = event.quitMessage();
-        }
-        if (changed == null)
-            return null;
-        return Objects.equals(component, changed) ? original
-                                                  : net.minecraft.network.chat.ComponentSerialization.CODEC
-                                                        .parse(ops, serializer.serializeToTree(changed))
-                                                        .getOrThrow();
+        try {
+            if (join)
+                levels.put(player.getUUID(), player.experienceLevel);
+            else
+                levels.remove(player.getUUID());
+            if (views == null || enabled.isEmpty())
+                return original;
+            var handlers = join ? org.bukkit.event.player.PlayerJoinEvent.getHandlerList()
+                                : org.bukkit.event.player.PlayerQuitEvent.getHandlerList();
+            if (handlers.getRegisteredListeners().length == 0)
+                return original;
+            var ops =
+                player.registryAccess().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE);
+            var serializer = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson();
+            var component =
+                original == null
+                    ? null
+                    : serializer.deserializeFromTree(
+                          net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(ops, original)
+                              .getOrThrow());
+            net.kyori.adventure.text.Component changed;
+            if (join) {
+                var event = new org.bukkit.event.player.PlayerJoinEvent(views.player(player), component);
+                fire(event);
+                changed = event.joinMessage();
+            } else {
+                var event = new org.bukkit.event.player.PlayerQuitEvent(
+                    views.player(player), component,
+                    org.bukkit.event.player.PlayerQuitEvent.QuitReason.DISCONNECTED);
+                fire(event);
+                changed = event.quitMessage();
+            }
+            if (changed == null)
+                return null;
+            return Objects.equals(component, changed) ? original
+                                                      : net.minecraft.network.chat.ComponentSerialization.CODEC
+                                                            .parse(ops, serializer.serializeToTree(changed))
+                                                            .getOrThrow();
+        } finally { if (!join && views != null) views.forget(player.getUUID()); }
     }
     @Override
     public boolean changeSlot(ServerPlayer player, int slot) {
@@ -436,16 +438,17 @@ public final class Host implements PluginHost {
             views.tick();
     }
     @Override
+    public void entityUntracked(net.minecraft.world.entity.Entity e) { if (views!=null) views.forget(e); }
+    @Override
     public void worldEvent(ServerLevel level, boolean load) {
-        if (views == null || enabled.isEmpty())
-            return;
+        if (views == null) return;
+        if (enabled.isEmpty()) { if (!load) views.forget(level); return; }
         var w = views.world(level);
         if (load) {
             fire(new WorldInitEvent(w));
             if (worldsReady)
                 fire(new WorldLoadEvent(w));
-        } else
-            fire(new WorldUnloadEvent(w));
+        } else try { fire(new WorldUnloadEvent(w)); } finally { views.forget(level); }
     }
     @Override
     public List<String> names() {
@@ -490,7 +493,7 @@ public final class Host implements PluginHost {
         } finally {
             try {
                 if (views != null)
-                    views.tasks.close();
+                    views.close();
             } finally {
                 for (var cl : loaders.values())
                     try {

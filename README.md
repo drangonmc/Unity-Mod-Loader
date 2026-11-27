@@ -1,37 +1,35 @@
-# Unity 0.2.7 Beta · Minecraft Java 26.2
+# Unity 0.2.8 Beta · Minecraft Java 26.2
 
-Unity 使用独立内核，Java 25 为运行环境。专服由 `mc.unity.bootstrap.Main` 启动。本页列出已通过实机验收的兼容子集。
+Unity 使用独立内核，服务端入口是 `mc.unity.bootstrap.Main`。解压 Standalone ZIP，使用 Java 25 运行 `Start-Unity.cmd`。客户端先安装原版 26.2，再运行 `Install-Unity-Client.cmd`。模组放在相应游戏目录的 `mods/`，Bukkit 插件放在 `standalone-instance/plugins/`。
 
-## 安装
+## 注册表与依赖
 
-1. 解压完整 Standalone ZIP，在独立测试目录运行 `Start-Unity.cmd`。客户端先安装原版 26.2，再用 `Install-Unity-Client.cmd` 安装 Unity 配置。
-2. 将下面两个 NeoForge 作者原包放到服务端及每个客户端的 `mods/`。发行包附有版本标识、下载地址和 SHA-512，见 `standalone/tests/reference/machines-26.2.json`。
-3. 将 WorldEdit 7.4.6、WorldGuard 7.0.19 的 Bukkit 作者 JAR 和随包的 `versions/0.2.7-Beta/UnityEditRegions.jar` 放入 `standalone-instance/plugins/`。两个上游插件的校验值在 `standalone/tests/reference/protection-originals.json`。为获准复制容器内容的编辑者配置 WorldEdit 命令权限和 `worldedit.setnbt`。
+Unity 从 MC 26.2 的根注册表枚举全部 **95 个内置注册表**。注册发生在原版冻结前，高频供应器依赖先处理，其余使用原版分配的顺序，自定义注册表与创造标签也纳入生命周期。轻量专服逐项检查了根表覆盖。双端混装见证模组以相反顺序挂载状态效果及其药水，同时注册属性和配方类型。专服首次启动和重启都能解析四项注册内容，玩家在游戏中实际获得了新效果。
 
-| NeoForge 原包 | 实测玩法 | 用于存档核对的字段 |
+FML 依赖声明支持 `required`、`optional`、`incompatible` 和 `discouraged`，并支持 `[1.0,2.0),[3.0,)` 一类联合区间。匹配冲突会阻止启动，匹配不推荐的组合会记录警告。NeoForge 在可注入的公开构造器中选择参数最多且唯一的一项。轻量 Fabric 视图提供 `java` 内置容器，平台 ID 由本次实际选中的平台适配器决定。
+
+## 平台组件与可选依赖
+
+| 组件 | 加载依据 | 验收的作者原包 |
 | --- | --- | --- |
-| AdvancedFurnaceY 1.0.2 | 高级熔炉用煤将粗铁烧成铁锭。连接铜漏斗后，侧面燃料槽收到 2 个煤。 | 注册 ID、朝向、机器名称、`lit_total_time`、槽号、物品数量和自定义物品组件 |
-| Copper Hopper 0.24.1 | 铜漏斗按过滤条件输送 4 个绿宝石，留下 1 个过滤样品，输入端的 3 个钻石保持原样。 | 方块 ID、独立的方块实体 ID、朝向、机器名称、过滤槽物品和自定义物品组件 |
+| 完整 Fabric API | 检查 umbrella 元数据、版本下界、实际嵌套关系、模块 ID 和生命周期声明。同名独立模块与整包的提供者发生冲突时报告模块名。 | 0.152.1+26.2、0.152.2+26.2 |
+| Puzzles Lib | 在 26.2.x 系列内匹配元数据、服务提供者及 Unity 适配器实际引用的二进制接口。 | 26.2.5、26.2.4 |
+| WorldEdit Bukkit | 从作者 JAR 检查 UnityWorldEdit 和方块适配器使用的类型、成员描述符和接口方法。 | 7.4.6、7.4.5，与 WorldGuard 7.0.19 同服 |
 
-作者版本：[AdvancedFurnaceY](https://modrinth.com/mod/advancedfurnacey/version/D0goCfZL) · [Copper Hopper，由 pcal.net 发布](https://modrinth.com/mod/copper-hopper/version/4JMEDg1g)
+默认 `-Dmc.unity.abi=conditional`。如果方法内存在一条无需使用缺失符号就能正常返回的路径，加载器可以在实际使用该符号的位置加入诊断，列出 JAR、类、方法和缺失符号。类头、声明签名、注解、无法安全验证的栈帧及必经调用继续在预检阶段报错。QA 可在 Java 命令的 `-jar` 之前设置 `-Dmc.unity.abi=strict`。同一个测试原包在严格模式下被拒绝；在默认模式下，未使用分支正常执行，触及缺失 API 的分支抛出带位置的异常。Puzzles Lib 替代 SPI 的已知休眠实现仍有独立的结构性例外清单。
 
-## WorldEdit 区域编辑和重启读档
+下载与发行验收继续对照 SHA-512 或 SHA-256。结构探测用于判断适配器能否链接。新微版本能否完成具体玩法，还需要对应的实机记录。
 
-Paper 26.2 build 121 和 Unity 使用相同的原版箱子、插件原包、区域组件和权限做对照。两个真实客户端分别在首次启动和重启后进服，核对方块、双方背包和血量。Unity 的机器用例另外装入两个候选模组。按作者样本 JAR 计，服务端共 79 个、每个客户端 77 个，另有官方 Fabric API 与验收见证模组。
+## Bukkit 与类转换
 
-| 操作 | 实际结果 |
-| --- | --- |
-| 箱子对照 | 跨界设置六格方块，区内三格保持原样。区外箱子粘贴后有 11 个带自定义数据的绿宝石，撤销恢复 3 个钻石，重做再恢复绿宝石。 |
-| 编辑者 A 从区外复制机器 | 将向东的机器粘贴到区内，原来的向北机器保留 7 个青金石与原始数据。粘贴到区外后，目标由向西、3 个钻石变成向东、11 个绿宝石。撤销和重做均恢复了对应朝向、槽位、名称与组件。 |
-| 编辑者 B 从区内复制机器 | B 有读取剪贴板内容的命令权限。粘贴到获准写入的空地后，两端读到向北的副本、7 个青金石和原始标记。B 撤销后该处变为空气，重做后机器与内容恢复。 |
-| 专服重启 | 从同一世界读回两台机器的源和目标、区内原件及区外副本。两个客户端分别打开区外机器的作者菜单，读取槽位与组件。服务端同时核对区内原件以及所有目标的方块实体 ID 与 NBT。两位玩家的背包和 20 点血量与重启前一致。 |
+- Forge 先取消破坏时，Bukkit 监听器能读到取消标记，保留或明确撤销它。双端分别验证了取消后保留的方块和恢复破坏后的空气。对钻石矿只设 `dropItems=false` 且保留原版经验计算时，未掉落钻石，服务端观察到经验球；普通矿石对照产生钻石。
+- 世界视图支持并发访问，卸载后释放。实体元数据随销毁或玩家退出清理。物品组件修改先快照键，传统显示名支持 `§` 颜色和样式。模组菜单的顶部库存通过实际槽位列表映射。
+- 插件域自行加载随包 SnakeYAML，关闭会话时逐项尝试清理并保留异常。客户端网络回调直接使用客户端 API，退出恢复原 TCCL。
+- Mixin 服务区分原始字节码和应用 Unity 前置转换后的字节码，提供类追踪与转换器查询。破坏预测、区块卸载、炼药锅和注册表同步的回调通过调用位置与实际操作识别。变换仍针对 MC 26.2，部分原版方法中的局部槽位和操作数栈形状仍是升版回归点。
+- AW 独立提权与 AW/AT 两种合并顺序分别验证，显式 AT 公开方法时不会误加合成 final。运行库受保护包的改写会被拒绝。
 
-上述区域启用 WorldGuard 的 `build: deny`，两位非 OP 编辑者均有 WorldEdit 读取和复制的权限。区域内的写入保护由 UnityEditRegions 执行。对于需要限制读取剪贴板的部署，还需单独配置并验收读取权限。
+## 实机验收
 
-## NeoForge 新增能力
+两组组件均使用两个静默图形客户端，与 Paper 的同版本箱子对照比较世界和背包。Unity 混装服保留 AdvancedFurnaceY 1.0.2、Copper Hopper 0.24.1 和既有样本。测试包含燃料投递、过滤、箱子与机器的区域内外复制、撤销重做、机器朝向与自定义组件，以及停服后从同一存档重新进服。区域写入检查使用随包的 `versions/0.2.8-Beta/UnityEditRegions.jar`，安装在服务端插件目录；获准复制容器内容的玩家需要 `worldedit.setnbt`。
 
-- `RegisterMenuScreensEvent` 在客户端将模组菜单工厂接入实际屏幕注册表，检测重复注册并在关闭时释放本会话添加的工厂。
-- 支持 NeoForge 的方块实体构造重载、有效方块集合和仅管理员可写 NBT 标志。WorldEdit 通过游戏注册键和原生方块属性转换状态。Bukkit 插件可以用注册键识别本服的模组物品与方块。
-- 物品与物品栈的 `getBurnTime`、`EventHooks.getItemBurnTime` 和 `FurnaceFuelBurnTimeEvent` 接入了熔炉燃料检查。由上游 SDK 编译的见证模组将带标记的黏土球燃料时间设为 240 tick，测试验证了监听优先级、取消语义和原版熔炉实际产出金锭。
-
-验证范围限于锁定的两个机器版本及本次混装。其他机器的能量、流体、跨区块多方块结构及离线编辑仍需各自验证。可复查的发行散列、两端结果和运行日志摘录在 `evidence/0.2.7-Beta/`。
+基线结果、替换组件结果、严格模式对照和发行物散列在 `evidence/0.2.8-Beta/`。这份清单的实测范围为上述原包、玩法和 MC 26.2。

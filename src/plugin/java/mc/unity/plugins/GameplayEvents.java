@@ -39,7 +39,8 @@ final class GameplayEvents implements Actions.Adapter {
         switch (a.kind) {
         case BREAK -> {
             var event = new BlockBreakEvent(blocks.block(level, a.pos), p);
-            event.setCancelled(a.initiallyDenied);
+            event.setCancelled(a.cancelled || a.initiallyDenied);
+            event.setDropItems(a.dropItems);
             int exp = a.experience == null
                           ? net.minecraft.world.level.block.UnityBlockExperience.sample(player, a.state)
                           : a.experience;
@@ -57,6 +58,7 @@ final class GameplayEvents implements Actions.Adapter {
                             ? new BlockPlaceEvent(blocks.block(level, a.pos), snapshots.getFirst(), against,
                                                   item, p, true, hand)
                             : new BlockMultiPlaceEvent(snapshots, against, item, p, true, hand);
+            event.setCancelled(a.cancelled);
             host.fire(event);
             a.cancelled = event.isCancelled() || !event.canBuild();
         }
@@ -67,7 +69,9 @@ final class GameplayEvents implements Actions.Adapter {
                         : new org.bukkit.event.player.PlayerInteractAtEntityEvent(
                               p, entity, new org.bukkit.util.Vector(a.location.x, a.location.y, a.location.z),
                               hand);
+            e.setCancelled(a.cancelled);
             host.fire(e);
+            a.cancelled = e.isCancelled();
             if (e.isCancelled()) {
                 a.cancelled = true;
                 a.result = InteractionResult.FAIL;
@@ -92,11 +96,13 @@ final class GameplayEvents implements Actions.Adapter {
                 event.setUseInteractedBlock(a.blockPolicy < 0 ? Event.Result.DENY : Event.Result.ALLOW);
             if (a.itemPolicy != 0)
                 event.setUseItemInHand(a.itemPolicy < 0 ? Event.Result.DENY : Event.Result.ALLOW);
+            if (a.cancelled) event.setCancelled(true);
             host.fire(event);
             // The SDK starts block clicks at ALLOW. Preserve vanilla secondary use unless a listener denies it.
             a.blockPolicy = event.useInteractedBlock() == Event.Result.DENY ? -1 : Math.max(0, a.blockPolicy);
             a.itemPolicy = policy(event.useItemInHand());
-            if (a.itemPolicy < 0 && (a.blockPolicy < 0 || a.kind == Actions.Kind.RIGHT_ITEM)) {
+            a.cancelled = a.itemPolicy < 0 && (a.blockPolicy < 0 || a.kind == Actions.Kind.RIGHT_ITEM);
+            if (a.cancelled) {
                 a.cancelled = true;
                 a.result = InteractionResult.FAIL;
             }

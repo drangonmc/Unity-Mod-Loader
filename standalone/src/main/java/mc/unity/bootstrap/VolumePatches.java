@@ -38,16 +38,21 @@ final class VolumePatches {
             });
         }
         var interactions=N+"core/cauldron/CauldronInteractions";
-        for(var entry:java.util.Map.of("lambda$bootStrap$0","BOTTLE_EMPTY","lambda$bootStrap$3","BOTTLE_FILL",
-                "lambda$bootStrap$4","BOTTLE_EMPTY","bannerInteraction","BANNER_WASH",
-                "shulkerBoxInteraction","SHULKER_WASH","dyedItemIteration","ARMOR_WASH").entrySet()) {
-            BukkitPatches.method(plan,interactions,entry.getKey(),"accepted item exchange",(b,e)->{
+        String sounds=N+"sounds/SoundEvents.";
+        for(var entry:java.util.Map.of(
+                MethodTarget.fields("bootStrap",sounds+"BOTTLE_EMPTY",B+"Blocks.WATER_CAULDRON"),"BOTTLE_EMPTY",
+                MethodTarget.fields("bootStrap",sounds+"BOTTLE_FILL"),"BOTTLE_FILL",
+                MethodTarget.fields("bootStrap",sounds+"BOTTLE_EMPTY",B+"LayeredCauldronBlock.LEVEL"),"BOTTLE_EMPTY",
+                MethodTarget.named("bannerInteraction"),"BANNER_WASH",
+                MethodTarget.named("shulkerBoxInteraction"),"SHULKER_WASH",
+                MethodTarget.named("dyedItemIteration"),"ARMOR_WASH").entrySet()) {
+            BukkitPatches.method(plan,interactions,entry.getKey(),"accepted item exchange "+entry.getValue()+entry.getKey().description(),(b,e)->{
                 if(!(e instanceof InvokeInstruction i) || !i.name().equalsString("isClientSide"))return false;
                 b.aload(0).aload(2).aload(3).ldc(entry.getValue()).invokestatic(CAULDRON,"skipItemWork",
                     MethodTypeDesc.ofDescriptor("("+t(L)+t(S)+t(POS)+t(P)+"Ljava/lang/String;)Z"));
                 return true;
             });
-            BukkitPatches.method(plan,interactions,entry.getKey(),"commit once",(b,e)->{
+            BukkitPatches.method(plan,interactions,entry.getKey(),"commit once "+entry.getValue()+entry.getKey().description(),(b,e)->{
                 if(!(e instanceof InvokeInstruction i))return false;
                 if(i.name().equalsString("lowerFillLevel"))
                     b.invokestatic(CAULDRON,"lowerOnce",MethodTypeDesc.ofDescriptor("("+t(S)+t(L)+t(POS)+")V"));

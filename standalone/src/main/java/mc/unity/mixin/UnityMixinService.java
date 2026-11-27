@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.transformer.*;
 import org.spongepowered.asm.service.*;
 
 public final class UnityMixinService
-    extends MixinServiceAbstract implements IClassProvider, IClassBytecodeProvider {
+    extends MixinServiceAbstract implements IClassProvider, IClassBytecodeProvider, IClassTracker, ITransformerProvider {
     private static UnityMixinService service;
     private Map<String, byte[]> sideConfigs = Map.of();
 
@@ -29,11 +29,12 @@ public final class UnityMixinService
                 if (common == null) continue;
                 boolean changed = false;
                 for (var iterator = common.iterator(); iterator.hasNext();) {
-                    var mixinName = config.get("package").getAsString() + "." + iterator.next().getAsString();
+                    String prefix = config.has("package") ? config.get("package").getAsString() : "";
+                    var mixinName = (prefix.isEmpty() ? "" : prefix + ".") + iterator.next().getAsString();
                     var node = getClassNode(mixinName, false, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG);
                     if (node.invisibleAnnotations == null) continue;
                     for (var ann : node.invisibleAnnotations) {
-                        if (!ann.desc.equals("Lorg/spongepowered/asm/mixin/Mixin;")) continue;
+                        if (ann.values == null || !ann.desc.equals("Lorg/spongepowered/asm/mixin/Mixin;")) continue;
                         var targets = new ArrayList<String>();
                         for (int i = 0; i < ann.values.size(); i += 2) {
                             var key = ann.values.get(i);
@@ -73,12 +74,36 @@ public final class UnityMixinService
     public IClassBytecodeProvider getBytecodeProvider() {
         return this;
     }
-    public IClassTracker getClassTracker() {
-        return null;
+    private final ClassLoader domain=getClass().getClassLoader();
+    private final Set<String> excluded=java.util.concurrent.ConcurrentHashMap.newKeySet();
+    private final java.lang.invoke.MethodHandle before=operation("beforeMixins",byte[].class,String.class,byte[].class);
+    private final java.lang.invoke.MethodHandle loaded=operation("alreadyDefined",boolean.class,String.class);
+    private final java.lang.invoke.MethodHandle invalid=operation("invalidMixin",void.class,String.class);
+    private java.lang.invoke.MethodHandle operation(String name,Class<?> result,Class<?>... params) {
+        try { return java.lang.invoke.MethodHandles.publicLookup().findVirtual(domain.getClass(),name,
+                  java.lang.invoke.MethodType.methodType(result,params)).bindTo(domain); }
+        catch(ReflectiveOperationException e){throw new IllegalStateException("Unity Mixin service: "+name,e);}
     }
-    public ITransformerProvider getTransformerProvider() {
-        return null;
+    private final ILegacyClassTransformer unity=new ILegacyClassTransformer() {
+        public String getName(){return "mc.unity.bootstrap.GameLoader";}
+        public boolean isDelegationExcluded(){return false;}
+        public byte[] transformClassBytes(String name,String mapped,byte[] bytes){
+            try{return (byte[])before.invokeExact(mapped,bytes);}
+            catch(RuntimeException|Error e){throw e;}catch(Throwable e){throw new IllegalStateException(e);}
+        }
+    };
+    public IClassTracker getClassTracker(){return this;}
+    public ITransformerProvider getTransformerProvider(){return this;}
+    public void registerInvalidClass(String name){
+        try{invalid.invokeExact(name);}catch(Throwable e){throw new IllegalStateException(e);}
     }
+    public boolean isClassLoaded(String name){
+        try{return (boolean)loaded.invokeExact(name.replace('/','.'));}catch(Throwable e){throw new IllegalStateException(e);}
+    }
+    public String getClassRestrictions(String name){return "";}
+    public Collection<ITransformer> getTransformers(){return List.of(unity);}
+    public Collection<ITransformer> getDelegatedTransformers(){return excluded.contains(unity.getName())?List.of():getTransformers();}
+    public void addTransformerExclusion(String name){excluded.add(name);}
     public IMixinAuditTrail getAuditTrail() {
         return null;
     }
@@ -118,11 +143,14 @@ public final class UnityMixinService
     }
     public ClassNode getClassNode(String name, boolean transform, int flags)
         throws IOException, ClassNotFoundException {
-        try (var input = getResourceAsStream(name.replace('.', '/') + ".class")) {
+        var resource = domain.getResource(name.replace('.', '/') + ".class");
+        try (var input = resource==null?null:resource.openStream()) {
             if (input == null)
                 throw new ClassNotFoundException(name);
             var node = new ClassNode();
-            new ClassReader(input).accept(node, flags);
+            byte[] bytes=input.readAllBytes();
+            if(transform && !excluded.contains(unity.getName())) bytes=unity.transformClassBytes(name,name,bytes);
+            new ClassReader(bytes).accept(node, flags);
             return node;
         }
     }

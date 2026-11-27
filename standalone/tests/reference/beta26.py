@@ -53,8 +53,11 @@ def cases(server, windows, file, first):
         for w,n in zip(windows,NAMES):
             teleport(server,w,n,x+.5,80,4.8)
             view=w.act("menuOpen",handSlot=0,x=x,y=80,z=7)
+            def matches(cell):return (cell["id"],cell["count"])==("minecraft:"+item,count)
             found=view["slots"][3]
-            assert (found["id"],found["count"]) == ("minecraft:"+item,count),found
+            if not matches(found):
+                found=eventually(lambda:w.act("menuInfo")["slots"][3],matches,8)
+            assert matches(found),found
             displays.append([found["id"],found["count"]])
             w.act("menuClose")
         return displays

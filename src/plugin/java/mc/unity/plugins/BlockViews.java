@@ -65,8 +65,8 @@ final class BlockViews {
                 result.applyComponents(meta.item.getComponentsPatch());
             }
             if (stack.isEmpty()) return false;
-            for (var entry : stack.getComponentsPatch().entrySet())
-                stack.copyFrom(entry.getKey(), stack.getPrototype());
+            for (var key : stack.getComponentsPatch().entrySet().stream().map(Map.Entry::getKey).toList())
+                stack.copyFrom(key, stack.getPrototype());
             stack.applyComponents(result.getComponentsPatch());
             changed.run();
             return true;

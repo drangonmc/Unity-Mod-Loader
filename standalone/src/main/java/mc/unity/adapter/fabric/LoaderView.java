@@ -132,7 +132,7 @@ public final class LoaderView implements FabricLoader, AutoCloseable {
             v.parent = null;
             map.put(e.id(), v);
         }
-        if (upstream) {
+        {
             var javaEntry = new Entry("java", System.getProperty("java.version"), List.of(),
                                       Entry.Kind.FABRIC, Path.of(System.getProperty("java.home")), List.of());
             map.put("java", mods.getOrDefault("java", new View(javaEntry, "Java")));
