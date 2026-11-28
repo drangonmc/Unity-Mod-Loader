@@ -7,12 +7,17 @@ import org.bukkit.plugin.PluginManager;
 final class SessionPluginManager implements PluginManager {
     private final SimpleCommandMap commandMap;
     private final PluginManager delegate;
-    SessionPluginManager(SimpleCommandMap commandMap, PluginManager delegate) {
+    private final SessionPermissions local;
+    private volatile io.papermc.paper.plugin.PermissionManager permissionManager;
+    private org.bukkit.plugin.Plugin permissionOwner;
+    SessionPluginManager(SimpleCommandMap commandMap, PluginManager delegate, org.bukkit.plugin.SimplePluginManager facade) {
+        local=new SessionPermissions(facade);
+        permissionManager=local;
         this.commandMap=commandMap;
         this.delegate=delegate;
     }
-    @Override public void addPermissions(java.util.List<org.bukkit.permissions.Permission> permissions) { permissions.forEach(delegate::addPermission); }
-    @Override public void clearPermissions() { delegate.clearPermissions(); }
+    @Override public void addPermissions(java.util.List<org.bukkit.permissions.Permission> permissions) { permissionManager.addPermissions(permissions); }
+    @Override public void clearPermissions() { permissionManager.clearPermissions(); }
     @Override
     public void registerInterface(java.lang.Class<? extends org.bukkit.plugin.PluginLoader> type) throws java.lang.IllegalArgumentException {
         delegate.registerInterface(type);
@@ -79,55 +84,55 @@ final class SessionPluginManager implements PluginManager {
     }
     @Override
     public org.bukkit.permissions.Permission getPermission(java.lang.String name) {
-        return delegate.getPermission(name);
+        return permissionManager.getPermission(name);
     }
     @Override
     public void addPermission(org.bukkit.permissions.Permission permission) {
-        delegate.addPermission(permission);
+        permissionManager.addPermission(permission);
     }
     @Override
     public void removePermission(org.bukkit.permissions.Permission permission) {
-        delegate.removePermission(permission);
+        permissionManager.removePermission(permission);
     }
     @Override
     public void removePermission(java.lang.String name) {
-        delegate.removePermission(name);
+        permissionManager.removePermission(name);
     }
     @Override
     public java.util.Set<org.bukkit.permissions.Permission> getDefaultPermissions(boolean flag) {
-        return delegate.getDefaultPermissions(flag);
+        return permissionManager.getDefaultPermissions(flag);
     }
     @Override
     public void recalculatePermissionDefaults(org.bukkit.permissions.Permission permission) {
-        delegate.recalculatePermissionDefaults(permission);
+        permissionManager.recalculatePermissionDefaults(permission);
     }
     @Override
     public void subscribeToPermission(java.lang.String name, org.bukkit.permissions.Permissible permissible) {
-        delegate.subscribeToPermission(name, permissible);
+        permissionManager.subscribeToPermission(name, permissible);
     }
     @Override
     public void unsubscribeFromPermission(java.lang.String name, org.bukkit.permissions.Permissible permissible) {
-        delegate.unsubscribeFromPermission(name, permissible);
+        permissionManager.unsubscribeFromPermission(name, permissible);
     }
     @Override
     public java.util.Set<org.bukkit.permissions.Permissible> getPermissionSubscriptions(java.lang.String name) {
-        return delegate.getPermissionSubscriptions(name);
+        return permissionManager.getPermissionSubscriptions(name);
     }
     @Override
     public void subscribeToDefaultPerms(boolean flag, org.bukkit.permissions.Permissible permissible) {
-        delegate.subscribeToDefaultPerms(flag, permissible);
+        permissionManager.subscribeToDefaultPerms(flag, permissible);
     }
     @Override
     public void unsubscribeFromDefaultPerms(boolean flag, org.bukkit.permissions.Permissible permissible) {
-        delegate.unsubscribeFromDefaultPerms(flag, permissible);
+        permissionManager.unsubscribeFromDefaultPerms(flag, permissible);
     }
     @Override
     public java.util.Set<org.bukkit.permissions.Permissible> getDefaultPermSubscriptions(boolean flag) {
-        return delegate.getDefaultPermSubscriptions(flag);
+        return permissionManager.getDefaultPermSubscriptions(flag);
     }
     @Override
     public java.util.Set<org.bukkit.permissions.Permission> getPermissions() {
-        return delegate.getPermissions();
+        return permissionManager.getPermissions();
     }
     @Override
     public boolean useTimings() {
@@ -138,7 +143,10 @@ final class SessionPluginManager implements PluginManager {
         return delegate.isTransitiveDependency(value1, value2);
     }
     @Override
-    public void overridePermissionManager(org.bukkit.plugin.Plugin plugin, io.papermc.paper.plugin.PermissionManager value2) {
-        delegate.overridePermissionManager(plugin, value2);
+    public synchronized void overridePermissionManager(org.bukkit.plugin.Plugin plugin, io.papermc.paper.plugin.PermissionManager value2) {
+        java.util.Objects.requireNonNull(plugin);
+        if (permissionOwner!=null && permissionOwner!=plugin) throw new IllegalStateException("Permission manager owned by "+permissionOwner.getName());
+        permissionOwner=value2==null?null:plugin;
+        permissionManager=value2==null?local:value2;
     }
 }

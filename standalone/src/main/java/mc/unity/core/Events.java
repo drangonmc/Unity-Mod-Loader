@@ -11,6 +11,7 @@ public final class Events {
         if (failure instanceof ThreadDeath fatal) throw fatal;
         System.getLogger("mc.unity").log(System.Logger.Level.ERROR, "Stopping callback " + owner, failure);
     }
+    public static final Signal<net.minecraft.core.Registry<?>> REGISTRY = new Signal<>();
     public static final class TickSignal {
         private final CopyOnWriteArrayList<java.util.function.BiConsumer<
             net.minecraft.server.MinecraftServer, java.util.function.BooleanSupplier>> callbacks =
@@ -182,6 +183,7 @@ public final class Events {
             s.clear();
         LEVEL_LOAD.clear();
         LEVEL_UNLOAD.clear();
+        REGISTRY.clear();
         LEVEL_TICK_PRE.clear();
         LEVEL_TICK_POST.clear();
         SERVER_TICK_PRE.clear();

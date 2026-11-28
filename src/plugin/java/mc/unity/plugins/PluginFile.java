@@ -33,10 +33,17 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
                 throw new IOException("Invalid plugin name in " + path);
             var yaml = new Yaml(new SafeConstructor(new LoaderOptions()));
             Map<?, ?> raw = yaml.load(new ByteArrayInputStream(bytes));
-            if (raw.containsKey("bootstrapper") || raw.containsKey("loader") || raw.containsKey("libraries"))
+            if (raw.containsKey("bootstrapper") || raw.containsKey("loader"))
                 throw new IOException(
                     desc.getName() +
-                    " requires a custom bootstrap, loader or library resolver outside this Alpha");
+                    " requires a custom bootstrap or loader outside the supported API");
+            if(raw.containsKey("libraries") && !(raw.get("libraries") instanceof List<?>))
+                throw new IOException("Expected a list of Maven coordinates in "+path);
+            for (String coordinate:desc.getLibraries()) {
+                if (!coordinate.matches("[A-Za-z0-9_]+(?:\\.[A-Za-z0-9_-]+)*:[A-Za-z0-9][A-Za-z0-9_.-]*:[A-Za-z0-9][A-Za-z0-9_.+-]*") ||
+                        coordinate.contains(".."))
+                    throw new IOException("Invalid Bukkit library coordinate "+coordinate+" in "+path);
+            }
             var needs = new ArrayList<String>(desc.getDepend());
             var after = new ArrayList<String>(desc.getSoftDepend());
             var before = new ArrayList<String>(desc.getLoadBefore());
@@ -137,6 +144,7 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
         private volatile List<Loader> dependencies = List.of();
         final PluginFile file;
         final Host host;
+        private URLClassLoader libraries;
         JavaPlugin plugin;
         private final Map<String,byte[]> platformClasses=new HashMap<>();
         private static final String WE_ADAPTER="mc.unity.adapter.worldedit.UnityWorldEdit";
@@ -153,13 +161,37 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
                 // Only inspect the feedback class if this loader has already defined it.
                 Class<?> progress=platformClasses.containsKey(WE_ADAPTER) ?
                     findLoadedClass("com.sk89q.worldedit.command.util.FutureProgressListener") : null;
+                // EssentialsX 2.22 uses a private non-daemon pool for locale bundles with no public close method.
+                // The pool belongs exclusively to this plugin class loader and is drained after onDisable.
+                var i18n = file.description().getMain().equals("com.earth2me.essentials.Essentials") ?
+                    findLoadedClass("com.earth2me.essentials.I18n") : null;
+                if(i18n!=null){
+                    var accessor=java.lang.invoke.MethodHandles.privateLookupIn(i18n,java.lang.invoke.MethodHandles.lookup())
+                            .findStaticVarHandle(i18n,"BUNDLE_LOADER_EXECUTOR",java.util.concurrent.ExecutorService.class);
+                    var pool=(java.util.concurrent.ExecutorService)accessor.get();pool.shutdown();
+                    try {if(!pool.awaitTermination(5,java.util.concurrent.TimeUnit.SECONDS))pool.shutdownNow();}
+                    catch(InterruptedException interrupted){pool.shutdownNow();Thread.currentThread().interrupt();}
+                }
                 if(progress!=null) {
                     var timer=java.lang.invoke.MethodHandles.privateLookupIn(progress,java.lang.invoke.MethodHandles.lookup())
                         .findStaticVarHandle(progress,"timer",java.util.Timer.class);
                     ((java.util.Timer)timer.get()).cancel();
                 }
             } catch(ReflectiveOperationException ex){throw new IOException("Closing WorldEdit command feedback",ex);}
-            finally{super.close();}
+            finally {
+                try { if(libraries!=null)libraries.close(); }
+                finally {super.close();}
+            }
+        }
+        private URL ownResource(String name) {return super.findResource(name);}
+        @Override public URL findResource(String name) {
+            var local=ownResource(name);
+            return local!=null || libraries==null?local:libraries.findResource(name);
+        }
+        @Override public Enumeration<URL> findResources(String name)throws IOException {
+            var urls=new LinkedHashSet<>(Collections.list(super.findResources(name)));
+            if(libraries!=null)urls.addAll(Collections.list(libraries.findResources(name)));
+            return Collections.enumeration(urls);
         }
         @Override protected Class<?> findClass(String name) throws ClassNotFoundException {
             byte[] data=platformClasses.get(name);
@@ -183,6 +215,16 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
             }
         }
         void link(Map<String, Loader> available) {
+            if (!file.description().getLibraries().isEmpty()) {
+                var resolver=new org.bukkit.plugin.java.LibraryLoader(Host.LOG);
+                try {
+                    var field=java.lang.invoke.MethodHandles.privateLookupIn(resolver.getClass(),java.lang.invoke.MethodHandles.lookup())
+                        .findVarHandle(resolver.getClass(),"repository",org.eclipse.aether.RepositorySystem.class);
+                    var system=(org.eclipse.aether.RepositorySystem)field.get(resolver);
+                    try { libraries=(URLClassLoader)resolver.createLoader(file.description()); }
+                    finally {system.shutdown();}
+                } catch (ReflectiveOperationException e){throw new IllegalStateException("Paper library resolver contract",e);}
+            }
             var seen = new LinkedHashSet<Loader>();
             var queue = new ArrayDeque<Loader>();
             seen.add(this);
@@ -199,9 +241,9 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
         }
         @Override
         protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-            return loadVisible(name, resolve, true);
+            return loadVisible(name, resolve, true, true);
         }
-        private Class<?> loadVisible(String name, boolean resolve, boolean imports)
+        private Class<?> loadVisible(String name, boolean resolve, boolean imports, boolean useLibraries)
             throws ClassNotFoundException {
             try {
                 Class<?> result = super.loadClass(name, resolve);
@@ -209,10 +251,16 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
                     throw new ClassNotFoundException(name);
                 return result;
             } catch (ClassNotFoundException missing) {
+                if (useLibraries && libraries!=null)
+                    try {return libraries.loadClass(name);} catch (ClassNotFoundException absent) { /* Try exported plugin types next. */ }
                 if (imports) {
                     String path = name.replace('.', '/') + ".class";
-                    for (var owner : dependencies) {
-                        if (owner.findResource(path) != null)
+                    var candidates=new LinkedHashSet<>(dependencies);
+                    // Classic Bukkit exports plugin API types to legacy plugins with undeclared soft dependencies.
+                    if(!file.paper()) candidates.addAll(host.loaders.values());
+                    candidates.remove(this);
+                    for (var owner : candidates) {
+                        if (owner.ownResource(path) != null)
                             return owner.local(name, resolve);
                     }
                 }
@@ -232,7 +280,7 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
         @Override
         public Class<?> loadClass(String name, boolean resolve, boolean global, boolean libraries)
             throws ClassNotFoundException {
-            return loadVisible(name, resolve, global);
+            return loadVisible(name, resolve, global, libraries);
         }
         @Override
         public PluginMeta getConfiguration() {

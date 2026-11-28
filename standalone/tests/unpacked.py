@@ -137,6 +137,14 @@ def run(options):
         installed_api=digest(api_game/"mods"/fabric_name,"sha512")
         if installed_api!=json.loads((extracted/"standalone/beta-gameplay.json").read_bytes())["fabricApi"]["sha512"]:raise AssertionError("Packaged full API install differs")
         worldedit=getattr(options,"worldedit_jar",None)
+        if version=="0.2.9-Beta":
+            transfer_source=options.neo_source
+            transfer_binary=options.world_refs/"neo.jar"
+            rebuilt_transfer=extracted/"neo-transfer-rebuilt.jar"
+            subprocess.run([sys.executable,"standalone/adapters/neo-transfer/build.py",transfer_binary.resolve(),transfer_source.resolve(),rebuilt_transfer],cwd=extracted,check=True)
+            distributed=extracted/"standalone/lib/unity-neo-transfer-26.2.0.93.jar"
+            if digest(rebuilt_transfer)!=digest(distributed):raise AssertionError("NeoForge transfer API extraction differs")
+            adapter_hashes[distributed.name]=digest(rebuilt_transfer)
         we_hash=None
         if worldedit is not None:
             provider=extracted/"worldedit-rebuilt.jar"
@@ -160,6 +168,7 @@ if __name__ == "__main__":
     for name in ("bundle","eula-from","client-home"):
         parser.add_argument("--"+name,required=True,type=Path)
     parser.add_argument("--version",default="0.2.5-Beta")
+    parser.add_argument("--neo-source",type=Path)
     parser.add_argument("--worldedit-jar",type=Path)
     parser.add_argument("--archive",type=Path,help="Exact delivered ZIP or packaging candidate to verify")
     parser.add_argument("--fabric-refs",required=True,type=Path)

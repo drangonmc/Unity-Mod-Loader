@@ -139,7 +139,8 @@ public final class Content {
     }
     public static void attach(String owner, ResourceKey<?> type, Consumer<Registry<?>> reg) {
         checkOpen();
-        if (!BuiltInRegistries.REGISTRY.containsKey(type.identifier()) && ExtraRegistries.all().stream().noneMatch(registry -> registry.key().equals(type)))
+        if (!type.isFor(BuiltInRegistries.REGISTRY.key()) ||
+            !BuiltInRegistries.REGISTRY.containsKey(type.identifier()) && ExtraRegistries.all().stream().noneMatch(registry -> registry.key().equals(type)))
             throw new IllegalArgumentException("Unsupported registry " + type);
         if (groups.stream().anyMatch(g -> g.register == reg))
             throw new IllegalStateException("Duplicate register " + owner);
@@ -158,10 +159,13 @@ public final class Content {
             net.minecraft.world.level.block.UnityBlockExperience.verifyRuntime();
             net.minecraft.world.item.UnityTabContents.verifyRuntime();
             Events.INIT.post(null);
-            for (Registry registry : registries())
+            for (Registry registry : registries()) {
+                Events.REGISTRY.post(registry);
                 for (var group : groups)
                     if (registry.key().equals(group.type))
                         group.register.accept(registry);
+            }
+            Attachments.register(PluginData.KEY);
             ExtraRegistries.freeze();
             frozen = true;
             Events.PLAY_REGISTRATION.post(null);

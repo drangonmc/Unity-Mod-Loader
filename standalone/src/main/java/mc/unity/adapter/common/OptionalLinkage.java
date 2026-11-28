@@ -37,17 +37,29 @@ public final class OptionalLinkage {
         for(var method:node.methods) {
             for(var handler:method.tryCatchBlocks) if(missing.contains(TYPE+handler.type))throw new IOException(TYPE+handler.type);
             var code=method.instructions.toArray();
-            var sites=new LinkedHashMap<String,BitSet>();
-            for(int i=0;i<code.length;i++)
-                for(String reason:references(code[i],missing))
-                    sites.computeIfAbsent(reason,k->new BitSet()).set(i);
-            if(sites.isEmpty())continue;
-            var positions=new IdentityHashMap<AbstractInsnNode,Integer>();
-            for(int i=0;i<code.length;i++)positions.put(code[i],i);
-            for(var site:sites.entrySet()) {
-                if(!canReturnWithout(code,positions,site.getValue()))throw new IOException(site.getKey());
-                found.add(site.getKey());
+            var sites = new BitSet(code.length);
+            var reasons = new LinkedHashSet<String>();
+            for (int i=0;i<code.length;i++) {
+                if (code[i] instanceof FrameNode frame) {
+                    for (var values : Arrays.asList(frame.local,frame.stack)) if (values != null)
+                        for (var value : values) if (value instanceof String name) {
+                            var types = new HashSet<String>();
+                            types.add(TYPE + name);
+                            descriptor(types,name);
+                            types.retainAll(missing);
+                            if (!types.isEmpty()) throw new IOException("Unsupported verification frame in " +
+                                node.name + "." + method.name + ": " + String.join(", ", types));
+                        }
+                }
+                var uses = references(code[i],missing);
+                if (!uses.isEmpty()) { sites.set(i); reasons.addAll(uses); }
             }
+            if (sites.isEmpty()) continue;
+            var positions = new IdentityHashMap<AbstractInsnNode,Integer>();
+            for (int i=0;i<code.length;i++) positions.put(code[i],i);
+            if (!canReturnWithout(code,positions,sites))
+                throw new IOException(node.name+"."+method.name+" has no normal return without "+String.join(", ",reasons));
+            found.addAll(reasons);
         }
         if(!found.containsAll(missing)) {missing.removeAll(found);throw new IOException(missing.iterator().next());}
         plans.put(new Key(jar,node.name), Set.copyOf(found));
@@ -82,10 +94,6 @@ public final class OptionalLinkage {
         if(ins instanceof MultiANewArrayInsnNode t)descriptor(refs,t.desc);
         if(ins instanceof LdcInsnNode l)constant(refs,l.cst);
         if(ins instanceof InvokeDynamicInsnNode d){descriptor(refs,d.desc);constant(refs,d.bsm);for(var v:d.bsmArgs)constant(refs,v);}
-        if(ins instanceof FrameNode f) {
-            for(var list:Arrays.asList(f.local,f.stack)) if(list!=null)for(var v:list)if(v instanceof String s && missing.contains(TYPE+s))
-                throw new IllegalStateException("Unresolved verification frame: "+s);
-        }
         refs.retainAll(missing);
         return refs;
     }

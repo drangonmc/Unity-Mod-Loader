@@ -24,13 +24,17 @@ final class MenuProbe {
             player.getInventory().setSelectedSlot(request.get("handSlot").getAsInt());
             BlockPos pos = new BlockPos(
                 request.get("x").getAsInt(), request.get("y").getAsInt(), request.get("z").getAsInt());
-            var aim = Vec3.atCenterOf(pos);
-            player.lookAt(EntityAnchorArgument.Anchor.EYES, aim);
-            var hit = mc.level.clip(new ClipContext(
-                player.getEyePosition(), aim, ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
-            if (hit.getType() != HitResult.Type.BLOCK || !hit.getBlockPos().equals(pos)
-                || !player.isWithinBlockInteractionRange(pos, 0))
-                throw new IllegalStateException("Container is not reachable: " + pos);
+            var eye=player.getEyePosition();
+            BlockHitResult hit=null;
+            var state=mc.level.getBlockState(pos);
+            for(var box:state.getShape(mc.level,pos).toAabbs()) {
+                Vec3 aim=box.move(pos).getCenter();
+                var ray=mc.level.clip(new ClipContext(eye,aim,ClipContext.Block.OUTLINE,ClipContext.Fluid.NONE,player));
+                if(ray.getType()==HitResult.Type.BLOCK && ray.getBlockPos().equals(pos) && player.isWithinBlockInteractionRange(pos,0)){
+                    hit=ray;player.lookAt(EntityAnchorArgument.Anchor.EYES,aim);break;
+                }
+            }
+            if(hit==null)throw new IllegalStateException("Container is not reachable: "+pos);
             mc.gameMode.useItemOn(player, InteractionHand.MAIN_HAND, hit);
             player.swing(InteractionHand.MAIN_HAND);
         }
@@ -50,6 +54,10 @@ final class MenuProbe {
             throw new IllegalStateException("Menu identity changed");
         out.addProperty("menu", BuiltInRegistries.MENU.getKey(menu.getType()).toString());
         out.addProperty("screen", screen.getClass().getName());
+        if (menu.getClass().getName().equals("com.guilei12.dronemod.gui.ChargeStationMenu")) {
+            try {out.addProperty("energy",(int)menu.getClass().getMethod("getEnergyStored").invoke(menu));}
+            catch(ReflectiveOperationException e){throw new IllegalStateException("Charge station GUI energy",e);}
+        }
         out.addProperty("containerId", menu.containerId);
         out.addProperty("stateId", menu.getStateId());
         if (menu.getClass().getName().equals(

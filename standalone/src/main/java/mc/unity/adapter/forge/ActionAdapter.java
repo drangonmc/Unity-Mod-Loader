@@ -49,7 +49,7 @@ public final class ActionAdapter implements Actions.Adapter {
                 var e = new BreakEvent(
                     a.level, a.pos, a.state, a.player, a.initiallyDenied ? Result.DENY : Result.DEFAULT);
                 a.cancelled = post(a,BreakEvent.BUS,e) || e.getResult().isDenied();
-                a.experience = e.experienceOverride();
+                if (e.experienceOverride() != null) a.experience = e.experienceOverride();
             }
             case LEFT_BLOCK -> {
                 var e = new LeftClickBlock(a.player, a.pos, a.face, LeftClickBlock.Action.valueOf(a.phase));

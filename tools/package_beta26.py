@@ -16,7 +16,7 @@ import acceptance
 import unpacked
 from acceptance import digest
 
-VERSION = "0.2.6-Beta"
+VERSION = "0.2.9-Beta"
 
 def validated(options, version=VERSION, alternate=False):
     reports = {}
@@ -82,13 +82,16 @@ def main(o):
     version=getattr(o,"version",VERSION)
     number=version.split("-")[0]
     jars=[f"unity-loader-{version}.jar","unity-world-marker.jar","unity-client-witness.jar","UnityEditRegions.jar"]
-    reports=validated(o, version)
+    if version=="0.2.9-Beta":
+        from validate_beta29 import validate
+        reports=validate(ROOT,o,digest)
+    else:reports=validated(o, version)
     evidence=ROOT/"evidence"/version
     stage=ROOT/".work"/version/"distribution"
     stage.mkdir(parents=True,exist_ok=True)
     evidence.mkdir(parents=True,exist_ok=True)
     target=ROOT/"versions"/version
-    archive=stage/f"Unity-{version}-MC26.2-Standalone.zip"
+    archive=stage/(f"Unity-{version}-rebuild.1-MC26.2-Standalone.zip" if version=="0.2.9-Beta" else f"Unity-{version}-MC26.2-Standalone.zip")
     more={}
     if version=="0.2.8-Beta":
         validated(o,version,True)
@@ -100,6 +103,14 @@ def main(o):
         more["contracts/contracts.log"]=o.contract_result.parent/"contracts.log"
         for n,src in more.items():
             dest=evidence/n;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dest)
+    if version=="0.2.9-Beta":
+        more["contracts/result.json"]=o.contract_result
+        more["contracts/contracts.log"]=o.contract_result.parent/"contracts.log"
+        more["lifecycle/lifecycle.json"]=evidence/"lifecycle/lifecycle.json"
+        for n,src in more.items():
+            dst=evidence/n
+            if src.resolve()!=dst.resolve():
+                dst.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dst)
     verified={"minecraft":"26.2","version":version,
               "artifacts":{n:digest(o.dist/n) for n in jars},
               "reports":{h:digest(o.runs/h/"result.json") for h in reports}}
@@ -116,10 +127,11 @@ def main(o):
             excerpts.append("[" + name + "]")
             for raw in (o.runs/host/name).read_text("utf8",errors="replace").splitlines():
                 line = re.sub(r"\x1b\[[0-9;]*m","",raw)
+                if any(word in line.lower() for word in ("cookie header","authorization:","access_token=")):continue
                 if any(s in line for s in ("Operation completed", "available edits", "clipboard has been pasted",
                           "has the following block data:", "REGION_CHEST_INTACT", "UNITY_NEO26_TICKS_OK",
                           "has the following entity data:", "BLOCK_OK_gold_block", "BLOCK_OK_smooth_stone",
-                          "UNITY28_", "[Server] NO_ITEM_DROP","[Server] NORMAL_ITEM_DROP","[Server] VANILLA_XP","UNITY_NEO27_FUEL_OK", "[Server] MACHINE_FUEL", "[Server] CUSTOM_FUEL_COOKED",
+                          "UNITY29 ", "UNITY29_PIPE_READY","[Server] FLUID_MOVED","[Server] ENERGY_MOVED","[Server] ITEM_MOVED","UNITY28_", "[Server] NO_ITEM_DROP","[Server] NORMAL_ITEM_DROP","[Server] VANILLA_XP","UNITY_NEO27_FUEL_OK", "[Server] MACHINE_FUEL", "[Server] CUSTOM_FUEL_COOKED",
                           "[Server] FURNACE_COOKED", "[Server] HOPPER_OUTPUT", "[Server] HOPPER_FILTER", "[Server] HOPPER_REJECTED")):
                     excerpts.append(line)
         (out/"observations.txt").write_text("\n".join(excerpts)+"\n","utf8")
@@ -132,6 +144,8 @@ def main(o):
         files[n]=(ROOT/n).read_bytes()
     for n in ("Install-Unity-Client.cmd","Start-Unity.cmd"):
         files[n]=re.sub(rb"0\.2\.\d+-Beta",version.encode(),(ROOT/n).read_bytes())
+    if version=="0.2.9-Beta":
+        for n in ("tools/validate_beta29.py","tools/bukkit-library-resolver.lock.json"):files[n]=(ROOT/n).read_bytes()
     for base in ("standalone","src/plugin"):
         for f in sorted((ROOT/base).rglob("*")):
             if not f.is_file() or any(p.startswith(".") or p=="__pycache__" for p in f.relative_to(ROOT).parts):continue
@@ -149,7 +163,7 @@ def main(o):
     unpacked.EVIDENCE=acceptance.EVIDENCE=evidence
     unpacked.run(SimpleNamespace(version=version,archive=archive,bundle=o.cache/"mojang-server-26.2.jar",
         client_home=o.cache/"client-home",eula_from=o.eula,samples=o.cache/"samples",adapter_refs=o.adapter_refs,
-        world_refs=o.world_refs,fabric_refs=o.adapter_refs,worldedit_jar=o.worldedit))
+        world_refs=o.world_refs,fabric_refs=o.adapter_refs,worldedit_jar=o.worldedit,neo_source=o.neo_source))
     check=json.loads((evidence/"unpacked.json").read_bytes())
     assert check["archiveSHA256"]==digest(archive) and check["byteIdenticalRebuild"]==verified["artifacts"]
     target.mkdir(parents=True,exist_ok=True)
@@ -161,7 +175,8 @@ def main(o):
     print("Verified",delivered,digest(delivered))
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
-    parser.add_argument("--version",choices=("0.2.6-Beta","0.2.7-Beta","0.2.8-Beta"),default=VERSION)
+    parser.add_argument("--version",choices=("0.2.6-Beta","0.2.7-Beta","0.2.8-Beta","0.2.9-Beta"),default=VERSION)
+    parser.add_argument("--neo-source",type=lambda s:Path(s).resolve())
     parser.add_argument("--variant-runs",type=lambda s:Path(s).resolve())
     parser.add_argument("--contract-result",type=lambda s:Path(s).resolve())
     for k in ("runs","dist","cache","eula","adapter-refs","world-refs","worldedit"):

@@ -44,7 +44,11 @@ final class BukkitViews {
         UUID id = entity.getUUID();
         String key = (String)args[0];
         if (method.equals("setMetadata")) {
-            metadata.computeIfAbsent(id, ignored -> new EntityMetadata(entity)).setMetadata(id,key,(org.bukkit.metadata.MetadataValue)args[1]);
+            metadata.compute(id,(ignored,previous)->{
+                var store = previous == null || previous.owner.get() != entity && !previous.player ? new EntityMetadata(entity) : previous;
+                store.setMetadata(id,key,(org.bukkit.metadata.MetadataValue)args[1]);
+                return store;
+            });
             return null;
         }
         var store = metadata.get(id);
@@ -60,7 +64,13 @@ final class BukkitViews {
         var store=metadata.get(entity.getUUID());
         if(store!=null && store.owner.get()==entity) metadata.remove(entity.getUUID(),store);
     }
-    void forget(UUID player) { metadata.remove(player); }
+    synchronized void forget(UUID player) {
+        metadata.remove(player);displayNames.remove(player);compassTargets.remove(player);
+        var removed=playerViews.remove(player);
+        if(removed instanceof org.bukkit.craftbukkit.entity.CraftHumanEntity human)human.clearSessionPermissions();
+        var base=playerPermissions.remove(player);
+        if(base!=null)base.clearPermissions();
+    }
     void forget(ServerLevel world) {
         worlds.remove(world);
         metadata.entrySet().removeIf(entry -> {
@@ -68,6 +78,9 @@ final class BukkitViews {
             return !entry.getValue().player && (entity == null || entity.level()==world);
         });
     }
+    private final Map<UUID,net.kyori.adventure.text.Component> displayNames=new java.util.concurrent.ConcurrentHashMap<>();
+    private final Map<UUID,net.minecraft.world.level.storage.LevelData.RespawnData> compassTargets=new java.util.concurrent.ConcurrentHashMap<>();
+    private final FlightAbilities flight=new FlightAbilities();
     final PluginHelp help;
     final PluginTasks tasks = new PluginTasks();
     private final Map<String, Permission> permissions = new HashMap<>();
@@ -77,7 +90,10 @@ final class BukkitViews {
     private final org.bukkit.plugin.messaging.StandardMessenger messenger = new org.bukkit.plugin.messaging.StandardMessenger();
     void bindCommands(Server server) {
         commandMap=new SimpleCommandMap(server,host.commands);
-        manager=new SessionPluginManager(commandMap,manager);
+        var facade = new SimplePluginManager(server,commandMap);
+        var session = new SessionPluginManager(commandMap,manager,facade);
+        facade.paperPluginManager = session;
+        manager=facade;
     }
     private final BukkitScheduler scheduler;
     BukkitViews(Host host) {
@@ -109,11 +125,14 @@ final class BukkitViews {
             throw new IllegalArgumentException(input, e);
         }
     }
+    private final UnsafeValues legacy = LegacyValues.create();
     Server server() {
         return Views.of(Server.class, "Unity", (m, a) -> switch (m) {
             case "getName" -> "Unity";
+            case "getUnsafe" -> legacy;
+            case "isStopping" -> !host.game.isRunning();
             case "createBlockData" -> createBlockData(a);
-            case "getVersion" -> "Unity 0.2.8-Beta (MC: 26.2)";
+            case "getVersion" -> "Unity 0.2.9-Beta (MC: 26.2)";
             case "getBukkitVersion" -> "26.2-R0.1-SNAPSHOT";
             case "getMinecraftVersion" -> "26.2";
             case "getLogger" -> Host.LOG;
@@ -122,6 +141,17 @@ final class BukkitViews {
             case "getCommandMap" -> commandMap;
             case "getTags" -> tags(a[0].toString(),(Class<?>)a[1],null);
             case "getTag" -> tags(a[0].toString(),(Class<?>)a[2],(NamespacedKey)a[1]).stream().findFirst().orElse(null);
+            case "createInventory" -> {
+                int slots=a[1] instanceof Integer n ? n :
+                    a[1]==org.bukkit.event.inventory.InventoryType.CHEST ? 27 : -1;
+                if(slots<0)throw Views.unsupported("createInventory",String.valueOf(a[1]));
+                var title=a.length<3?net.minecraft.network.chat.Component.translatable("container.chest"):
+                    a[2] instanceof net.kyori.adventure.text.Component text ?
+                    net.minecraft.network.chat.ComponentSerialization.CODEC.parse(host.game.registryAccess().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE),
+                        net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().serializeToTree(text)).getOrThrow()
+                    :StackMeta.fromLegacy((String)a[2]);
+                yield PluginChest.create(host,(org.bukkit.inventory.InventoryHolder)a[0],slots,title);
+            }
             case "getServicesManager" -> services;
             case "getMessenger" -> messenger;
             case "getScheduler" -> scheduler;
@@ -147,6 +177,7 @@ final class BukkitViews {
             case "getSpawnRadius" -> host.game instanceof net.minecraft.server.dedicated.DedicatedServer server ? server.getProperties().spawnProtection.get() : 0;
             case "getMaxPlayers" -> host.game.getMaxPlayers();
             case "getPort" -> host.game.getPort();
+            case "getOfflinePlayer" -> OfflineViews.find(host,a[0]);
             case "getOnlineMode" -> host.game.usesAuthentication();
             case "isPrimaryThread" -> host.game.isSameThread();
             case "getCurrentTick" -> host.game.getTickCount();
@@ -238,7 +269,7 @@ final class BukkitViews {
     }
     void permissions(Plugin plugin) {
         for (var p : plugin.getDescription().getPermissions())
-            permissions.putIfAbsent(p.getName().toLowerCase(Locale.ROOT), p);
+            if(manager.getPermission(p.getName())==null) manager.addPermission(p);
     }
     CommandSender sender(CommandSourceStack src) {
         if (src.getEntity() instanceof ServerPlayer p)
@@ -286,6 +317,7 @@ final class BukkitViews {
             }
             case "getVelocity" -> { var v=raw.getDeltaMovement(); yield new org.bukkit.util.Vector(v.x,v.y,v.z); }
             case "setVelocity" -> { var v=(org.bukkit.util.Vector)a[0];v.checkFinite();raw.setDeltaMovement(v.getX(),v.getY(),v.getZ());raw.hurtMarked=true;yield null; }
+            case "getPersistentDataContainer" -> PersistentTags.entity(raw);
             case "hasMetadata", "getMetadata", "setMetadata", "removeMetadata" -> metadata(raw,m,a);
             case "getEntityId" -> raw.getId();
             case "getUniqueId" -> raw.getUUID();
@@ -302,38 +334,64 @@ final class BukkitViews {
             default -> throw Views.unsupported("Entity", m);
         });
     }
-    private final Map<net.minecraft.server.network.ServerGamePacketListenerImpl,java.lang.ref.WeakReference<Player>> playerViews=new WeakHashMap<>();
+    private final Map<UUID,Player> playerViews=new HashMap<>();
     synchronized Player player(ServerPlayer p) {
-        // Respawn replaces the ServerPlayer on the existing play connection. A later login has its own connection.
-        var connection = p.connection;
-        if(connection!=null){
-            var ref=playerViews.get(connection);
-            var cached=ref==null ? null : ref.get();
-            if(cached!=null)return cached;
-        }
-        java.util.function.Supplier<ServerPlayer> handle=connection==null ? ()->p : connection::getPlayer;
+        var cached=playerViews.get(p.getUUID());
+        if(cached instanceof org.bukkit.craftbukkit.entity.CraftHumanEntity human && human.getHandle()==p)return cached;
+        java.util.function.Supplier<ServerPlayer> handle=()->p.connection==null?p:p.connection.getPlayer();
         var view=Views.of(Player.class, p.getGameProfile().name(), p.getUUID(), (method, args) -> {
             var current=handle.get();
             return senderCall(current.createCommandSourceStack(), current, method, args);
         });
-        if(connection!=null)playerViews.put(connection,new java.lang.ref.WeakReference<>(view));
+        view=org.bukkit.craftbukkit.entity.CraftHumanEntity.create(view,p);
+        playerViews.put(p.getUUID(),view);
         return view;
+    }
+    private final Map<UUID,org.bukkit.permissions.PermissibleBase> playerPermissions=new HashMap<>();
+    private org.bukkit.permissions.PermissibleBase consolePermissions;
+    private synchronized org.bukkit.permissions.PermissibleBase permissible(CommandSourceStack src,ServerPlayer p) {
+        if(p!=null)return playerPermissions.computeIfAbsent(p.getUUID(),ignored->new org.bukkit.permissions.PermissibleBase(player(p)));
+        if(consolePermissions==null)consolePermissions=new org.bukkit.permissions.PermissibleBase(sender(src));
+        return consolePermissions;
     }
     private Object senderCall(CommandSourceStack src, ServerPlayer p, String m, Object[] a) {
         boolean op = src.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
         return switch (m) {
-            case "getName", "getDisplayName" -> p == null ? "CONSOLE" : p.getGameProfile().name();
+            case "getName" -> p == null ? "CONSOLE" : p.getGameProfile().name();
+            case "getDisplayName" -> p==null ? "CONSOLE" : net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().serialize(
+                displayNames.getOrDefault(p.getUUID(),net.kyori.adventure.text.Component.text(p.getGameProfile().name())));
+            case "displayName" -> {
+                if(a.length==0)yield displayNames.getOrDefault(p.getUUID(),net.kyori.adventure.text.Component.text(p.getGameProfile().name()));
+                if(a[0]==null)displayNames.remove(p.getUUID());else displayNames.put(p.getUUID(),(net.kyori.adventure.text.Component)a[0]);
+                yield null;
+            }
+            case "setDisplayName" -> {
+                if(a[0]==null)displayNames.remove(p.getUUID());else displayNames.put(p.getUUID(),
+                    net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize((String)a[0]));
+                yield null;
+            }
+            case "updateCommands" -> {host.game.getCommands().sendCommands(p);yield null;}
+            case "getPlayer" -> p==null?null:player(p);
+
             case "getServer" -> host.server;
             case "isOp" -> op;
             case "getLocale" -> Objects.requireNonNull(p).clientInformation().language();
             case "locale" -> Locale.forLanguageTag(Objects.requireNonNull(p).clientInformation().language().replace('_', '-'));
-            case "hasPermission", "isPermissionSet" -> {
-                var perm = a[0] instanceof Permission v
-                               ? v
-                               : permissions.get(a[0].toString().toLowerCase(Locale.ROOT));
-                yield m.equals("isPermissionSet") ? perm != null
-                : perm == null                    ? op
-                                                  : perm.getDefault().getValue(op);
+            case "hasPermission","isPermissionSet","addAttachment","removeAttachment","getEffectivePermissions","recalculatePermissions" -> {
+                var perm = permissible(src,p);
+                if (m.equals("hasPermission")) yield a[0] instanceof Permission node?perm.hasPermission(node):perm.hasPermission((String)a[0]);
+                if (m.equals("isPermissionSet")) yield a[0] instanceof Permission node?perm.isPermissionSet(node):perm.isPermissionSet((String)a[0]);
+                if (m.equals("getEffectivePermissions")) yield perm.getEffectivePermissions();
+                if (m.equals("recalculatePermissions")) {perm.recalculatePermissions();yield null;}
+                if (m.equals("removeAttachment")) {perm.removeAttachment((org.bukkit.permissions.PermissionAttachment)a[0]);yield null;}
+                Plugin plugin=(Plugin)a[0];
+                yield switch(a.length) {
+                    case 1->perm.addAttachment(plugin);
+                    case 2->perm.addAttachment(plugin,(int)a[1]);
+                    case 3->perm.addAttachment(plugin,(String)a[1],(boolean)a[2]);
+                    case 4->perm.addAttachment(plugin,(String)a[1],(boolean)a[2],(int)a[3]);
+                    default->throw Views.unsupported("Permissible",m);
+                };
             }
             case "sendMessage", "sendPlainMessage", "sendRichMessage" -> {
                 Object message = a[a.length - 1];
@@ -373,6 +431,98 @@ final class BukkitViews {
                     p.connection.send(new net.minecraft.network.protocol.game.ClientboundLevelEventPacket(effect.getId(),
                         new net.minecraft.core.BlockPos(at.getBlockX(),at.getBlockY(),at.getBlockZ()),data,false));
                 }
+                yield null;
+            }
+            case "getPersistentDataContainer" -> PersistentTags.entity(Objects.requireNonNull(p));
+            case "setFoodLevel" -> {p.getFoodData().setFoodLevel(Math.clamp((int)a[0],0,20));yield null;}
+            case "setHealth" -> {
+                double health=(double)a[0];
+                if(!Double.isFinite(health) || health<0 || health>p.getMaxHealth())throw new IllegalArgumentException("Health exceeds player range");
+                p.setHealth((float)health);yield null;
+            }
+            case "setAllowFlight" -> {flight.set(p,true,(boolean)a[0]);yield null;}
+            case "getFlySpeed"->p.getAbilities().getFlyingSpeed()*2.0f;
+            case "getWalkSpeed"->p.getAbilities().getWalkingSpeed()*2.0f;
+            case "setWalkSpeed","setFlySpeed"->{
+                float speed=(float)a[0];
+                if (!Float.isFinite(speed) || Math.abs(speed)>1)throw new IllegalArgumentException("Speed must be between -1 and 1");
+                if(m.equals("setFlySpeed"))p.getAbilities().setFlyingSpeed(speed/2);else p.getAbilities().setWalkingSpeed(speed/2);
+                p.onUpdateAbilities();yield null;
+            }
+            case "setFlying" -> {flight.set(p,false,(boolean)a[0]);yield null;}
+            case "isEmpty" -> p.getPassengers().isEmpty();
+            case "eject" -> {boolean occupied=!p.getPassengers().isEmpty();p.ejectPassengers();yield occupied;}
+            case "getVehicle" -> p.getVehicle()==null?null:entity(p.getVehicle());
+            case "getPassengers" -> p.getPassengers().stream().map(this::entity).toList();
+            case "isInsideVehicle" -> p.isPassenger();
+            case "leaveVehicle" -> {boolean riding=p.isPassenger();p.stopRiding();yield riding;}
+            case "isInWater" -> p.isInWater();
+            case "isOnGround" -> p.onGround();
+            case "getFallDistance" -> (float)p.fallDistance;
+            case "setFallDistance" -> {p.fallDistance=(float)a[0];yield null;}
+            case "updateInventory" -> {p.containerMenu.sendAllDataToRemote();yield null;}
+            case "teleportAsync" -> {
+                var snapshot=a.clone();if(snapshot[0] instanceof Location loc)snapshot[0]=loc.clone();
+                yield host.game.submit(()->(Boolean)senderCall(p.createCommandSourceStack(),p,"teleport",snapshot));
+            }
+            case "setGameMode" -> {p.setGameMode(net.minecraft.world.level.GameType.valueOf(((GameMode)a[0]).name()));yield null;}
+            case "teleport" -> {
+                if(a.length>2)throw Views.unsupported("Player","teleport flags");
+                var at=a[0] instanceof Location l ? l : ((org.bukkit.entity.Entity)a[0]).getLocation();
+                at.checkFinite();
+                var cause=a.length==2?(org.bukkit.event.player.PlayerTeleportEvent.TeleportCause)a[1]:
+                    org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.PLUGIN;
+                var moved=new org.bukkit.event.player.PlayerTeleportEvent(player(p),player(p).getLocation(),at,cause);
+                host.fire(moved);
+                if(moved.isCancelled() || moved.getTo()==null)yield false;
+                at=moved.getTo();at.checkFinite();
+                var world=((NativeWorldView)Objects.requireNonNull(at.getWorld())).unityLevel();
+                yield p.teleportTo(world,at.getX(),at.getY(),at.getZ(),Set.of(),at.getYaw(),at.getPitch(),true);
+            }
+            case "kickPlayer","kick" -> {
+                var reason=a.length==0 || a[0]==null ? net.minecraft.network.chat.Component.translatable("multiplayer.disconnect.kicked")
+                    : a[0] instanceof net.kyori.adventure.text.Component text ?
+                        net.minecraft.network.chat.ComponentSerialization.CODEC.parse(p.registryAccess().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE),
+                            net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().serializeToTree(text)).getOrThrow()
+                        : net.minecraft.network.chat.Component.literal((String)a[0]);
+                p.connection.disconnect(reason);yield null;
+            }
+            case "getPlayerProfile" -> LoginProfiles.view(p.getGameProfile());
+            case "setCompassTarget" -> {
+                var to=(Location)a[0];to.checkFinite();var dest=((NativeWorldView)Objects.requireNonNull(to.getWorld())).unityLevel();
+                var data=net.minecraft.world.level.storage.LevelData.RespawnData.of(dest.dimension(),
+                    new net.minecraft.core.BlockPos(to.getBlockX(),to.getBlockY(),to.getBlockZ()),to.getYaw(),to.getPitch());
+                compassTargets.put(p.getUUID(),data);
+                p.connection.send(new net.minecraft.network.protocol.game.ClientboundSetDefaultSpawnPositionPacket(data));
+                yield null;
+            }
+            case "getCompassTarget" -> {
+                var data=compassTargets.getOrDefault(p.getUUID(),p.level().getRespawnData());
+                var dest=host.game.getLevel(data.dimension());
+                yield new Location(world(dest==null?p.level():dest),data.pos().getX(),data.pos().getY(),data.pos().getZ(),data.yaw(),data.pitch());
+            }
+            case "getRespawnLocation","getBedSpawnLocation" -> {
+                var saved=p.getRespawnConfig();
+                if(saved==null)yield null;
+                var data=saved.respawnData();var dest=host.game.getLevel(data.dimension());
+                yield dest==null?null:new Location(world(dest),data.pos().getX()+0.5,data.pos().getY(),data.pos().getZ()+0.5,data.yaw(),data.pitch());
+            }
+            case "openInventory" -> {
+                if(a[0] instanceof PluginChest chest)yield p.openMenu(chest.unityMenu()).isEmpty()?null:new MenuViews(host,p).view;
+                throw Views.unsupported("Player.openInventory","foreign inventory");
+            }
+            case "playSound" -> {
+                if(a.length<4)throw Views.unsupported("Player.playSound","adventure sound overload");
+                var at=a[0] instanceof Location l?l:((org.bukkit.entity.Entity)a[0]).getLocation();
+                if(at.getWorld()!=world(p.level()))yield null;
+                var id=net.minecraft.resources.Identifier.parse(a[1] instanceof Sound snd?snd.getKey().toString():(String)a[1]);
+                var event=net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.get(id)
+                    .map(h->(net.minecraft.core.Holder<net.minecraft.sounds.SoundEvent>)h)
+                    .orElseGet(()->net.minecraft.core.Holder.direct(net.minecraft.sounds.SoundEvent.createVariableRangeEvent(id)));
+                int offset=a[2] instanceof SoundCategory?1:0;
+                var source=offset==0?net.minecraft.sounds.SoundSource.MASTER:net.minecraft.sounds.SoundSource.valueOf(((SoundCategory)a[2]).name());
+                long seed=a.length>4+offset?(long)a[4+offset]:p.getRandom().nextLong();
+                p.connection.send(new net.minecraft.network.protocol.game.ClientboundSoundPacket(event,source,at.getX(),at.getY(),at.getZ(),(float)a[2+offset],(float)a[3+offset],seed));
                 yield null;
             }
             case "getPing" -> Objects.requireNonNull(p).connection.latency();
@@ -444,6 +594,9 @@ final class BukkitViews {
                     for(var p:l.players())if(p.distanceToSqr(at.getX(),at.getY(),at.getZ())<=(double)range*range)p.connection.send(packet);
                     yield null;
                 }
+                case "getWorldBorder"->WorldQueries.border(this,l);
+                case "getHighestBlockYAt"->WorldQueries.highest(l,a);
+                case "getSpawnLocation"->{var respawn=l.getRespawnData();var pos=respawn.pos();yield new Location(world(l),pos.getX()+.5,pos.getY(),pos.getZ()+.5,respawn.yaw(),respawn.pitch());}
                 case "getMinHeight" -> l.getMinY();
                 case "getMaxHeight" -> l.getMaxY()+1;
                 case "getSeed" -> l.getSeed();
@@ -545,11 +698,10 @@ final class BukkitViews {
         tasks.tick();
         if (++metadataTicks == 20) {
             metadataTicks = 0;
-            metadata.entrySet().removeIf(entry -> {
-                var entity = entry.getValue().owner.get();
-                if (host.game.getPlayerList().getPlayer(entry.getKey()) != null) return false;
-                return entity == null || entity.isRemoved();
-            });
+            metadata.keySet().forEach(id -> metadata.computeIfPresent(id,(ignored,store) -> {
+                var entity = store.owner.get();
+                return (entity == null || entity.isRemoved()) && host.game.getPlayerList().getPlayer(id) == null ? null : store;
+            }));
         }
     }
 }

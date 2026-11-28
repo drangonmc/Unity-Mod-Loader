@@ -25,15 +25,49 @@ public final class JarContract {
                                   cp instanceof FieldRefEntry,new HashSet<>()))
                     throw new IOException(jar.getName()+" lacks "+owner+"."+ref.name().stringValue()+ref.type().stringValue());
             }
-            for (var face:client.interfaces()) if(matches(face.asInternalName(),namespaces)) {
-                for(var method:check.required(face.asInternalName()).methods()) {
-                    if (method.flags().has(java.lang.reflect.AccessFlag.ABSTRACT) &&
-                            client.methods().stream().noneMatch(m->m.methodName().equalsString(method.methodName().stringValue()) &&
-                            m.methodType().equalsString(method.methodType().stringValue())))
-                        throw new IOException("Adapter "+client.thisClass().asInternalName()+" lacks "+method.methodName()+method.methodType());
+            if (client.flags().has(java.lang.reflect.AccessFlag.ABSTRACT)) continue;
+            var faces = new LinkedHashMap<String,ClassModel>();
+            for (var parent = client; parent != null;) {
+                for (var face : parent.interfaces()) check.interfaces(face.asInternalName(), faces);
+                parent = parent.superclass().isPresent() ? check.model(parent.superclass().get().asInternalName()) : null;
+            }
+            var obligations=new LinkedHashMap<String,ClassModel>();
+            for(var name:faces.keySet()) if(matches(name,namespaces)) check.interfaces(name,obligations);
+            for (var face : obligations.values()) {
+                for (var method : face.methods()) {
+                    if (!method.flags().has(java.lang.reflect.AccessFlag.ABSTRACT)) continue;
+                    String name=method.methodName().stringValue(), desc=method.methodType().stringValue();
+                    if (!check.implemented(client,faces,name,desc))
+                        throw new IOException("Adapter "+client.thisClass().asInternalName()+" lacks "+face.thisClass().asInternalName()+"."+name+desc);
                 }
             }
         }
+    }
+    private void interfaces(String name,Map<String,ClassModel> result) throws IOException {
+        if (result.containsKey(name)) return;
+        var face=model(name);
+        if (face==null) return;
+        result.put(name,face);
+        for(var parent:face.interfaces()) interfaces(parent.asInternalName(),result);
+    }
+    private boolean implemented(ClassModel concrete,Map<String,ClassModel> faces,String name,String desc) throws IOException {
+        for (var cls=concrete;cls!=null;cls=cls.superclass().isPresent()?model(cls.superclass().get().asInternalName()):null) {
+            for (var m:cls.methods()) if (m.methodName().equalsString(name) && m.methodType().equalsString(desc))
+                return m.flags().has(java.lang.reflect.AccessFlag.PUBLIC) && !m.flags().has(java.lang.reflect.AccessFlag.ABSTRACT)
+                        && !m.flags().has(java.lang.reflect.AccessFlag.STATIC);
+        }
+        var declarations=new HashMap<String,Boolean>();
+        for (var face:faces.values()) for (var m:face.methods())
+            if (m.methodName().equalsString(name) && m.methodType().equalsString(desc) &&
+                    !m.flags().has(java.lang.reflect.AccessFlag.PRIVATE) && !m.flags().has(java.lang.reflect.AccessFlag.STATIC))
+                declarations.put(face.thisClass().asInternalName(), !m.flags().has(java.lang.reflect.AccessFlag.ABSTRACT));
+        var maximal=new HashMap<>(declarations);
+        for (var key:declarations.keySet()) {
+            var supers=new HashMap<String,ClassModel>();
+            for(var parent:faces.get(key).interfaces()) interfaces(parent.asInternalName(),supers);
+            supers.keySet().forEach(maximal::remove);
+        }
+        return maximal.values().stream().filter(Boolean::booleanValue).count()==1;
     }
     private static boolean matches(String name,String[] prefixes) {
         for(var prefix:prefixes) if(name.startsWith(prefix)) return true;

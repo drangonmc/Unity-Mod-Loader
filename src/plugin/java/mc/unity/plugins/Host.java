@@ -68,7 +68,7 @@ public final class Host implements PluginHost {
         try {
             Thread.currentThread().setContextClassLoader(getClass().getClassLoader());
             views = new BukkitViews(this);
-            server = views.server();
+            server = ServerFacade.create(views.server(),game);
             detachGameplay = mc.unity.core.Actions.attachScoped(new GameplayEvents(this));
             Bukkit.setServer(server);
             views.bindCommands(server);
@@ -439,6 +439,20 @@ public final class Host implements PluginHost {
     }
     @Override
     public void entityUntracked(net.minecraft.world.entity.Entity e) { if (views!=null) views.forget(e); }
+    @Override public net.minecraft.network.chat.Component preLogin(com.mojang.authlib.GameProfile profile,java.net.InetAddress address) {
+        if (org.bukkit.event.player.AsyncPlayerPreLoginEvent.getHandlerList().getRegisteredListeners().length==0)return null;
+        var event=new org.bukkit.event.player.AsyncPlayerPreLoginEvent(profile.name(),address,profile.id(),false,LoginProfiles.view(profile));
+        fire(event);
+        return event.getLoginResult()==org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result.ALLOWED?null:net.minecraft.network.chat.Component.literal(event.getKickMessage());
+    }
+    @Override public net.minecraft.network.chat.Component login(ServerPlayer raw,java.net.InetAddress address){
+        if (org.bukkit.event.player.PlayerLoginEvent.getHandlerList().getRegisteredListeners().length==0)return null;
+        var event=new org.bukkit.event.player.PlayerLoginEvent(views.player(raw),"",address);
+        fire(event);
+        if(event.getResult()==org.bukkit.event.player.PlayerLoginEvent.Result.ALLOWED)return null;
+        views.forget(raw.getUUID());
+        return net.minecraft.network.chat.Component.literal(event.getKickMessage());
+    }
     @Override
     public void worldEvent(ServerLevel level, boolean load) {
         if (views == null) return;

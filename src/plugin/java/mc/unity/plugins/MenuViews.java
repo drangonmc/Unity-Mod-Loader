@@ -80,6 +80,14 @@ final class MenuViews {
             case "getType" -> upper ? type : InventoryType.PLAYER;
             case "getSize" -> upper ? upperSlots.size() : player.getInventory().getContainerSize();
             case "getHolder" -> upper ? null : owner;
+            case "getViewers" -> {
+                if(!upper)yield List.of(owner);
+                var containers=Collections.newSetFromMap(new IdentityHashMap<net.minecraft.world.Container,Boolean>());
+                upperSlots.forEach(slot->containers.add(slot.container));
+                yield player.level().getServer().getPlayerList().getPlayers().stream()
+                    .filter(viewer->viewer.containerMenu!=viewer.inventoryMenu && viewer.containerMenu.slots.stream().anyMatch(s->containers.contains(s.container)))
+                    .map(viewer->Host.active().views.player(viewer)).toList();
+            }
             case "getItem" -> a[0] instanceof org.bukkit.inventory.EquipmentSlot slot ?
                 playerItem(player.getItemBySlot(equipment(slot))) :
                 upper ? ((int)a[0] >= 0 && (int)a[0] < upperSlots.size() ? slotItem(upperSlots.get((int)a[0])) : null) : playerItem(player.getInventory().getItem((int)a[0]));

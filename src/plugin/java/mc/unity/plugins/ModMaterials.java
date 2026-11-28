@@ -11,7 +11,15 @@ import org.bukkit.NamespacedKey;
 public final class ModMaterials {
     private static Map<String,Material> byKey = Map.of();
 
+    private static Material[] original;
+    public static Material[] tagValues() {
+        // Paper's predefined legacy set tags validate counts against its own release's material universe.
+        boolean builtin = StackWalker.getInstance().walk(frames -> frames.anyMatch(frame ->
+            frame.getClassName().equals("com.destroystokyo.paper.MaterialTags") && frame.getMethodName().equals("<clinit>")));
+        return builtin && original!=null ? original.clone() : Material.values();
+    }
     public static Material[] append(Material[] vanilla) {
+        original=vanilla.clone();
         var ids = new TreeSet<String>();
         for (var registry : List.of(BuiltInRegistries.BLOCK, BuiltInRegistries.ITEM))
             for (var id : registry.keySet())

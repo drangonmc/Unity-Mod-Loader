@@ -6,8 +6,11 @@ public class ModContainer {
     private final net.neoforged.neoforgespi.language.IModInfo info;
     private final java.util.Map<Class<?>,java.util.function.Supplier<?>> extensions = new java.util.concurrent.ConcurrentHashMap<>();
     public ModContainer(String id, IEventBus bus) {this(id,bus,id,"");}
-    public ModContainer(String id, IEventBus bus,String title,String summary) {
+    public ModContainer(String id, IEventBus bus,String title,String summary) {this(id,bus,title,summary,id.equals("minecraft")?"26.2":"0");}
+    public ModContainer(String id,IEventBus bus,String title,String summary,String version) {
         info=new net.neoforged.neoforgespi.language.IModInfo(){
+            private final org.apache.maven.artifact.versioning.ArtifactVersion value=new org.apache.maven.artifact.versioning.DefaultArtifactVersion(version);
+            public org.apache.maven.artifact.versioning.ArtifactVersion getVersion(){return value;}
             public String getModId(){return id;}
             public String getDisplayName(){return title;}
             public String getDescription(){return summary;}

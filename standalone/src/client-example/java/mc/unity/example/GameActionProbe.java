@@ -61,6 +61,13 @@ final class GameActionProbe {
             case "qaSelect" -> {
                 me.getInventory().setSelectedSlot(slot);
             }
+            case "qaTransferState" -> {
+                var pos=new BlockPos(req.get("x").getAsInt(),req.get("y").getAsInt(),req.get("z").getAsInt());
+                var state=mc.level.getBlockState(pos);
+                out.addProperty("state",net.minecraft.commands.arguments.blocks.BlockStateParser.serialize(state));
+                var be=mc.level.getBlockEntity(pos);
+                if(be!=null)out.addProperty("nbt",be.saveWithFullMetadata(mc.level.registryAccess()).toString());
+            }
             case "qaCommand" -> {
                 mc.getConnection().sendCommand(req.get("cmd").getAsString());
             }

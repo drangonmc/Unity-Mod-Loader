@@ -33,14 +33,18 @@ public final class BlockCapability<T, C> extends BaseCapability<T, C> {
         if (state == null)
             state = level.getBlockState(pos);
         var handlers = providers.get(state.getBlock());
-        if (handlers == null)
-            return null;
         if (be == null && state.hasBlockEntity())
             be = level.getBlockEntity(pos);
-        for (var fn : handlers) {
+        if (handlers!=null) for (var fn : handlers) {
             T result = fn.getCapability(level, pos, state, be, context);
             if (result != null)
                 return result;
+        }
+        if (this == Capabilities.Item.BLOCK && be instanceof net.minecraft.world.Container container &&
+                !be.isRemoved() && level instanceof net.minecraft.server.level.ServerLevel server && server.getServer().isSameThread()) {
+            if (container instanceof net.minecraft.world.WorldlyContainer sided && context instanceof Direction face)
+                return (T)new net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper(sided,face);
+            return (T)net.neoforged.neoforge.transfer.item.VanillaContainerWrapper.of(container);
         }
         return null;
     }

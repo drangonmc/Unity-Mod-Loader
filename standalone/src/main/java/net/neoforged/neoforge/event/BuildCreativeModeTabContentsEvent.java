@@ -4,7 +4,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.ItemLike;
-public final class BuildCreativeModeTabContentsEvent extends UnityNeoTabAccess {
+public final class BuildCreativeModeTabContentsEvent extends UnityNeoTabAccess implements net.neoforged.fml.event.IModBusEvent {
     private final Events.Tab event;
     public BuildCreativeModeTabContentsEvent(Events.Tab event) {
         this.event = event;

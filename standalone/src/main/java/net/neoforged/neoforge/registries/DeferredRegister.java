@@ -54,6 +54,7 @@ public class DeferredRegister<R> {
         entries.add(h);
         return h;
     }
+    public Collection<DeferredHolder<R,?>> getEntries(){return Collections.unmodifiableList(entries);}
     public void register(IEventBus bus) {
         if (!(bus instanceof NeoBus n) || n.owner() == null)
             throw new IllegalArgumentException("Expected mod event bus");

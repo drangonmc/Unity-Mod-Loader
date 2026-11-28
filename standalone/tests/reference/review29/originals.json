@@ -1,0 +1,74 @@
+{
+  "plugins": [
+    {
+      "project": "luckperms",
+      "version": "v5.5.71-bukkit",
+      "filename": "LuckPerms-Bukkit-5.5.71.jar",
+      "url": "https://cdn.modrinth.com/data/Vebnzrzj/versions/b0mk8uS6/LuckPerms-Bukkit-5.5.71.jar",
+      "sha512": "188a91f0a543d23bfda32385fca6db63d61e49c8a422bd452a260bd9cbc6a7d7fe45071199e9fca8f3ce43c2b41ee84fd315bd15464577028ff3951a7d4fab27"
+    },
+    {
+      "project": "vault",
+      "version": "1.7.3",
+      "filename": "Vault-1.7.3.jar",
+      "url": "https://github.com/MilkBowl/Vault/releases/download/1.7.3/Vault.jar",
+      "sha512": "aa02af3c9770249bda77b91058ce97240d4fd4cba3f07918534127acace297feb05445122b499c2623123dfde49670e9a763221e0f41ef03f51e6880ea8f6647"
+    },
+    {
+      "project": "essentialsx",
+      "version": "2.22.0",
+      "filename": "EssentialsX-2.22.0.jar",
+      "url": "https://github.com/EssentialsX/Essentials/releases/download/2.22.0/EssentialsX-2.22.0.jar",
+      "sha512": "472ecf71924801723643ca6e1f9931297de5aa0874a544f8a719e2e2f7c81af81ef7bcbd38b6e43f0260a9dae6abe42c97907e70e2430e326ff8cff12ebd61cf"
+    }
+  ],
+  "machines": [
+    {
+      "project": "iron-tanks",
+      "projectId": "qfbxKpLA",
+      "versionId": "4XinG2Jr",
+      "version": "3.3.1+mc26.2.neoforge",
+      "filename": "irontanks-3.3.1+mc26.2.neoforge.jar",
+      "url": "https://cdn.modrinth.com/data/qfbxKpLA/versions/4XinG2Jr/irontanks-3.3.1%2Bmc26.2.neoforge.jar",
+      "size": 1158246,
+      "sha512": "81e74f6b62c747949f47872acade737508d64bb794f37f5f0f47c99d8799c4f51092dd486ae8f3c56b41efd609350cc49f412ff74cc34c42df7aeca1cd11e9be",
+      "dependencies": [
+        {
+          "version_id": null,
+          "project_id": "cyW2SS1x",
+          "file_name": null,
+          "dependency_type": "optional"
+        }
+      ]
+    },
+    {
+      "project": "logistics-drones",
+      "projectId": "XxJV23AA",
+      "versionId": "OCP6gqWR",
+      "version": "1.1.0",
+      "filename": "logisticsdrones 1.1.0.jar",
+      "url": "https://cdn.modrinth.com/data/XxJV23AA/versions/OCP6gqWR/logisticsdrones%201.1.0.jar",
+      "size": 221981,
+      "sha512": "77520d45e050dbc19c951d95894618a8c1b94f01e179b55b99e4c9e58facad738175add276b17f8d0d05b59572e6d0e6495110a61ce3ab88b9fe0db02c899c03",
+      "dependencies": []
+    },
+    {
+      "project": "tiny-pipes",
+      "projectId": "mUFODDIy",
+      "versionId": "AquDZiFc",
+      "version": "26.2-7.0.1",
+      "filename": "tinypipes-26.2-7.0.1.jar",
+      "url": "https://cdn.modrinth.com/data/mUFODDIy/versions/AquDZiFc/tinypipes-26.2-7.0.1.jar",
+      "size": 290716,
+      "sha512": "20e6ff23c98b4bcb0c0d5186650cecbdd9c46a2ed444e60a6b3dd339acf67ed46c6a0c7d1010986747975b97ac69a941b73b95888e774481b66617252cf995aa",
+      "dependencies": [
+        {
+          "version_id": null,
+          "project_id": "nvQzSEkH",
+          "file_name": null,
+          "dependency_type": "optional"
+        }
+      ]
+    }
+  ]
+}

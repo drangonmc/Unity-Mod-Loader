@@ -27,6 +27,7 @@ public final class ClientHooks {
             throw failure;
         }
         ServerHooks.attachClient(mods,forge);
+        mc.unity.core.Events.PLAY_REGISTRATION.listen(ignored->mc.unity.client.MachineModels.ready());
         mc.unity.client.ClientEvents.wire();
         mc.unity.client.ClientEvents.bindNetwork();
         callbacks = mods.mods()

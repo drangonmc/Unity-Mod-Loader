@@ -51,7 +51,7 @@ public final class InternalBridge implements io.papermc.paper.InternalAPIBridge 
     @Override
     public org.bukkit.damage.DamageSource.Builder
     createDamageSourceBuilder(org.bukkit.damage.DamageType arg0) {
-        throw new UnsupportedOperationException("Paper API: createDamageSourceBuilder");
+        return new PluginDamageSource.Builder(arg0);
     }
     @Override
     public org.bukkit.damage.DamageEffect getDamageEffect(java.lang.String arg0) {

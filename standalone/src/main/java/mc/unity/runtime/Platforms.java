@@ -205,7 +205,7 @@ public final class Platforms implements AutoCloseable {
                     var meta = metadata.get(e.id());
                     session.neoContainers.put(
                         e.id(), new net.neoforged.fml.ModContainer(e.id(), new NeoBus(e.id()), meta.title(),
-                                                                   meta.description()));
+                                                                   meta.description(),e.version()));
                 }
                 boolean clientOnly=e.kind()==Entry.Kind.FORGE && FmlDescriptor.clientSideOnly(jar);
                 if(clientOnly)Content.localResources(e.id());

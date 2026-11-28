@@ -97,9 +97,10 @@ final class GameplayEvents implements Actions.Adapter {
             if (a.itemPolicy != 0)
                 event.setUseItemInHand(a.itemPolicy < 0 ? Event.Result.DENY : Event.Result.ALLOW);
             if (a.cancelled) event.setCancelled(true);
+            var initialBlock = event.useInteractedBlock();
             host.fire(event);
-            // The SDK starts block clicks at ALLOW. Preserve vanilla secondary use unless a listener denies it.
-            a.blockPolicy = event.useInteractedBlock() == Event.Result.DENY ? -1 : Math.max(0, a.blockPolicy);
+            if (event.useInteractedBlock() != initialBlock || a.cancelled)
+                a.blockPolicy = policy(event.useInteractedBlock());
             a.itemPolicy = policy(event.useItemInHand());
             a.cancelled = a.itemPolicy < 0 && (a.blockPolicy < 0 || a.kind == Actions.Kind.RIGHT_ITEM);
             if (a.cancelled) {

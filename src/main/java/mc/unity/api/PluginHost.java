@@ -7,6 +7,8 @@ import net.minecraft.server.level.ServerLevel;
 public interface PluginHost extends UnityMod, AutoCloseable {
     void tick(MinecraftServer server);
     default void entityUntracked(net.minecraft.world.entity.Entity entity) {}
+    default net.minecraft.network.chat.Component preLogin(com.mojang.authlib.GameProfile profile,java.net.InetAddress address){return null;}
+    default net.minecraft.network.chat.Component login(net.minecraft.server.level.ServerPlayer p,java.net.InetAddress address){return null;}
     void worldEvent(ServerLevel level, boolean loaded);
     void aboutToStart(MinecraftServer server);
     net.minecraft.network.chat.Component playerMessage(net.minecraft.network.chat.Component text,

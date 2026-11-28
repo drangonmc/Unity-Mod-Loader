@@ -22,7 +22,7 @@ final class StackMeta implements InvocationHandler {
         return meta != null && Proxy.isProxyClass(meta.getClass()) && Proxy.getInvocationHandler(meta) instanceof StackMeta m ? m : null;
     }
 
-    private static net.minecraft.network.chat.Component fromLegacy(String text) {
+    static net.minecraft.network.chat.Component fromLegacy(String text) {
         var rich = net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().deserialize(text);
         var json = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().serializeToTree(rich);
         return net.minecraft.network.chat.ComponentSerialization.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE,json).getOrThrow();
@@ -36,6 +36,7 @@ final class StackMeta implements InvocationHandler {
         var name = item.get(DataComponents.CUSTOM_NAME);
         var lore = item.getOrDefault(DataComponents.LORE, ItemLore.EMPTY);
         return switch (method.getName()) {
+            case "getPersistentDataContainer" -> PersistentTags.item(item);
             case "clone" -> of(item);
             case "hasDisplayName", "hasCustomName" -> name != null;
             case "getDisplayName" -> name == null ? "" : legacy(name);
@@ -45,7 +46,12 @@ final class StackMeta implements InvocationHandler {
                 yield null;
             }
             case "hasLore" -> !lore.lines().isEmpty();
-            case "getLore" -> lore.lines().isEmpty() ? null : lore.lines().stream().map(c -> c.getString()).toList();
+            case "getLore" -> lore.lines().isEmpty() ? null : lore.lines().stream().map(StackMeta::legacy).toList();
+            case "setLore" -> {
+                if(args[0]==null)item.remove(DataComponents.LORE);
+                else item.set(DataComponents.LORE, new ItemLore(((java.util.List<?>)args[0]).stream().map(x->fromLegacy((String)x)).toList()));
+                yield null;
+            }
             case "hasEnchants" -> !item.getEnchantments().isEmpty();
             case "hasDamage", "hasDamageValue" -> item.getDamageValue() > 0;
             case "getDamage" -> item.getDamageValue();

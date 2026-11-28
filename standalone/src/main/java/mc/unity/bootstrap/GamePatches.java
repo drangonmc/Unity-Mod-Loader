@@ -84,6 +84,10 @@ final class GamePatches {
         LevelPatches.add(plan);
         BukkitPatches.add(plan);
         ActionPatches.add(plan, client);
+        PluginLoginPatches.add(plan);
+        if (client) {TransferPatches.client(plan);MachineRenderPatches.add(plan); }
+        ExtendedMenus.add(plan);
+        TransferPatches.add(plan);
         NeoFuelPatches.add(plan);
         NeoBlockEntityPatches.add(plan);
         NeoDataPatches.add(plan);

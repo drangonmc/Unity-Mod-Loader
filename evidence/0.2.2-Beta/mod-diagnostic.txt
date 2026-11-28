@@ -1,6 +1,0 @@
-Unity 模组加载失败
-阶段 Mixin / net.minecraft.server.Main
-字节码转换失败。请核对以下配置所属模组与当前 MC 版本，并检查修改同一目标的其他模组。
-disableportalchecks.mixins.json → disableportalchecks-1.0.0.jar
-Mixin [disableportalchecks.mixins.json:DisablePortalChecks from mod (unknown)] from phase [DEFAULT] in config [disableportalchecks.mixins.json] FAILED during PREPARE
-@Mixin target net.minecraft.class_2424 was not found disableportalchecks.mixins.json:DisablePortalChecks from mod (unknown)

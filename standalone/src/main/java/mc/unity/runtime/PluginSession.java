@@ -18,19 +18,22 @@ final class PluginSession implements AutoCloseable {
             super("Unity Bukkit 26.2", urls, parent);
         }
         @Override protected Class<?> findClass(String name) throws ClassNotFoundException {
-            if (!name.equals("org.bukkit.Material")) return super.findClass(name);
-            var url = findResource("org/bukkit/Material.class");
+            boolean material=name.equals("org.bukkit.Material");
+            if (!material && !name.equals("com.destroystokyo.paper.MaterialSetTag"))return super.findClass(name);
+            String path=name.replace('.','/')+".class";
+            String pkg=name.substring(0,name.lastIndexOf('.'));
+            var url = super.findResource(path);
             if (url == null) throw new ClassNotFoundException(name);
             try {
                 var connection = (JarURLConnection)url.openConnection();
                 connection.setUseCaches(false);
                 try (var jar = connection.getJarFile()) {
-                    var entry = jar.getJarEntry("org/bukkit/Material.class");
+                    var entry = jar.getJarEntry(path);
                     byte[] data;
-                    try (var in = jar.getInputStream(entry)) { data = BukkitMaterialPatch.apply(in.readAllBytes(),this); }
+                    try (var in = jar.getInputStream(entry)) { data = material?BukkitMaterialPatch.apply(in.readAllBytes(),this):BukkitMaterialPatch.tagUniverse(in.readAllBytes(),this); }
                     var location = connection.getJarFileURL();
                     synchronized (this) {
-                        if (getDefinedPackage("org.bukkit") == null) definePackage("org.bukkit",jar.getManifest(),location);
+                        if (getDefinedPackage(pkg) == null) definePackage(pkg,jar.getManifest(),location);
                     }
                     return defineClass(name,data,0,data.length,new java.security.CodeSource(location,entry.getCodeSigners()));
                 }
@@ -39,7 +42,8 @@ final class PluginSession implements AutoCloseable {
         private static boolean owned(String n) {
             return n.startsWith("org.bukkit.") || n.startsWith("io.papermc.paper.") ||
                 n.startsWith("com.destroystokyo.paper.") || n.startsWith("net.kyori.") ||
-                n.startsWith("org.yaml.snakeyaml.") || n.startsWith("net.md_5.bungee.") || n.startsWith("mc.unity.plugins.");
+                n.startsWith("org.eclipse.aether.") || n.startsWith("org.apache.maven.") || n.startsWith("org.codehaus.plexus.") ||
+                n.startsWith("org.apache.http.") || n.startsWith("org.yaml.snakeyaml.") || n.startsWith("net.md_5.bungee.") || n.startsWith("mc.unity.plugins.");
         }
         @Override
         protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
@@ -53,6 +57,21 @@ final class PluginSession implements AutoCloseable {
                     resolveClass(found);
                 return found;
             }
+        }
+        private static URL sessionResource(URL source) {
+            if(source==null || !"jar".equals(source.getProtocol()))return source;
+            try {
+                return URL.of(source.toURI(),new URLStreamHandler() {
+                    protected URLConnection openConnection(URL requested) throws IOException {
+                        var conn=source.openConnection();conn.setUseCaches(false);return conn;
+                    }
+                });
+            } catch(URISyntaxException|MalformedURLException e){throw new IllegalArgumentException(source.toString(),e);}
+        }
+        @Override public URL findResource(String name){return sessionResource(super.findResource(name));}
+        @Override public Enumeration<URL> findResources(String name)throws IOException {
+            var urls=Collections.list(super.findResources(name));
+            urls.replaceAll(Domain::sessionResource);return Collections.enumeration(urls);
         }
         @Override
         public Enumeration<URL> getResources(String name) throws IOException {

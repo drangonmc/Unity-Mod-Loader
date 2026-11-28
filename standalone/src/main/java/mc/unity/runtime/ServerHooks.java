@@ -112,6 +112,35 @@ public final class ServerHooks {
         if (plugins!=null && entity.isRemoved() && !(entity instanceof net.minecraft.server.level.ServerPlayer))
             plugins.host().entityUntracked(entity);
     }
+    private static final java.util.concurrent.CompletableFuture<Component> LOGIN_ALLOWED =
+        java.util.concurrent.CompletableFuture.completedFuture(null);
+    public static java.util.concurrent.CompletableFuture<Component> beginPluginLogin(net.minecraft.network.Connection c,com.mojang.authlib.GameProfile p) {
+        var session=plugins;
+        if(session==null || !(c.getRemoteAddress() instanceof java.net.InetSocketAddress remote))return LOGIN_ALLOWED;
+        var future=new java.util.concurrent.CompletableFuture<Component>();
+        Thread.startVirtualThread(()->{
+            try{future.complete(session.host().preLogin(p,remote.getAddress()));}
+            catch(Throwable e){future.completeExceptionally(e);}
+        });
+        return future;
+    }
+    public static boolean allowPluginLogin(java.util.concurrent.CompletableFuture<Component> future,net.minecraft.network.Connection c){
+        if(!future.isDone())return false;
+        Component denial;
+        try{denial=future.join();}catch(java.util.concurrent.CompletionException e){
+            System.getLogger("mc.unity").log(System.Logger.Level.ERROR,"Plugin pre-login failed",e);
+            denial=Component.literal("Login failed during plugin verification");
+        }
+        if(denial==null)return true;
+        if(c.isConnected()){c.send(new net.minecraft.network.protocol.login.ClientboundLoginDisconnectPacket(denial));c.disconnect(denial);}
+        return false;
+    }
+    public static boolean allowPluginPlacement(net.minecraft.network.Connection c,net.minecraft.server.level.ServerPlayer p){
+        if(plugins==null || !(c.getRemoteAddress() instanceof java.net.InetSocketAddress remote))return true;
+        var denial=plugins.host().login(p,remote.getAddress());
+        if(denial==null)return true;
+        c.disconnect(denial);return false;
+    }
     public static void worldSave(net.minecraft.server.level.ServerLevel level) {
         if (plugins != null)
             plugins.host().worldSave(level);
@@ -131,7 +160,7 @@ public final class ServerHooks {
         dispatcher.register(Commands.literal("unity").executes(c -> {
             c.getSource().sendSuccess(
                 ()
-                    -> Component.literal("Unity 0.2.8-Beta standalone | MC 26.2 | native " + names() +
+                    -> Component.literal("Unity 0.2.9-Beta standalone | MC 26.2 | native " + names() +
                                          " | platform mods " + forge.ids() + " | plugins " +
                                          (plugins == null ? List.of() : plugins.host().names())),
                 false);

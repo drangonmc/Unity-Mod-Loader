@@ -9,6 +9,9 @@ import net.minecraft.server.MinecraftServer;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 public final class NeoBus implements IEventBus {
     private final String owner;
+    private static final Set<String> clientCallbacks=java.util.concurrent.ConcurrentHashMap.newKeySet();
+    public static boolean clientEvent(Class<?> type){return clientCallbacks.contains(type.getName());}
+
     private final Events.Signal<Event> handlers = new Events.Signal<>();
     private final Map<Class<?>, Runnable> bridges = new HashMap<>();
     private static final Set<NeoBus> sessions = Collections.newSetFromMap(new IdentityHashMap<>());
@@ -108,6 +111,27 @@ public final class NeoBus implements IEventBus {
                     k -> Events.SERVER_TICK_POST.listenScoped((s,t) -> post(new net.neoforged.neoforge.event.tick.ServerTickEvent.Post(t,s))));
                 supported = true;
             }
+            if (owner!=null && kind.isAssignableFrom(net.neoforged.neoforge.registries.RegisterEvent.class)) {
+                bridges.computeIfAbsent(net.neoforged.neoforge.registries.RegisterEvent.class,k->Events.REGISTRY.listen(registry->{
+                    int before=registry.size();
+                    post(net.neoforged.neoforge.registries.UnityRegistration.event(registry));
+                    if (registry.size()!=before)mc.unity.core.Content.include(owner);
+                }));supported=true;
+            }
+            if(owner==null && kind.isAssignableFrom(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent.class)){
+                bridges.computeIfAbsent(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent.class,
+                    k->Events.PLAYER_LOGIN.listen(p->post(new net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent(p))));supported=true;
+            }
+            if(owner==null && kind.isAssignableFrom(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent.class)){
+                bridges.computeIfAbsent(net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent.class,
+                    k->Events.PLAYER_LOGOUT.listen(p->post(new net.neoforged.neoforge.event.entity.player.PlayerEvent.PlayerLoggedOutEvent(p))));supported=true;
+            }
+            if(owner==null)for(var entry:Map.of(net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.LeftClickBlock.class,
+                    mc.unity.core.Actions.Kind.LEFT_BLOCK,net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickBlock.class,
+                    mc.unity.core.Actions.Kind.RIGHT_BLOCK).entrySet()){
+                if(kind.isAssignableFrom(entry.getKey())){bridges.computeIfAbsent(entry.getKey(),
+                    k->mc.unity.core.Actions.attachScoped(new MachineInteractions(this,entry.getValue())));supported=true;}
+            }
             if (owner == null && kind.isAssignableFrom(AddServerReloadListenersEvent.class)) {
                 bridges.computeIfAbsent(AddServerReloadListenersEvent.class,
                                         k -> mc.unity.core.Reloads.COLLECT.listen((byte)1, r -> {
@@ -162,6 +186,10 @@ public final class NeoBus implements IEventBus {
                     k -> Events.PLAY_REGISTRATION.listen(v -> post(new RegisterPayloadHandlersEvent())));
                 supported = true;
             }
+            if(owner==null && Set.of("net.neoforged.neoforge.client.event.ExtractBlockOutlineRenderStateEvent",
+                    "net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent").contains(kind.getName())){
+                clientCallbacks.add(kind.getName());supported=true;
+            }
             if (!supported &&
                 !(owner != null &&
                   (net.neoforged.fml.event.config.ModConfigEvent.class.isAssignableFrom(kind) ||
@@ -172,6 +200,9 @@ public final class NeoBus implements IEventBus {
                    kind.getName().equals(
                        "net.neoforged.neoforge.client.event.EntityRenderersEvent$RegisterRenderers") ||
                    kind.getName().equals("net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent") ||
+                   kind.getName().equals("net.neoforged.neoforge.client.event.RegisterPictureInPictureRenderersEvent") ||
+                   kind.getName().equals("net.neoforged.neoforge.client.event.RegisterItemModelsEvent") ||
+                   kind.getName().equals("net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent") ||
                    kind.getName().equals("net.neoforged.neoforge.client.event.RegisterMenuScreensEvent") ||
                    kind == net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent.class ||
                    kind == net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent.class ||
@@ -209,7 +240,7 @@ public final class NeoBus implements IEventBus {
                 bus.bridges.values().forEach(Runnable::run);
                 bus.bridges.clear();
             }
-            sessions.clear();
+            sessions.clear();clientCallbacks.clear();
         }
         ListenerTypes.clear();
     }

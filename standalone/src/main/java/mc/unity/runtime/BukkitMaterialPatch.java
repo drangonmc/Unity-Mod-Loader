@@ -7,6 +7,16 @@ import static java.lang.constant.ConstantDescs.*;
 
 /** Extend Material while its enum universe is being built, before Bukkit or any plugin can cache values. */
 final class BukkitMaterialPatch {
+    static byte[] tagUniverse(byte[] original,ClassLoader loader){
+        var cf=ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchyResolver.ofResourceParsing(loader)));
+        int[] hits={0};
+        var bytes=cf.transformClass(cf.parse(original),ClassTransform.transformingMethodBodies(m->true,(c,e)->{
+            if(e instanceof java.lang.classfile.instruction.InvokeInstruction call && call.owner().asInternalName().equals("org/bukkit/Material")
+                    && call.name().equalsString("values")) {hits[0]++;c.invokestatic(ClassDesc.of("mc.unity.plugins.ModMaterials"),"tagValues",call.typeSymbol());}
+            else c.with(e);
+        }));
+        if(hits[0]!=3)throw new IllegalStateException("Unexpected MaterialSetTag universe");return bytes;
+    }
     static byte[] apply(byte[] original, ClassLoader loader) {
         ClassDesc material = ClassDesc.of("org.bukkit.Material");
         ClassDesc key = ClassDesc.of("org.bukkit.NamespacedKey");

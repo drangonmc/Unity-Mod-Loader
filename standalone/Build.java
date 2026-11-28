@@ -8,7 +8,7 @@ import javax.tools.ToolProvider;
 
 /** JDK-only source build. Arguments: project directory, original 26.2 Mojang server bundle. */
 class Build {
-    static final String VERSION = "0.2.8-Beta";
+    static final String VERSION = "0.2.9-Beta";
     public static void main(String[] args) throws Exception {
         if (args.length < 2 || args.length > 3)
             throw new IllegalArgumentException(
@@ -100,6 +100,11 @@ class Build {
             pluginClasspath.addAll(game);
             var adapterClasses=work.resolve("plugin-classes");
             compile(javaFiles(root.resolve("src/plugin/java")),pluginClasspath,adapterClasses,empty);
+            var apiList=work.resolve("facade-classpath.txt");
+            Files.write(apiList,pluginClasspath.stream().map(Path::toString).toList());
+            if(new ProcessBuilder(Path.of(System.getProperty("java.home"),"bin","java").toString(),
+                    root.resolve("standalone/FacadeBuild.java").toString(),adapterClasses.toString(),apiList.toString()).inheritIO().start().waitFor()!=0)
+                throw new IOException("Bukkit facade generation failed");
             var adapter=embedded.resolve("unity-bukkit.jar");
             var metadata=new Manifest();metadata.getMainAttributes().putValue("Manifest-Version","1.0");
             pack(adapter,metadata,adapterClasses,root.resolve("src/plugin/resources"));

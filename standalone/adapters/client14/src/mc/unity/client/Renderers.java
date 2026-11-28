@@ -50,6 +50,7 @@ public final class Renderers {
         }
     }
     public static void close() {
+        MachineModels.clear();
         net.neoforged.neoforge.client.event.RegisterMenuScreensEvent.clear();
         net.minecraftforge.client.event.RegisterKeyMappingsEvent.clear();
         net.minecraftforge.client.event.EntityRenderersEvent.RegisterRenderers.clear();

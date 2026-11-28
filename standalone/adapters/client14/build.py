@@ -14,7 +14,7 @@ def build(core,home,dest):
         client = home/"versions/26.2/26.2.jar"
         sdk = temp/"sdk"
         subprocess.run(["java",Path(__file__).with_name("ClientSdk.java"),client,sdk],check=True)
-        cp=[sdk,api,client,*sorted((home/"libraries").rglob("*.jar"))]
+        cp=[sdk,ROOT/"standalone/lib/unity-neo-transfer-26.2.0.93.jar",api,client,*sorted((home/"libraries").rglob("*.jar"))]
         # All signatures for the client implementation come from the real 26.2 SDK.
         subprocess.run(["javac","-proc:none","--release","25","-encoding","UTF-8","-g:none","-cp",os.pathsep.join(map(str,cp)),"-d",str(classes),*files],check=True)
         with zipfile.ZipFile(dest,"w") as out:
