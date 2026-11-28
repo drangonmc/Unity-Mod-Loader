@@ -14,6 +14,7 @@ final class LifecyclePatches {
             .getfield(ClassDesc.ofInternalName(serverConfig),"connection",connection)
             .invokestatic(config,"initial",MethodTypeDesc.of(ConstantDescs.CD_void,connection)),null);
         if (client) {
+            clientLevels(plan);
             String configuration="net/minecraft/client/multiplayer/ClientConfigurationPacketListenerImpl";
             var payload=ClassDesc.of("net.minecraft.network.protocol.common.custom.CustomPacketPayload");
             hook(plan,configuration,"handleCustomPayload","("+payload.descriptorString()+")V",b -> {
@@ -137,4 +138,29 @@ final class LifecyclePatches {
             return bytes;
         });
     }
+    private static void clientLevels(TransformPlan plan){
+        String mc="net/minecraft/client/Minecraft";
+        var type=ClassDesc.of("net.minecraft.client.multiplayer.ClientLevel");
+        var level=ClassDesc.of("net.minecraft.world.level.Level");
+        var signature=MethodTypeDesc.of(ConstantDescs.CD_void,level,level);
+        for(String name:java.util.List.of("setLevel","disconnect","clearClientLevel")){
+            plan.add(mc,73,"Unity client world lifecycle",name,(cf,model)->{
+                int[] hits={0};
+                byte[] bytes=cf.transformClass(model,ClassTransform.transformingMethodBodies(m->m.methodName().equalsString(name),(b,e)->{
+                    if(e instanceof java.lang.classfile.instruction.FieldInstruction field && field.opcode()==Opcode.PUTFIELD &&
+                            field.owner().asInternalName().equals(mc) && field.name().equalsString("level") && field.typeSymbol().equals(type)){
+                        int next=b.allocateLocal(TypeKind.REFERENCE), previous=b.allocateLocal(TypeKind.REFERENCE);
+                        b.astore(next).dup().getfield(ClassDesc.ofInternalName(mc),"level",type).astore(previous);
+                        b.aload(previous).aload(next).invokestatic(EVENTS,"beforeClientLevel",signature);
+                        b.aload(next).with(e);
+                        b.aload(previous).aload(next).invokestatic(EVENTS,"afterClientLevel",signature);
+                        hits[0]++;
+                    }else b.with(e);
+                }));
+                if(hits[0]!=1)throw new IOException("Unexpected Minecraft client world assignment count in "+name+": "+hits[0]);
+                return bytes;
+            });
+        }
+    }
+
 }

@@ -20,6 +20,14 @@ public final class Views {
         implements InvocationHandler {
         @Override
         public Object invoke(Object self, Method m, Object[] args) throws Throwable {
+            if(m.getDeclaringClass()==Object.class && self instanceof org.bukkit.block.data.BlockData data){
+                return switch(m.getName()){
+                    case "equals" -> self==args[0] || args[0] instanceof org.bukkit.block.data.BlockData other && data.getAsString().equals(other.getAsString());
+                    case "hashCode" -> data.getAsString().hashCode();
+                    case "toString" -> data.getAsString();
+                    default -> throw unsupported(label,m.getName());
+                };
+            }
             if (m.getDeclaringClass() == Object.class)
                 return switch (m.getName()) {
                     case "toString" -> label;

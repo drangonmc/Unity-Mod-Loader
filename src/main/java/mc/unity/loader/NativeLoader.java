@@ -28,13 +28,18 @@ public final class NativeLoader implements AutoCloseable {
     }
 
     public static NativeLoader open(Path game,String side) throws Exception {
+        return open(game,side,null);
+    }
+    public static NativeLoader open(Path game,String side,Loaded builtin) throws Exception {
         if (!Set.of("client","server").contains(side)) throw new IllegalArgumentException("Invalid Unity side: "+side);
         var directory = Files.createDirectories(game.resolve("unity-mods"));
         var descriptors = new TreeMap<String, Descriptor>();
+        if(builtin!=null)descriptors.put(builtin.id,new Descriptor(builtin.id,"",List.of(),"server",null));
         try (var files = Files.list(directory)) {
             for (Path jar : files.filter(Files::isRegularFile)
                     .filter(p -> p.toString().toLowerCase(Locale.ROOT).endsWith(".jar")).sorted().toList()) {
                 var descriptor = read(jar);
+                if(builtin!=null && descriptor.id.equals(builtin.id) && descriptor.entry.equals("mc.unity.example.WorldMarker") && descriptor.side.equals("server")) continue;
                 if (!descriptor.side.equals("both") && !descriptor.side.equals(side)) continue;
                 if (descriptors.putIfAbsent(descriptor.id, descriptor) != null)
                     throw new IOException("Duplicate Unity id " + descriptor.id + " in " + jar);
@@ -43,11 +48,16 @@ public final class NativeLoader implements AutoCloseable {
         var order = new LinkedHashMap<String, Descriptor>();
         for (var descriptor : descriptors.values()) visit(descriptor, descriptors, new LinkedHashSet<>(), order);
         var urls = new ArrayList<URL>();
-        for (var descriptor : order.values()) urls.add(descriptor.jar.toUri().toURL());
+        for (var descriptor : order.values()) if(descriptor.jar!=null) urls.add(descriptor.jar.toUri().toURL());
         var classes = new URLClassLoader("unity-native", urls.toArray(URL[]::new), UnityMod.class.getClassLoader());
         try {
             var loaded = new ArrayList<Loaded>();
             for (var descriptor : order.values()) {
+                if(descriptor.jar==null){
+                    builtin.mod.initialize(Files.createDirectories(game.resolve("unity-data").resolve(builtin.id)));
+                    loaded.add(builtin);
+                    continue;
+                }
                 var type = Class.forName(descriptor.entry, false, classes).asSubclass(UnityMod.class);
                 var origin = Path.of(type.getProtectionDomain().getCodeSource().getLocation().toURI());
                 if (!Files.isSameFile(origin, descriptor.jar)) throw new IOException("Entrypoint belongs to a different jar: " + descriptor.entry);

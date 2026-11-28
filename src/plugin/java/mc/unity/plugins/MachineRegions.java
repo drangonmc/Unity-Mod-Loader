@@ -55,6 +55,19 @@ final class MachineRegions {
         }
     }
     void close(){bindings.clear();warned.clear();}
+    private Guard editGuard;
+    boolean allowsEdit(UUID actor,Location at) {
+        var loader=host.providers.get("WorldGuard");
+        if(loader==null || loader.plugin==null || !loader.plugin.isEnabled())return false;
+        try {
+            if(editGuard==null)editGuard=new Guard(loader.plugin);
+            var player=actor==null?null:host.server.getPlayer(actor);
+            var subject=player==null?null:editGuard.wrap.invoke(loader.plugin,player);
+            if(subject!=null && (boolean)editGuard.bypass.invoke(editGuard.sessions,subject,editGuard.adaptWorld.invoke(null,at.getWorld()))) return true;
+            return (boolean)editGuard.test.invoke(editGuard.query,editGuard.adaptLoc.invoke(null,at),subject,Array.newInstance(editGuard.flag,0));
+        } catch(ReflectiveOperationException failure){throw new IllegalStateException("WorldGuard edit authorization failed at "+at,failure);}
+    }
+    void disabled(Plugin plugin){bindings.remove(plugin.getName());warned.remove(plugin.getName());if(plugin.getName().equalsIgnoreCase("WorldGuard"))editGuard=null;}
     private static final class Guard implements Rule {
         private final Plugin plugin;
         private final Object query,sessions,breakFlag,chestFlag;

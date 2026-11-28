@@ -12,10 +12,11 @@ final class ProfileTextures implements PlayerTextures {
     private SkinModel model=SkinModel.CLASSIC;
     private long timestamp;
     private boolean signed;
+    private Set<ProfileProperty> owner;
     static ProfileTextures read(Set<ProfileProperty> props){
-        var result=new ProfileTextures();
+        var result=new ProfileTextures();result.owner=props;
         for(var p:props)if(p.getName().equals("textures")){
-            var json=JsonParser.parseString(new String(Base64.getDecoder().decode(p.getValue()),StandardCharsets.UTF_8)).getAsJsonObject();
+            var json=JsonParser.parseString(new String(Base64.getMimeDecoder().decode(p.getValue()),StandardCharsets.UTF_8)).getAsJsonObject();
             var textures=json.getAsJsonObject("textures");if(textures!=null){
                 var s=textures.getAsJsonObject("SKIN");var c=textures.getAsJsonObject("CAPE");
                 if(s!=null){result.skin=url(s.get("url").getAsString());var meta=s.getAsJsonObject("metadata");
@@ -36,7 +37,7 @@ final class ProfileTextures implements PlayerTextures {
     }
     private static URL url(String text){try{return URI.create(text).toURL();}catch(MalformedURLException e){throw new IllegalArgumentException(text,e);}}
     private static URL checked(URL u){
-        if(u!=null && (!u.getHost().equalsIgnoreCase("textures.minecraft.net") || !Set.of("https","http").contains(u.getProtocol())))throw new IllegalArgumentException("Invalid Minecraft texture URL");
+        if(u!=null && (!"textures.minecraft.net".equalsIgnoreCase(u.getHost()) || !Set.of("https","http").contains(u.getProtocol())))throw new IllegalArgumentException("Invalid Minecraft texture URL");
         return u;
     }
     public boolean isEmpty(){return skin==null && cape==null;}
@@ -47,7 +48,7 @@ final class ProfileTextures implements PlayerTextures {
     public SkinModel getSkinModel(){return model;}
     public URL getCape(){return cape;}
     public void setCape(URL c){cape=checked(c);changed();}
-    private void changed(){timestamp=0;signed=false;}
+    private void changed(){timestamp=0;signed=false;set(owner,this);}
     public long getTimestamp(){return timestamp;}
     public boolean isSigned(){return signed;}
 }

@@ -39,10 +39,18 @@ public final class Events {
                                                                      SERVER_STARTED = new Signal<>(),
                                                                      SERVER_STOPPING = new Signal<>(),
                                                                      SERVER_STOPPED = new Signal<>();
-    public static final Signal<net.minecraft.server.level.ServerLevel> LEVEL_LOAD = new Signal<>(),
+    public static final Signal<net.minecraft.server.level.ServerLevel> LEVEL_LOAD = new Signal<>(), LEVEL_SAVE = new Signal<>(),
                                                                        LEVEL_UNLOAD = new Signal<>(),
                                                                        LEVEL_TICK_PRE = new Signal<>(),
                                                                        LEVEL_TICK_POST = new Signal<>();
+    public static final Signal<net.minecraft.world.level.Level> CLIENT_LEVEL_LOAD=new Signal<>(), CLIENT_LEVEL_UNLOAD=new Signal<>();
+    public static void beforeClientLevel(net.minecraft.world.level.Level previous,net.minecraft.world.level.Level next){
+        if(previous!=null && previous!=next)CLIENT_LEVEL_UNLOAD.postDuringShutdown(previous);
+    }
+    public static void afterClientLevel(net.minecraft.world.level.Level previous,net.minecraft.world.level.Level next){
+        if(next!=null && previous!=next)CLIENT_LEVEL_LOAD.post(next);
+    }
+    public static void savedLevel(net.minecraft.server.level.ServerLevel value){LEVEL_SAVE.postDuringShutdown(value);}
     public static void loadLevel(Object value) {
         LEVEL_LOAD.post((net.minecraft.server.level.ServerLevel)value);
     }
@@ -225,6 +233,7 @@ public final class Events {
                                        PLAYER_LOGIN, PLAYER_LOGOUT))
             s.clear();
         LEVEL_LOAD.clear();
+        LEVEL_SAVE.clear();CLIENT_LEVEL_LOAD.clear();CLIENT_LEVEL_UNLOAD.clear();
         LEVEL_UNLOAD.clear();
         REGISTRY.clear();
         CLIENT_BREAK.clear();LEVEL_TIME_PRE.clear();LEVEL_TIME_POST.clear();CHUNK_LOAD.clear();CHUNK_UNLOAD.clear();ENTITY_JOIN.clear();

@@ -6,6 +6,7 @@ import net.minecraft.server.dedicated.DedicatedServer;
 
 /** Root of the generated Bukkit Server delegate used by classic server implementation lookups. */
 public abstract class ServerFacade implements Server {
+    @Override public String toString(){return "CraftServer{"+view.getName()+"}";}
     protected final Server view;
     private final MinecraftServer handle;
     protected ServerFacade(Server view, MinecraftServer handle) {this.view=view;this.handle=handle;}

@@ -8,7 +8,7 @@ import javax.tools.ToolProvider;
 
 /** JDK-only source build. Arguments: project directory, original 26.2 Mojang server bundle. */
 class Build {
-    static final String VERSION = "0.3.3-Beta";
+    static final String VERSION = "0.3.4-Beta";
     public static void main(String[] args) throws Exception {
         if (args.length < 2 || args.length > 3)
             throw new IllegalArgumentException(
@@ -114,16 +114,12 @@ class Build {
             Path artifact = work.resolve("unity-loader-" + VERSION + ".jar");
             pack(artifact, manifest, classes, src.resolve("main/resources"),bundled);
             game.add(0, artifact);
-            var serverExamples=javaFiles(src.resolve("example/java"));serverExamples.addAll(javaFiles(src.resolve("testsupport/java")));
-            compile(serverExamples,game,example,empty);
             var modManifest = new Manifest();
             modManifest.getMainAttributes().putValue("Manifest-Version", "1.0");
-            Path mod = work.resolve("unity-world-marker.jar");
-            pack(mod, modManifest, example, src.resolve("example/resources"));
             Path release = Files.createDirectories(Path.of(System.getProperty("mc.unity.buildOutput",
                 root.resolve("versions/" + VERSION).toString())));
-            var outputs = new ArrayList<>(List.of(artifact, mod));
-            if (args.length == 3) {
+            var outputs = new ArrayList<>(List.of(artifact));
+            if (args.length == 3 && Boolean.getBoolean("mc.unity.buildClientWitness")) {
                 Path home = Path.of(args[2]).toRealPath();
                 List<Path> clientPath = new ArrayList<>(List.of(artifact));
                 try(var loader=new URLClassLoader(new URL[]{bootstrap.toUri().toURL()},ClassLoader.getPlatformClassLoader())){

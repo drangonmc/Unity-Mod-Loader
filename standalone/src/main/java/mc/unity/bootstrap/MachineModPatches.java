@@ -20,12 +20,14 @@ final class MachineModPatches {
         for(var entry:entries){
             String id=(String)entry.getClass().getMethod("id").invoke(entry);
             var file=(java.nio.file.Path)entry.getClass().getMethod("file").invoke(entry);
-            if(id.equals("quietquarry"))machines.put(file,List.of(QUARRY));
-            if(id.equals("logisticsdrones"))machines.put(file,List.of(GOAL,ITEM));
+            if(id.equals("quietquarry"))machines.put(file.toAbsolutePath().normalize(),List.of(QUARRY));
+            if(id.equals("logisticsdrones"))machines.put(file.toAbsolutePath().normalize(),List.of(GOAL,ITEM));
         }
         var cf=ClassFile.of(ClassFile.ClassHierarchyResolverOption.of(ClassHierarchyResolver.ofResourceParsing(loader)));
         for(var jar:jars){
-            for(var name:machines.getOrDefault(java.nio.file.Path.of(jar.getName()),List.of())){
+            var targets=machines.remove(java.nio.file.Path.of(jar.getName()).toAbsolutePath().normalize());
+            if(targets==null)continue;
+            for(var name:targets){
                 var entry=jar.getJarEntry(name+".class");if(entry==null)throw new IOException("Missing required machine protection anchor "+jar.getName()+"!/"+name);
                 byte[] data=patches.get(name);
                 if(data==null)try(var in=jar.getInputStream(entry)){data=in.readAllBytes();}
@@ -34,6 +36,7 @@ final class MachineModPatches {
                 patches.put(name,data);
             }
         }
+        if(!machines.isEmpty())throw new IOException("Missing machine protection archives "+machines.keySet());
     }
     private static byte[] quarry(ClassFile cf,ClassModel model)throws IOException{
         int[] count={0,0,0};String descriptor="("+SL+"Lnet/mego/quietquarry/quarry/FrameValidator$FrameArea;)V";

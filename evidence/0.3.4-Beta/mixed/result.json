@@ -1,0 +1,167 @@
+{
+  "loader": "d29ceaf31fb7aeeb808da1b5d94f75a166ec3d64bea53e5b6e40f87c8f81d589",
+  "authors": {
+    "BedrockCrafter-1.3.5-MC26.2-Fabric.jar": "8d869430b290136e18bbe69eff2c247014d5a816bdddf5dd249a89e11b498dd7d07891fc9eeb7b6590e61118932f904186e441ccc150d488fdd1d03fb63049f0",
+    "moreberryuses-2.0.1-for-forge-26.2.jar": "17c29e27c0a1206ff38afd95f8285264c6bebf19c59c142070690ef41a0cac32db5e6eb324d111be026a56d18a6f3ef423d488807b9599ca9a982849f05c7f26",
+    "advanced-furnace-neoforge-26.2-1.0.2.jar": "8a3198a8b956b55e29042c99340e7a42fc0dda3ed49556a7e729c66cb27baaf4c3c047113176ec6ae32c7fbeceb1ba8dc158e98f1fe6147d2aba55994ce25a3b"
+  },
+  "runs": [
+    {
+      "blocks": [
+        [
+          [
+            "Block{minecraft:smooth_stone}",
+            "Block{minecraft:smooth_stone}"
+          ],
+          [
+            "Block{minecraft:smooth_stone}",
+            "Block{minecraft:smooth_stone}"
+          ],
+          [
+            "Block{minecraft:smooth_stone}",
+            "Block{minecraft:smooth_stone}"
+          ],
+          [
+            "Block{minecraft:gold_block}",
+            "Block{minecraft:gold_block}"
+          ],
+          [
+            "Block{minecraft:gold_block}",
+            "Block{minecraft:gold_block}"
+          ],
+          [
+            "Block{minecraft:gold_block}",
+            "Block{minecraft:gold_block}"
+          ]
+        ],
+        [
+          [
+            [
+              "minecraft:emerald",
+              11
+            ],
+            [
+              "minecraft:emerald",
+              11
+            ]
+          ],
+          [
+            [
+              "minecraft:emerald",
+              11
+            ],
+            [
+              "minecraft:emerald",
+              11
+            ]
+          ]
+        ]
+      ],
+      "bags": {
+        "VolumeA": {
+          "4": "minecraft:obsidian*3@0"
+        },
+        "VolumeB": {
+          "4": "minecraft:flint*5@0"
+        }
+      },
+      "health": [
+        [
+          20.0,
+          20.0,
+          20.0
+        ],
+        [
+          20.0,
+          20.0,
+          20.0
+        ]
+      ]
+    },
+    {
+      "blocks": [
+        [
+          [
+            "Block{minecraft:smooth_stone}",
+            "Block{minecraft:smooth_stone}"
+          ],
+          [
+            "Block{minecraft:smooth_stone}",
+            "Block{minecraft:smooth_stone}"
+          ],
+          [
+            "Block{minecraft:smooth_stone}",
+            "Block{minecraft:smooth_stone}"
+          ],
+          [
+            "Block{minecraft:gold_block}",
+            "Block{minecraft:gold_block}"
+          ],
+          [
+            "Block{minecraft:gold_block}",
+            "Block{minecraft:gold_block}"
+          ],
+          [
+            "Block{minecraft:gold_block}",
+            "Block{minecraft:gold_block}"
+          ]
+        ],
+        [
+          [
+            [
+              "minecraft:emerald",
+              11
+            ],
+            [
+              "minecraft:emerald",
+              11
+            ]
+          ],
+          [
+            [
+              "minecraft:emerald",
+              11
+            ],
+            [
+              "minecraft:emerald",
+              11
+            ]
+          ]
+        ]
+      ],
+      "bags": {
+        "VolumeA": {
+          "4": "minecraft:obsidian*3@0"
+        },
+        "VolumeB": {
+          "4": "minecraft:flint*5@0"
+        }
+      },
+      "health": [
+        [
+          20.0,
+          20.0,
+          20.0
+        ],
+        [
+          20.0,
+          20.0,
+          20.0
+        ]
+      ]
+    }
+  ],
+  "stopSeconds": [
+    55.969,
+    39.937
+  ],
+  "pluginLayout": "root plus legacy instance",
+  "logs": {
+    "first.log": "0c9146f9cd268c3e680ddeeab2a1cda8b800a07711b1ffee700053d01f79016c",
+    "firstVolumeA-client.log": "736757d1b1ae1240426ee90200e9fb3463e4c0e53402dbc4a3b1f17a9ef1d5bb",
+    "firstVolumeB-client.log": "c0fdab675b741ed13d450b522105c72eff6ff78356630c5b92a3ca211e27dded",
+    "upgrade.log": "c1f096ef980cd0b15a853a532cff0118f003fd65208d2b8049a59efafb259a94",
+    "upgradeVolumeA-client.log": "74b7f494a91c477b826d87c4b2c9834aa3622d099e3ae71205f0d65b800cdd0b",
+    "upgradeVolumeB-client.log": "234226ee7fbed6e534b8893079b3b65a25d22d52174d8d8c57408490308b1584"
+  }
+}

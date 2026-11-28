@@ -76,6 +76,7 @@ final class WorldGameplay {
     @SuppressWarnings({"unchecked","rawtypes"})
     Object spawn(ServerLevel level,Object[] args){
         var at=(Location)args[0];at.checkFinite();
+        if(args[1]==org.bukkit.entity.Entity.class || args[1]==org.bukkit.entity.LivingEntity.class)throw new IllegalArgumentException("A concrete entity type is required");
         var type=args[1] instanceof org.bukkit.entity.EntityType t?t:java.util.Arrays.stream(org.bukkit.entity.EntityType.values())
             .filter(t->t.getEntityClass()==args[1] && t.isSpawnable()).findFirst().orElseThrow(()->new IllegalArgumentException("No spawnable entity type for "+args[1]));
         var nativeType=BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.parse(type.getKey().toString()));

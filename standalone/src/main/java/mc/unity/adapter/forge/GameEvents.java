@@ -18,6 +18,10 @@ public final class GameEvents {
         if (!b.empty())
             b.dispatch(factory.get());
     }
+    static <T extends net.minecraftforge.event.level.LevelEvent> void level(T event,EventBus<T> bus){
+        emit(net.minecraftforge.event.level.LevelEvent.BUS,()->event);
+        emit(bus,()->event);
+    }
     public static void about(MinecraftServer s) {
         server = s;
         var e = new ServerAboutToStartEvent(s);
@@ -74,7 +78,7 @@ public final class GameEvents {
     public static void clear() {
         server = null;
         for (var bus :
-            java.util.List.of(ServerTickEvent.Pre.BUS, ServerTickEvent.Post.BUS, ClientTickEvent.Pre.BUS,
+            java.util.List.of(net.minecraftforge.event.level.LevelEvent.BUS,net.minecraftforge.event.level.LevelEvent.Load.BUS,net.minecraftforge.event.level.LevelEvent.Unload.BUS,net.minecraftforge.event.level.LevelEvent.Save.BUS,ServerTickEvent.Pre.BUS, ServerTickEvent.Post.BUS, ClientTickEvent.Pre.BUS,
                 ClientTickEvent.Post.BUS, ServerAboutToStartEvent.BUS, ServerStartingEvent.BUS,
                 ServerStartedEvent.BUS, ServerStoppingEvent.BUS, ServerStoppedEvent.BUS,
                 net.minecraftforge.event.entity.SpawnPlacementRegisterEvent.BUS, net.minecraftforge.event.AddReloadListenerEvent.BUS, net.minecraftforge.event.entity.EntityAttributeCreationEvent.BUS, ServerLifecycleEvent.BUS, PlayerLoggedInEvent.BUS, PlayerLoggedOutEvent.BUS))

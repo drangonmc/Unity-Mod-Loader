@@ -37,9 +37,21 @@ final class PortalPatches {
             }));if(!java.util.Arrays.equals(hits,new int[]{2,1}))throw new IOException("Portal radius anchors");return bytes;
         });
         plan.add("net/minecraft/world/level/block/EndPortalBlock",269,"Unity portal search","end destination",(cf,model)->{
-            int[] hits={0};var bytes=cf.transformClass(model,ClassTransform.transformingMethodBodies(m->m.methodName().equalsString("getPortalDestination"),(b,e)->{
-                if(e instanceof ReturnInstruction){hits[0]++;b.aload(2).invokestatic(H,"end",sig("("+T+E+")"+T));}b.with(e);
-            }));if(hits[0]!=3)throw new IOException("End portal destinations");return bytes;
+            int[] hits={0,0};
+            byte[] bytes=cf.transformClass(model,ClassTransform.transformingMethodBodies(m->m.methodName().equalsString("getPortalDestination"),new CodeTransform(){
+                int pos;
+                public void atStart(CodeBuilder b){pos=b.allocateLocal(TypeKind.REFERENCE);b.aconst_null().astore(pos);}
+                public void accept(CodeBuilder b,CodeElement e){
+                    if(e instanceof InvokeInstruction call && call.owner().asInternalName().equals("net/minecraft/world/level/levelgen/feature/EndPlatformFeature") &&
+                            call.name().equalsString("createEndPlatform") && call.type().equalsString("(Lnet/minecraft/world/level/ServerLevelAccessor;"+B+"Z)V")){
+                        hits[0]++;b.pop().astore(pos).pop();return;
+                    }
+                    if(e instanceof ReturnInstruction){hits[1]++;b.aload(2).aload(pos).invokestatic(H,"end",sig("("+T+E+B+")"+T));}
+                    b.with(e);
+                }
+            }));
+            if(!java.util.Arrays.equals(hits,new int[]{1,3}))throw new IOException("End portal creation/transition anchors");
+            return bytes;
         });
     }
 }

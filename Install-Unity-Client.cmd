@@ -2,11 +2,9 @@
 setlocal
 set "UNITY_LAUNCHER=%~1"
 if not defined UNITY_LAUNCHER set "UNITY_LAUNCHER=%APPDATA%\.minecraft"
-java -jar "%~dp0versions\0.3.3-Beta\unity-loader-0.3.3-Beta.jar" --install-client "%UNITY_LAUNCHER%"
+set "UNITY_LOADER=%~dp0unity-loader-0.3.4-Beta.jar"
+if not exist "%UNITY_LOADER%" set "UNITY_LOADER=%~dp0versions\0.3.4-Beta\unity-loader-0.3.4-Beta.jar"
+java -jar "%UNITY_LOADER%" --install-client "%UNITY_LAUNCHER%"
 if errorlevel 1 exit /b 1
-if not exist "%~dp0standalone-client\unity-mods\" (
-    mkdir "%~dp0standalone-client\unity-mods" || exit /b 1
-    copy /y "%~dp0versions\0.3.3-Beta\unity-client-witness.jar" "%~dp0standalone-client\unity-mods\" >nul || exit /b 1
-)
-echo Create an installation for unity-standalone-0.3.3-Beta-26.2.
+echo Create an installation for unity-standalone-0.3.4-Beta-26.2.
 echo Game directory: "%~dp0standalone-client"

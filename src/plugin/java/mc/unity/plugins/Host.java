@@ -93,14 +93,32 @@ public final class Host implements PluginHost {
     private boolean worldsReady;
     private Runnable detachGameplay;
     private boolean closed;
+    private AutoCloseable editRegions;
+    private void enableRegionEdits(PluginFile.Loader loader){
+        if(editRegions!=null || !loader.file.description().getMain().equals("com.sk89q.worldedit.bukkit.WorldEditPlugin") || !providers.containsKey("WorldGuard"))return;
+        try{
+            var bridge=loader.loadClass("mc.unity.adapter.worldedit.RegionEdits");
+            java.util.function.BiPredicate<UUID,org.bukkit.Location> policy=machineRegions::allowsEdit;
+            editRegions=(AutoCloseable)bridge.getMethod("install",java.util.function.BiPredicate.class).invoke(null,policy);
+            LOG.info("Enabled built-in WorldEdit / WorldGuard region protection");
+        }catch(ReflectiveOperationException e){throw new IllegalStateException("Installing WorldEdit region protection",e);}
+    }
     private record PaperHandler(Plugin plugin, LifecycleEventHandler handler) {}
     public static final Logger LOG = Logger.getLogger("mc.unity.plugins");
 
     @Override
     public void initialize(Path path) throws Exception {
-        current = this;
-        directory = path;
-        files = PluginFile.ordered(path);
+        initializePlugins(path,path);
+    }
+    private Path previousDirectory;
+    Path dataFolder(PluginFile file){
+        var local=file.jar().getParent().resolve(file.name());
+        var old=previousDirectory.resolve(file.name());
+        return !java.nio.file.Files.exists(local) && java.nio.file.Files.isDirectory(old)?old:local;
+    }
+    @Override public void initializePlugins(Path primary,Path previous) throws Exception {
+        current=this;directory=primary;previousDirectory=previous;
+        files=PluginFile.ordered(primary,previous);
     }
     @Override
     public void registerCommands(CommandDispatcher<CommandSourceStack> next) {
@@ -164,6 +182,7 @@ public final class Host implements PluginHost {
                 enabled.add(cl.plugin);
                 cl.enable();
                 if(!cl.plugin.isEnabled())continue;
+                enableRegionEdits(cl);
                 fire(new org.bukkit.event.server.PluginEnableEvent(cl.plugin));
                 LOG.info("Enabled " + f.name() + " " + f.description().getVersion());
             } finally {
@@ -539,12 +558,25 @@ public final class Host implements PluginHost {
     }
     void disable(JavaPlugin plugin){
         if(!enabled.remove(plugin))return;
+        long start=Boolean.getBoolean("mc.unity.shutdownDiagnostics")?System.nanoTime():0;
+        if(editRegions!=null && plugin.getDescription().getMain().equals("com.sk89q.worldedit.bukkit.WorldEditPlugin")){
+            try{editRegions.close();}catch(Exception failure){LOG.log(java.util.logging.Level.WARNING,"Closing region protection",failure);}finally{editRegions=null;}
+        }
         try{
             fire(new org.bukkit.event.server.PluginDisableEvent(plugin));
         }finally{
             try{plugin.setEnabled(false);}
-            catch(RuntimeException|LinkageError problem){LOG.log(java.util.logging.Level.SEVERE,"Disabling "+plugin.getName(),problem);}
-            finally{HandlerList.unregisterAll(plugin);views.tasks.call("cancelTasks",new Object[]{plugin});}
+            catch(Throwable problem){mc.unity.core.Events.shutdownFailure(plugin.getName(),problem);}
+            finally{
+                HandlerList.unregisterAll(plugin);
+                views.tasks.call("cancelTasks",new Object[]{plugin});
+                server.getServicesManager().unregisterAll(plugin);
+                server.getMessenger().unregisterIncomingPluginChannel(plugin);
+                server.getMessenger().unregisterOutgoingPluginChannel(plugin);
+                mc.unity.runtime.EntityPresentation.release(plugin);
+                machineRegions.disabled(plugin);
+                if(start!=0)LOG.info("[Unity timings] disable "+plugin.getName()+" "+((System.nanoTime()-start)/1_000_000)+" ms");
+            }
         }
     }
     @Override
@@ -558,8 +590,6 @@ public final class Host implements PluginHost {
     }
     @Override
     public void close() {
-        mc.unity.runtime.EntityPresentation.clear();
-        machineRegions.close();playerEvents.close();
         if (closed)
             return;
         closed = true;
@@ -581,6 +611,8 @@ public final class Host implements PluginHost {
                     } catch (java.io.IOException e) {
                         LOG.warning(e.toString());
                     }
+                mc.unity.runtime.EntityPresentation.clear();
+                machineRegions.close();playerEvents.close();
                 providers.clear();
                 loaders.clear();
                 if (current == this)

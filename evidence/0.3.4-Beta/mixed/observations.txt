@@ -1,0 +1,155 @@
+first.log
+信息: Enabled built-in WorldEdit / WorldGuard region protection
+[00:40:35] [Server thread/INFO]: [STDOUT]: U34 FORGE load minecraft:overworld
+[00:40:36] [Server thread/INFO]: [STDOUT]: U34 NEO load minecraft:overworld
+[00:40:36] [Server thread/INFO]: [STDOUT]: U34 FABRIC load true
+[00:40:36] [Server thread/INFO]: [STDOUT]: U34 FABRIC generate
+[00:40:36] [Server thread/INFO]: [STDOUT]: U34 FORGE load minecraft:the_nether
+[00:40:36] [Server thread/INFO]: [STDOUT]: U34 NEO load minecraft:the_nether
+[00:40:36] [Server thread/INFO]: [STDOUT]: U34 FORGE load minecraft:the_end
+[00:40:36] [Server thread/INFO]: [STDOUT]: U34 NEO load minecraft:the_end
+[00:40:37] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:overworld
+[00:40:37] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:overworld
+[00:40:37] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:the_nether
+[00:40:37] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:the_nether
+[00:40:38] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:the_end
+[00:40:38] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:the_end
+[00:40:39] [Server thread/INFO]: Unity marks saved: 0
+[00:40:40] [Server thread/INFO]: Unity marker placed on game tick at 6, 84, 7; total 1
+信息: U34 BUKKIT PASS advancedfurnace:advanced_furnace
+[00:41:14] [Server thread/INFO]: [Not Secure] [Server] REGION_CHEST_INTACT
+[00:41:18] [Server thread/INFO]: [Not Secure] [Server] REGION_CHEST_INTACT
+信息: U34 PORTAL MODE cancel
+信息: U34 PORTAL cancel
+[00:41:23] [Server thread/INFO]: [Not Secure] [Server] U34_PLATFORM_cancel
+信息: U34 PORTAL MODE redirect
+信息: U34 PORTAL redirect
+[00:41:23] [Server thread/INFO]: [Not Secure] [Server] U34_PLATFORM_redirect
+信息: U34 PORTAL MODE forbid
+信息: U34 PORTAL forbid
+[00:41:23] [Server thread/INFO]: [Not Secure] [Server] U34_PLATFORM_forbid
+信息: U34 PORTAL MODE allow
+信息: U34 PORTAL allow
+[00:41:24] [Server thread/INFO]: [Not Secure] [Server] U34_PLATFORM_allow
+[00:41:25] [Server thread/INFO]: [STDOUT]: U34 FABRIC unload
+[00:41:28] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:overworld
+[00:41:28] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:overworld
+[00:41:28] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:the_nether
+[00:41:28] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:the_nether
+[00:42:09] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:the_end
+[00:42:10] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:the_end
+信息: [Unity timings] disable WorldGuard 1 ms
+信息: [Unity timings] disable Unity34Check 0 ms
+信息: [Unity timings] disable Beta25Probe 0 ms
+信息: [Unity timings] disable WorldEdit 8 ms
+[00:43:04] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:overworld
+[00:43:04] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:overworld
+[00:43:04] [Server thread/INFO]: [STDOUT]: [Unity timings] save minecraft:overworld 53718 ms
+[00:43:04] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:the_nether
+[00:43:04] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:the_nether
+[00:43:04] [Server thread/INFO]: [STDOUT]: [Unity timings] save minecraft:the_nether 98 ms
+[00:43:04] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:the_end
+[00:43:04] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:the_end
+[00:43:04] [Server thread/INFO]: [STDOUT]: [Unity timings] save minecraft:the_end 266 ms
+[00:43:05] [Server thread/INFO]: [STDOUT]: U34 FORGE unload minecraft:overworld
+[00:43:05] [Server thread/INFO]: [STDOUT]: U34 NEO unload minecraft:overworld
+[00:43:05] [Server thread/INFO]: [STDOUT]: U34 FORGE unload minecraft:the_nether
+[00:43:05] [Server thread/INFO]: [STDOUT]: U34 NEO unload minecraft:the_nether
+[00:43:05] [Server thread/INFO]: [STDOUT]: U34 FORGE unload minecraft:the_end
+[00:43:05] [Server thread/INFO]: [STDOUT]: U34 NEO unload minecraft:the_end
+[00:43:06] [Server thread/INFO]: [STDOUT]: [Unity timings] shutdown callbacks and vanilla save 55442 ms
+firstVolumeA-client.log
+[00:40:54] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD load
+[00:40:54] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD load
+[00:41:14] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[00:41:18] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[00:41:23] [Render thread/INFO]: [System] [CHAT] [Server] U34_PLATFORM_cancel
+[00:41:23] [Render thread/INFO]: [System] [CHAT] [Server] U34_PLATFORM_redirect
+[00:41:23] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD unload
+[00:41:23] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD unload
+[00:41:23] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD load
+[00:41:23] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD load
+[00:41:23] [Render thread/INFO]: [System] [CHAT] [Server] U34_PLATFORM_forbid
+[00:41:24] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD unload
+[00:41:24] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD unload
+[00:41:24] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD load
+[00:41:24] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD load
+[00:41:24] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD unload
+[00:41:24] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD unload
+[00:41:24] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD load
+[00:41:24] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD load
+[00:41:24] [Render thread/INFO]: [System] [CHAT] [Server] U34_PLATFORM_allow
+[00:41:24] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD unload
+[00:41:24] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD unload
+[00:41:24] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD load
+[00:41:24] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD load
+[00:41:25] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD unload
+[00:41:25] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD unload
+firstVolumeB-client.log
+[00:41:08] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD load
+[00:41:08] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD load
+[00:41:14] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[00:41:18] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[00:41:23] [Render thread/INFO]: [System] [CHAT] [Server] U34_PLATFORM_cancel
+[00:41:23] [Render thread/INFO]: [System] [CHAT] [Server] U34_PLATFORM_redirect
+[00:41:23] [Render thread/INFO]: [System] [CHAT] [Server] U34_PLATFORM_forbid
+[00:41:25] [Render thread/INFO]: [System] [CHAT] [Server] U34_PLATFORM_allow
+[00:41:25] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD unload
+[00:41:25] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD unload
+upgrade.log
+信息: Enabled built-in WorldEdit / WorldGuard region protection
+[00:43:16] [Server thread/INFO]: [STDOUT]: U34 FORGE load minecraft:overworld
+[00:43:16] [Server thread/INFO]: [STDOUT]: U34 NEO load minecraft:overworld
+[00:43:16] [Server thread/INFO]: [STDOUT]: U34 FORGE load minecraft:the_nether
+[00:43:16] [Server thread/INFO]: [STDOUT]: U34 NEO load minecraft:the_nether
+[00:43:16] [Server thread/INFO]: [STDOUT]: U34 FORGE load minecraft:the_end
+[00:43:16] [Server thread/INFO]: [STDOUT]: U34 NEO load minecraft:the_end
+[00:43:16] [Server thread/INFO]: [STDOUT]: U34 FABRIC load false
+[00:43:17] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:overworld
+[00:43:17] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:overworld
+[00:43:17] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:the_nether
+[00:43:17] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:the_nether
+[00:43:17] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:the_end
+[00:43:17] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:the_end
+[00:43:18] [Server thread/INFO]: Unity marks saved: 1
+信息: U34 BUKKIT PASS advancedfurnace:advanced_furnace
+[00:43:43] [Server thread/INFO]: [Not Secure] [Server] REGION_CHEST_INTACT
+[00:43:50] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:overworld
+[00:43:50] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:overworld
+[00:43:50] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:the_nether
+[00:43:50] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:the_nether
+[00:43:50] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:the_end
+[00:43:50] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:the_end
+信息: [Unity timings] disable WorldGuard 1 ms
+信息: [Unity timings] disable Unity34Check 0 ms
+信息: [Unity timings] disable Beta25Probe 0 ms
+信息: [Unity timings] disable WorldEdit 7 ms
+[00:43:50] [Server thread/INFO]: [STDOUT]: U34 FABRIC unload
+[00:43:51] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:overworld
+[00:43:51] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:overworld
+[00:43:51] [Server thread/INFO]: [STDOUT]: [Unity timings] save minecraft:overworld 619 ms
+[00:43:51] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:the_nether
+[00:43:51] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:the_nether
+[00:43:51] [Server thread/INFO]: [STDOUT]: [Unity timings] save minecraft:the_nether 74 ms
+[00:43:51] [Server thread/INFO]: [STDOUT]: U34 FORGE save minecraft:the_end
+[00:43:51] [Server thread/INFO]: [STDOUT]: U34 NEO save minecraft:the_end
+[00:43:51] [Server thread/INFO]: [STDOUT]: [Unity timings] save minecraft:the_end 224 ms
+[00:43:51] [Server thread/INFO]: [STDOUT]: U34 FORGE unload minecraft:overworld
+[00:43:51] [Server thread/INFO]: [STDOUT]: U34 NEO unload minecraft:overworld
+[00:43:52] [Server thread/INFO]: [STDOUT]: U34 FORGE unload minecraft:the_nether
+[00:43:52] [Server thread/INFO]: [STDOUT]: U34 NEO unload minecraft:the_nether
+[00:43:52] [Server thread/INFO]: [STDOUT]: U34 FORGE unload minecraft:the_end
+[00:43:52] [Server thread/INFO]: [STDOUT]: U34 NEO unload minecraft:the_end
+[00:43:52] [Server thread/INFO]: [STDOUT]: [Unity timings] shutdown callbacks and vanilla save 1680 ms
+upgradeVolumeA-client.log
+[00:43:30] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD load
+[00:43:30] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD load
+[00:43:43] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[00:43:49] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD unload
+[00:43:49] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD unload
+upgradeVolumeB-client.log
+[00:43:42] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD load
+[00:43:42] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD load
+[00:43:43] [Render thread/INFO]: [System] [CHAT] [Server] REGION_CHEST_INTACT
+[00:43:48] [Render thread/INFO]: [STDOUT]: U34 CLIENT FORGEWORLD unload
+[00:43:48] [Render thread/INFO]: [STDOUT]: U34 CLIENT NEOWORLD unload

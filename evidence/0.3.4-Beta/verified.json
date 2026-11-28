@@ -1,0 +1,15 @@
+{
+  "version": "0.3.4-Beta",
+  "minecraft": "26.2",
+  "runtime": "Unity-0.3.4-Beta-MC26.2-Standalone.zip",
+  "archiveSHA256": "186f43854c30cdf0f79d06f3d9a6a25cd8c85037af70fbd1c4bd1cf1ce5d63c5",
+  "loaderSHA256": "d29ceaf31fb7aeeb808da1b5d94f75a166ec3d64bea53e5b6e40f87c8f81d589",
+  "files": {
+    "mixed/observations.txt": "d153f3ba7b63f78fcbeac8493f3c891fcccf7e59f6ad975191f4ec39bddff9bb",
+    "mixed/result.json": "52ed7f6b13e40b61fc587bed4848fe6c47d0f352b31604839dc5673e85baeb48",
+    "offline-residence/observations.txt": "b4ee471537ff9f7e9b5c21bcd5791b664e8250d4c4fe1e7d6fe4c7b6218f6a43",
+    "offline-residence/result.json": "8241c8b4509bf45914862aec649abfda7cb922dcdf8a81b80d05d3cb3b28a2e1",
+    "shutdown.json": "0cd64866a517722c9475fb9572e0f7ab6899812e3f625b8184058a1f6728fadc",
+    "unpacked.json": "dcb29d2f44fa42e95e586d16877ed054f2685f69d8b4656d2aaa9b06c428ff3f"
+  }
+}

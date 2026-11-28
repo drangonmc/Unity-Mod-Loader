@@ -1,25 +1,28 @@
-# Unity 0.3.3 Beta
+# Unity 0.3.4 Beta
 
-Unity 使用独立加载内核运行 Minecraft Java 26.2，需要 Java 25。这个版本验证了两种机器在 WorldGuard 和 Residence 同服时使用放置者的权限。[GitHub 发行页](https://github.com/drangonmc/Unity-Mod-Loader/releases/tag/0.3.3-Beta)
+Unity 是 Minecraft Java 26.2 的独立加载器，运行环境为 Java 25。本地发行包内只有一个 JAR，专服和客户端共用。
 
-## 安装
+## 安装插件和模组
 
-解压 Standalone ZIP 后运行 `Start-Unity.cmd` 启动专服。客户端先安装原版 26.2，再运行 `Install-Unity-Client.cmd` 创建 Unity 配置。模组放入各自游戏目录的 `mods/`，Bukkit 插件放入 `standalone-instance/plugins/`。作者插件和商业插件请从作者处获取。WorldGuard 使用 WorldEdit，Residence 使用 CMILib。WorldEdit 的区域编辑保护还可以安装发行包里的 `UnityEditRegions.jar`。
+1. 解压完整 ZIP，将 Bukkit、Spigot 或 Paper 插件的作者原始 JAR 放入 **与 `Start-Unity.cmd` 同级的 `plugins/`**，再启动或重启服务器。插件作者声明的其他前置插件也放在这里。
+2. 需要 WorldGuard 区域限制 WorldEdit 编辑时，将 WorldEdit 和 WorldGuard 的原包装入 `plugins/`。Unity 会自动接入每次编辑实际写入的坐标，覆盖填充、粘贴和历史操作。`/unitymark place`、`/unitymark count` 随加载器提供。
+3. 专服的 Forge、NeoForge、Fabric 模组放入 `standalone-instance/mods/`。客户端先安装原版 26.2，再运行 `Install-Unity-Client.cmd`，选择生成的 Unity 启动配置并在对应游戏目录的 `mods/` 安装所需模组。直接用 `java -jar unity-loader-0.3.4-Beta.jar` 启动专服时，使用当前实例的 `plugins/` 和 `mods/`。
 
-## 机器领地兼容清单
+## 从 0.3.3 升级
 
-| 作者原包 | 验证的操作 | 观测结果 |
-| --- | --- | --- |
-| Quite Quarry 项目的 QuietQuarry 1.1.0，26.2 | 玩家从客户端放置采矿核心，机器消耗 FE 逐格采矿 | 一次加入 800 FE，只挖走获准位置的铁块和铜块，各产出 1 个。三处拒绝位置的金块、绿宝石块和青金石块保持原状。在同一存档的副本中换 VolumeB 实际放置核心，原先拒绝 VolumeA 开采的同一金块、绿宝石块均可开采，重叠区的青金石仍保留。两次归属均已从关闭后的存档读回。 |
-| Logistics Drones 1.1.0，石质无人机 | 两名玩家各自部署无人机，使用原模组遥控器和原生 AI 搬运 | VolumeA 从公共源箱送出 12 个绿宝石。VolumeB 在自己获准的区域搬运 5 个钻石，目的箱从 4 个增至 9 个。越权取货和目标箱拒收时，源箱、目的箱、机上货物总数均保持原值。 |
-| WorldGuard 7.0.19 + WorldEdit 7.4.6，Residence 6.0.4.2 + CMILib 1.6.1.4 | 原始插件共存，按目标坐标评估采矿、取货和交货，两套规则均需允许 | 同一观察插件在独立 Paper 和 Unity 上得到相同的 12 组双人判定。实际客户端挖掘和开箱复核了公共区、单独保护区与重叠区。玩家下线后，已部署无人机在重启实例中继续受其 UUID 对应的区域规则约束。 |
+原有 `standalone-instance/plugins/` 继续参与插件发现。根目录和旧目录中的插件使用同一依赖顺序。两个目录有同名且字节相同的插件时只加载一份；同名但内容不同会在启动时报错。把 JAR 挪到新目录后，已有的旧配置和数据目录仍可使用。原版 UnityEditRegions 旧副本会被识别；World Marker 使用原来的计数存档键。客户端安装程序只安装主加载器，图形验收组件仅供开发测试。
 
-采矿授权发生在作者代码计算并写入掉落、扣电和破坏之前。无人机在抽取前检查源箱和目标箱，实际交货时再次检查目标。缺少归属或已安装的策略提供者出错时拒绝操作。当前运行时钩子覆盖表内的作者机器入口。其他模组直接写世界、转运物品的路径需要单独验证。[机器与保护插件原包清单](evidence/0.3.3-Beta/machine-compatibility.json) · [Unity 双端记录](evidence/0.3.3-Beta/unity/result.json) · [Paper 对照记录](evidence/0.3.3-Beta/paper/result.json)
+## 本版验证的兼容范围
 
-## 存档和客户端
+| 平台 | 本版新增或验证的行为 |
+| --- | --- |
+| Forge | `LevelEvent.Load/Unload` 接入专服世界和客户端世界切换，`LevelEvent.Save` 在原版区块与实体保存路径完成后触发。使用 Forge SDK 编译的监听器及 More Berry Uses 原包验证。 |
+| NeoForge | NeoBus 派发上游 `LevelEvent.Load/Unload/Save` 类。使用 NeoForge SDK 编译的监听器及 Advanced Furnace 原包验证。 |
+| Fabric | 轻量模式支持 `ServerChunkEvents.CHUNK_LOAD`、`CHUNK_GENERATE` 和 `CHUNK_UNLOAD`，加载事件携带新区块标记。使用官方 SDK 编译的回调及 Bedrock Crafter 原包验证。完整 Fabric API 模式沿用上游模块。 |
+| Bukkit/Paper | WorldEdit 7.4.6 + WorldGuard 7.0.19。同一选区横跨边界时，保护侧三格保持原样，允许侧三格变更；撤销、重做和带内容的箱子复制已用两台实际客户端核对。 |
 
-Unity 专服加载 88 个作者顶层模组文件，每个实际客户端加载 86 个，另有 14 个作者插件。见证程序单独计数。两台隐藏图形客户端在回环离线账号环境中进服，重启后再次读取容器、玩家和机器。原版 NBT 读取器另行核对了关闭后的采矿核心、两台无人机的作者和 Unity 归属、箱子及两名玩家的背包。正常停服测得 Unity 为 34.046 s, 50.157 s，Paper 为 3.156 s, 1.984 s。开发期间一次多实例并行存盘触发了 60 秒 watchdog，快照显示服务端正在做 Windows 剩余空间检查。此处时长来自保留原版 watchdog 的串行发行验收。[世界存档](evidence/0.3.3-Beta/unity/world.json) · [玩家存档](evidence/0.3.3-Beta/unity/players.json) · [第二名放置者的同坐标存档](evidence/0.3.3-Beta/other-owner/world.json)
+另已验证客户端切换维度、拦截末地传送、禁止创建末地平台和末地目标重定向。兼容范围以所列 API 和用例为准。完整作者插件依赖仍应按作者说明安装。
 
-NeoForge 的方块实体和世界附件支持同步。双端核对了世界值 3303、箱子附件值 3305，以及玩家切换到下界后自身值 3302 和下界值 3304 的读回。两服均验证了玩家进入下界门前取消 `PlayerPortalEvent` 能使玩家留在原世界。Bukkit 世界 UUID 保存在 `uid.dat`。物品 Lore 可取出、修改再写回。Unity 接受旧式 `keepInventory` 名称，并拒绝以 0 级附魔覆盖既有附魔。本次 Paper 26.2 build 121 对旧名称抛出异常，对忽略等级限制的 0 级写入返回成功且读回等级 0。
+上版混装世界的副本另用 88 个作者模组和 14 个作者插件验证离线归属。在仅 Residence 拒绝的取货点，无人机货舱为 0，源箱保留 6 个绿宝石，目的箱保留 12 个。
 
-本版覆盖的是上述游戏操作。Tiny Pipes 部分可选配方仍有已知解析告警。正版在线聊天签名、十人以上并发和长期堆内存趋势属于 0.4.0 公测前的独立验收。[验收程序](standalone/tests/reference/review33/accept33.py) · [第三方组件声明](NOTICE.md)
+开发测试使用本机回环离线账号和真实游戏客户端。该机第一次停服时，主世界保存耗时 53.7 秒。通过 JVM 参数 `-Dmc.unity.shutdownDiagnostics=true` 可记录每个世界和每个插件的耗时。

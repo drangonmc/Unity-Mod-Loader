@@ -1,0 +1,32 @@
+[
+  {
+    "phase": "first",
+    "worldSaveMs": {
+      "minecraft:overworld": 53718,
+      "minecraft:the_nether": 98,
+      "minecraft:the_end": 266
+    },
+    "pluginDisableMs": {
+      "WorldGuard": 1,
+      "Unity34Check": 0,
+      "Beta25Probe": 0,
+      "WorldEdit": 8
+    },
+    "serverShutdownMs": 55442
+  },
+  {
+    "phase": "upgrade",
+    "worldSaveMs": {
+      "minecraft:overworld": 619,
+      "minecraft:the_nether": 74,
+      "minecraft:the_end": 224
+    },
+    "pluginDisableMs": {
+      "WorldGuard": 1,
+      "Unity34Check": 0,
+      "Beta25Probe": 0,
+      "WorldEdit": 7
+    },
+    "serverShutdownMs": 1680
+  }
+]

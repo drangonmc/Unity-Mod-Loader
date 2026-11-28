@@ -5,6 +5,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 
 public interface PluginHost extends UnityMod, AutoCloseable {
+    default void initializePlugins(java.nio.file.Path primary,java.nio.file.Path instance) throws Exception {initialize(primary);}
     default boolean chat(net.minecraft.server.level.ServerPlayer p,net.minecraft.network.chat.PlayerChatMessage message,net.minecraft.network.chat.ChatType.Bound bound){return false;}
     default String command(net.minecraft.server.level.ServerPlayer p,String input){return input;}
     default boolean move(net.minecraft.server.level.ServerPlayer p,double x,double y,double z,float yaw,float pitch,double fromX,double fromY,double fromZ,float oldYaw,float oldPitch){return true;}

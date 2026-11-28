@@ -104,6 +104,25 @@ final class BukkitPatches {
                 .with(e);
             return true;
         });
+        plan.add("net/minecraft/server/level/ServerLevel",215,"Unity shutdown timings","save",(cf,model)->{
+            int[] methods={0,0,0};
+            byte[] bytes=cf.transformClass(model,ClassTransform.transformingMethodBodies(m->m.methodName().equalsString("save"),new CodeTransform(){
+                int start;
+                public void atStart(CodeBuilder b){methods[0]++;start=b.allocateLocal(TypeKind.LONG);b.invokestatic(HOOK,"saveStart",MethodTypeDesc.ofDescriptor("()J")).lstore(start);}
+                public void accept(CodeBuilder b,CodeElement e){
+                    if(e instanceof InvokeInstruction call && call.owner().asInternalName().equals("net/minecraft/world/level/entity/PersistentEntitySectionManager") && call.type().equalsString("()V") &&
+                            (call.name().equalsString("saveAll") || call.name().equalsString("autoSave"))){
+                        methods[call.name().equalsString("saveAll")?1:2]++;
+                        b.with(e).aload(0).invokestatic(ClassDesc.of("mc.unity.core.Events"),"savedLevel",MethodTypeDesc.ofDescriptor("(Lnet/minecraft/server/level/ServerLevel;)V"));
+                        return;
+                    }
+                    if(e instanceof java.lang.classfile.instruction.ReturnInstruction)b.lload(start).aload(0).invokestatic(HOOK,"saveEnd",MethodTypeDesc.ofDescriptor("(JLnet/minecraft/server/level/ServerLevel;)V"));
+                    b.with(e);
+                }
+            }));
+            if(!java.util.Arrays.equals(methods,new int[]{1,1,1}))throw new IOException("Unexpected ServerLevel.save anchors "+java.util.Arrays.toString(methods));
+            return bytes;
+        });
         method(plan, "net/minecraft/server/level/ServerLevel", "save", "saveLevelData", (b, e) -> {
             if (!(e instanceof InvokeInstruction i) || !i.name().equalsString("saveLevelData"))
                 return false;

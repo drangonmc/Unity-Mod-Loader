@@ -14,7 +14,7 @@ public final class ClientHooks {
         if (cleanup != null)
             throw new IllegalStateException("Client session already open");
         setup = false;
-        var mods = NativeLoader.open(game, "client");
+        var mods = NativeLoader.open(game,"client",new NativeLoader.Loaded("world-marker",new WorldMarker()));
         Platforms forge;
         try {
             forge = Platforms.open(game, mods.mods().stream().map(NativeLoader.Loaded::id).toList(), "CLIENT");

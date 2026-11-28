@@ -232,6 +232,29 @@ public final class NeoBus implements IEventBus {
     private static final class ClientBreakBinding {}
     private boolean gameplay(Class<?> kind) {
         boolean bound=false;
+        if(kind.isAssignableFrom(net.neoforged.neoforge.event.level.LevelEvent.Load.class)){
+            bridges.computeIfAbsent(net.neoforged.neoforge.event.level.LevelEvent.Load.class,k->{
+                java.util.function.Consumer<net.minecraft.world.level.Level> dispatch=level->post(new net.neoforged.neoforge.event.level.LevelEvent.Load(level));
+                var server=Events.LEVEL_LOAD.listen(dispatch::accept);
+                var client=Events.CLIENT_LEVEL_LOAD.listen(dispatch);
+                return ()->{client.run();server.run();};
+            });
+            bound=true;
+        }
+        if(kind.isAssignableFrom(net.neoforged.neoforge.event.level.LevelEvent.Unload.class)){
+            bridges.computeIfAbsent(net.neoforged.neoforge.event.level.LevelEvent.Unload.class,k->{
+                java.util.function.Consumer<net.minecraft.world.level.Level> dispatch=level->post(new net.neoforged.neoforge.event.level.LevelEvent.Unload(level));
+                var server=Events.LEVEL_UNLOAD.listen(dispatch::accept);
+                var client=Events.CLIENT_LEVEL_UNLOAD.listen(dispatch);
+                return ()->{client.run();server.run();};
+            });
+            bound=true;
+        }
+        if(kind.isAssignableFrom(net.neoforged.neoforge.event.level.LevelEvent.Save.class)){
+            bridges.computeIfAbsent(net.neoforged.neoforge.event.level.LevelEvent.Save.class,k->Events.LEVEL_SAVE.listen(level->post(new net.neoforged.neoforge.event.level.LevelEvent.Save(level))));
+            bound=true;
+        }
+
         if(kind.isAssignableFrom(net.neoforged.neoforge.event.level.block.BreakBlockEvent.class)){
             bridges.computeIfAbsent(ClientBreakBinding.class,k->Events.CLIENT_BREAK.listen(new NeoActions(this,mc.unity.core.Actions.Kind.BREAK)::accept));bound=true;
         }

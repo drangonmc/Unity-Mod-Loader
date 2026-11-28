@@ -70,16 +70,20 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
             return new PluginFile(path, desc, paper, needs, after, before, imports);
         }
     }
-    static List<PluginFile> ordered(Path directory) throws Exception {
+    static List<PluginFile> ordered(Path... directories) throws Exception {
         var files = new TreeMap<String, PluginFile>(String.CASE_INSENSITIVE_ORDER);
-        try (var list = Files.list(Files.createDirectories(directory))) {
+        for(var directory:new LinkedHashSet<>(Arrays.asList(directories)))try (var list = Files.list(Files.createDirectories(directory))) {
             for (var jar : list.filter(p
                                        -> Files.isRegularFile(p) &&
                                               p.toString().toLowerCase(Locale.ROOT).endsWith(".jar"))
                                .sorted()
                                .toList()) {
                 var file = read(jar);
-                if (files.putIfAbsent(file.name(), file) != null)
+                if(file.name().equals("UnityEditRegions") && file.description.getMain().equals("mc.unity.editregions.EditRegions") &&
+                        mc.unity.bootstrap.VanillaBundle.hash(jar).equals("7175974a1d4d0a3bf3ffc18c8bbc284dfe59954cc371cb6746e78859f283deb8"))continue;
+                var previous=files.putIfAbsent(file.name(),file);
+                if(previous!=null && !previous.jar.getParent().equals(jar.getParent()) && Files.mismatch(previous.jar,jar)==-1)continue;
+                if (previous!=null)
                     throw new IOException("Duplicate plugin " + file.name());
             }
         }
@@ -190,7 +194,7 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
             }
             finally {
                 try { if(libraries!=null)libraries.close(); }
-                finally {try{if(archive!=null)archive.close();}finally{super.close();}}
+                finally {try{closeArchive();}finally{super.close();}}
             }
         }
         private URL ownResource(String name) {return super.findResource(name);}
@@ -203,7 +207,13 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
             if(libraries!=null)urls.addAll(Collections.list(libraries.findResources(name)));
             return Collections.enumeration(urls);
         }
+        private final java.util.concurrent.locks.ReentrantReadWriteLock archiveAccess = new java.util.concurrent.locks.ReentrantReadWriteLock();
         private JarFile archive;
+        private void closeArchive() throws IOException {
+            var lock=archiveAccess.writeLock();lock.lock();
+            try {if(archive!=null){archive.close();archive=null;}}finally{lock.unlock();}
+        }
+        private java.util.jar.Manifest manifest;
         @Override protected Class<?> findClass(String name) throws ClassNotFoundException {
             byte[] adapter=platformClasses.get(name);
             if(adapter!=null)return defineClass(name,adapter,0,adapter.length);
@@ -211,11 +221,16 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
                 file.description().getMain().equals("com.sk89q.worldguard.bukkit.WorldGuardPlugin");
             if(!timer && file.description().getAPIVersion()==null)return super.findClass(name);
             try {
-                var entry=archive.getJarEntry(name.replace('.','/')+".class");
-                if(entry==null)throw new ClassNotFoundException(name);
                 byte[] bytes;
-                try(var in=archive.getInputStream(entry)){bytes=in.readAllBytes();}
-                var signers=entry.getCodeSigners();
+                java.security.CodeSigner[] signers;
+                var lock=archiveAccess.readLock();lock.lock();
+                try {
+                    if(archive==null)throw new ClassNotFoundException("Plugin closed: "+name);
+                    var entry=archive.getJarEntry(name.replace('.','/')+".class");
+                    if(entry==null)throw new ClassNotFoundException(name);
+                    try(var in=archive.getInputStream(entry)){bytes=in.readAllBytes();}
+                    signers=entry.getCodeSigners();
+                }finally{lock.unlock();}
                 if(signers==null){
                     if(file.description().getAPIVersion()!=null)bytes=ModernMaterials.transform(bytes,this);
                     if(timer)bytes=PluginTimers.migration(bytes,this);
@@ -224,7 +239,7 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
                 int dot=name.lastIndexOf('.');
                 if(dot>0){
                     String pkg=name.substring(0,dot);
-                    var manifest=archive.getManifest();
+                    
                     if(getDefinedPackage(pkg)==null)try{
                         if(manifest!=null)definePackage(pkg,manifest,origin);else definePackage(pkg,null,null,null,null,null,null,null);
                     }catch(IllegalArgumentException race){if(getDefinedPackage(pkg)==null)throw race;}
@@ -251,6 +266,7 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
                 }
             }
             archive=new JarFile(file.jar().toFile(),true,java.util.zip.ZipFile.OPEN_READ,Runtime.version());
+            try{manifest=archive.getManifest();}catch(IOException failure){archive.close();throw failure;}
         }
         void link(Map<String, Loader> available) {
             if (!file.description().getLibraries().isEmpty()) {
@@ -337,7 +353,7 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
             if (plugin != null)
                 throw new IllegalStateException("Already initialized " + file.name());
             plugin = instance;
-            instance.init(host.server, file.description, host.directory.resolve(file.name()).toFile(),
+            instance.init(host.server, file.description, host.dataFolder(file).toFile(),
                           file.jar.toFile(), this, file.description, Logger.getLogger(file.name()));
         }
     }

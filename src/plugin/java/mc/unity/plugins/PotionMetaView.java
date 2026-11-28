@@ -42,6 +42,7 @@ final class PotionMetaView {
                 var effects=new ArrayList<>(v.customEffects());boolean changed=false;
                 if(name.equals("clearCustomEffects")){changed=!effects.isEmpty();effects.clear();}
                 else {
+                    if(args[0]==null)throw new IllegalArgumentException("Potion effect must be specified");
                     var input=args[0] instanceof PotionEffect e?e:null;
                     var kind=input==null?(PotionEffectType)args[0]:input.getType();
                     var h=BuiltInRegistries.MOB_EFFECT.get(Identifier.parse(kind.getKey().toString())).orElseThrow();

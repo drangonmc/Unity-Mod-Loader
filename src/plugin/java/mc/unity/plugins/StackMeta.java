@@ -43,7 +43,9 @@ public final class StackMeta implements InvocationHandler {
             case "hasOwner"->item.has(DataComponents.PROFILE);
             case "getOwner"->{var p=item.get(DataComponents.PROFILE);yield p==null?null:p.name().orElse(null);}
             case "setOwner"->{if(args[0]==null)item.remove(DataComponents.PROFILE);else item.set(DataComponents.PROFILE,net.minecraft.world.item.component.ResolvableProfile.createUnresolved((String)args[0]));yield true;}
-            case "getOwningPlayer"->{var p=item.get(DataComponents.PROFILE);yield p==null?null:org.bukkit.Bukkit.getOfflinePlayer(p.partialProfile().id());}
+            case "getOwningPlayer"->{var p=item.get(DataComponents.PROFILE);if(p==null)yield null;
+                var profile=p.partialProfile();
+                yield net.minecraft.util.Util.NIL_UUID.equals(profile.id())?(profile.name().isBlank()?null:org.bukkit.Bukkit.getOfflinePlayer(profile.name())):org.bukkit.Bukkit.getOfflinePlayer(profile.id());}
             case "setOwningPlayer"->{if(args[0]==null)item.remove(DataComponents.PROFILE);else item.set(DataComponents.PROFILE,net.minecraft.world.item.component.ResolvableProfile.createUnresolved(((org.bukkit.OfflinePlayer)args[0]).getUniqueId()));yield true;}
             case "getPlayerProfile","getOwnerProfile"->{var p=item.get(DataComponents.PROFILE);yield p==null?null:LoginProfiles.view(p.partialProfile());}
             case "setPlayerProfile","setOwnerProfile"->{if(args[0]==null)item.remove(DataComponents.PROFILE);else item.set(DataComponents.PROFILE,net.minecraft.world.item.component.ResolvableProfile.createResolved(LoginProfiles.nativeProfile((org.bukkit.profile.PlayerProfile)args[0])));yield null;}
@@ -80,7 +82,8 @@ public final class StackMeta implements InvocationHandler {
                 if(key.equals("hasEnchant"))yield level>0;yield level;
             }
             case "addEnchant","removeEnchant" -> {
-                var e=(BukkitEnchant)args[0];int level=args.length==1?0:(int)args[1];
+                if(!(args[0] instanceof BukkitEnchant e))throw new IllegalArgumentException("Expected a registered enchantment");
+                int level=args.length==1?0:(int)args[1];
                 if(args.length>1 && level<=0)yield false;
                 if(args.length>1 && !(boolean)args[2] && (level<e.getStartLevel() || level>e.getMaxLevel()))yield false;
                 int old=enchantments.getLevel(e.holder);if(old==level)yield false;
@@ -90,7 +93,7 @@ public final class StackMeta implements InvocationHandler {
             }
             case "removeEnchantments" -> {item.remove(DataComponents.ENCHANTMENTS);yield null;}
             case "hasConflictingEnchant" -> {
-                var candidate=(BukkitEnchant)args[0];yield enchantments.keySet().stream().anyMatch(h->!h.equals(candidate.holder) && !net.minecraft.world.item.enchantment.Enchantment.areCompatible(h,candidate.holder));
+                if(!(args[0] instanceof BukkitEnchant candidate))throw new IllegalArgumentException("Expected a registered enchantment");yield enchantments.keySet().stream().anyMatch(h->!h.equals(candidate.holder) && !net.minecraft.world.item.enchantment.Enchantment.areCompatible(h,candidate.holder));
             }
             case "hasEnchants" -> !enchantments.isEmpty();
             case "hasDamage", "hasDamageValue" -> item.getDamageValue() > 0;
@@ -100,7 +103,8 @@ public final class StackMeta implements InvocationHandler {
             case "setCustomModelDataComponent"->{if(args[0]==null)item.remove(DataComponents.CUSTOM_MODEL_DATA);else item.set(DataComponents.CUSTOM_MODEL_DATA,ModelComponent.nativeData((org.bukkit.inventory.meta.components.CustomModelDataComponent)args[0]));yield null;}
             case "getCustomModelData"->{var c=item.get(DataComponents.CUSTOM_MODEL_DATA);if(c==null || c.floats().isEmpty())throw new IllegalStateException("No custom model data");yield c.floats().getFirst().intValue();}
             case "setCustomModelData"->{if(args[0]==null)item.remove(DataComponents.CUSTOM_MODEL_DATA);else item.set(DataComponents.CUSTOM_MODEL_DATA,new net.minecraft.world.item.component.CustomModelData(List.of(((Integer)args[0]).floatValue()),List.of(),List.of(),List.of()));yield null;}
-            case "hasCustomModelData" -> item.has(DataComponents.CUSTOM_MODEL_DATA);
+            case "hasCustomModelData" -> !item.getOrDefault(DataComponents.CUSTOM_MODEL_DATA,net.minecraft.world.item.component.CustomModelData.EMPTY).floats().isEmpty();
+            case "hasCustomModelDataComponent" -> item.has(DataComponents.CUSTOM_MODEL_DATA);
             case "isUnbreakable" -> item.has(DataComponents.UNBREAKABLE);
             case "hasItemName" -> item.hasNonDefault(DataComponents.ITEM_NAME);
             case "equals" -> args[0] instanceof ItemMeta m && from(m) instanceof StackMeta other &&

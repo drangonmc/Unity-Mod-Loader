@@ -1,0 +1,4 @@
+residence.log
+信息: Enabled built-in WorldEdit / WorldGuard region protection
+信息: U33 POLICY EXTRACT 67, 80, 35 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=false
+[00:44:59] [Server thread/INFO]: [STDOUT]: U33 CARGO d72a93df-334e-34e6-81f8-67ddcdeb22db 0 IDLE false

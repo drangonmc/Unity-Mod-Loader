@@ -35,6 +35,15 @@ final class BukkitMaterialPatch {
                     }
                     c.with(ins);
                 }));
+            else if(e instanceof MethodModel m && m.methodName().equalsString("<init>")){
+                b.transformMethod(m,MethodTransform.transformingCode((c,i)->{
+                    if(i instanceof java.lang.classfile.instruction.InvokeInstruction call && call.opcode()==Opcode.INVOKESPECIAL &&
+                            call.owner().asInternalName().equals("java/lang/Enum") && call.name().equalsString("<init>")){
+                        c.aload(1).invokestatic(bridge,"ordinalAtConstruction",MethodTypeDesc.of(CD_int,CD_int,CD_String));
+                    }
+                    c.with(i);
+                }));
+            }
             else if (e instanceof MethodModel m && m.methodName().equalsString("matchMaterial")
                     && m.methodType().equalsString("(Ljava/lang/String;Z)Lorg/bukkit/Material;"))
                 b.transformMethod(m, MethodTransform.transformingCode(new CodeTransform() {

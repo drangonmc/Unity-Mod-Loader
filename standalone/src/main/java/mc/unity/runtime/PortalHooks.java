@@ -27,12 +27,18 @@ public final class PortalHooks {
         if(!p.create)return Optional.empty();var old=radius.get();radius.set(p.creation);
         try{return forcer.createPortal(pos,axis);}finally{if(old==null)radius.remove();else radius.set(old);}
     }
-    public static TeleportTransition end(TeleportTransition t,Entity e){
-        var host=ServerHooks.pluginHost();if(t==null || !(e instanceof ServerPlayer player) || host==null)return t;
+    public static TeleportTransition end(TeleportTransition t,Entity e,BlockPos platform){
+        if(t==null)return null;
+        var host=ServerHooks.pluginHost();
         var a=PositionMoveRotation.calculateAbsolute(PositionMoveRotation.of(e),PositionMoveRotation.of(t),t.relatives());
         var original=new Plan(t.newLevel(),a.position(),a.yRot(),a.xRot(),0,true,0);
-        var result=host.portal(player,original,"END_PORTAL");
-        if(result==null)return null;if(original.equals(result))return t;
+        var result=e instanceof ServerPlayer player && host!=null?host.portal(player,original,"END_PORTAL"):original;
+        if(result==null)return null;
+        if(platform!=null && result.create && result.world.dimension()==Level.END){
+            var offset=BlockPos.containing(result.target).subtract(BlockPos.containing(original.target));
+            net.minecraft.world.level.levelgen.feature.EndPlatformFeature.createEndPlatform(result.world,platform.offset(offset),true);
+        }
+        if(original.equals(result))return t;
         return new TeleportTransition(result.world,result.target,a.deltaMovement(),result.yaw,result.pitch,t.missingRespawnBlock(),t.asPassenger(),java.util.Set.of(),t.postTeleportTransition());
     }
 }

@@ -595,6 +595,7 @@ final class BukkitViews {
             case "isFlying" -> Objects.requireNonNull(p).getAbilities().flying;
             case "getUniqueId" -> Objects.requireNonNull(p).getUUID();
             case "getWorld" -> world((ServerLevel)Objects.requireNonNull(p).level());
+            case "canSee" -> {var other=nativeEntity((org.bukkit.entity.Entity)a[0]);yield other!=null && (other==p || mc.unity.runtime.EntityPresentation.visible(other,p));}
             case "hideEntity","showEntity" -> {
                 var target=nativeEntity((org.bukkit.entity.Entity)a[1]);
                 if(target!=null)mc.unity.runtime.EntityPresentation.visible(target,Objects.requireNonNull(p),a[0],m.equals("showEntity"));

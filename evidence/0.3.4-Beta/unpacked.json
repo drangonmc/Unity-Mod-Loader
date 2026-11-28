@@ -1,0 +1,8 @@
+{
+  "archiveSHA256": "186f43854c30cdf0f79d06f3d9a6a25cd8c85037af70fbd1c4bd1cf1ce5d63c5",
+  "engineSHA256": "d29ceaf31fb7aeeb808da1b5d94f75a166ec3d64bea53e5b6e40f87c8f81d589",
+  "singleJar": true,
+  "firstBoot": true,
+  "restartCount": 1,
+  "clientProfile": "unity-standalone-0.3.4-Beta-26.2"
+}

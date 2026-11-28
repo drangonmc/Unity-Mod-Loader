@@ -88,7 +88,9 @@ final class PluginSession implements AutoCloseable {
 
     static PluginSession open(Path game) throws Exception {
         Path directory = Files.createDirectories(game.resolve("plugins"));
-        try (var files = Files.list(directory)) {
+        Path primary=Files.createDirectories(Path.of(System.getProperty("mc.unity.pluginsDir",directory.toString()))).toRealPath();
+        try (var current=Files.list(primary);var previous=Files.list(directory)) {
+            var files=java.util.stream.Stream.concat(current,previous);
             if (files.noneMatch(f
                                 -> Files.isRegularFile(f) &&
                                        f.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".jar")))
@@ -120,7 +122,7 @@ final class PluginSession implements AutoCloseable {
                                .asSubclass(PluginHost.class)
                                .getConstructor()
                                .newInstance();
-            session.host.initialize(directory);
+            session.host.initializePlugins(primary,directory.toRealPath());
             session.subscribe();
             return session;
         } catch (Exception | Error failure) {

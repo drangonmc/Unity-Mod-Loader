@@ -46,6 +46,11 @@ public final class ForgeCommands {
             r.listeners().addAll(e.getListeners());
         });
         Events.SERVER_ABOUT_TO_START.listen(GameEvents::about);
+        Events.LEVEL_LOAD.listen(level -> GameEvents.level(new net.minecraftforge.event.level.LevelEvent.Load(level),net.minecraftforge.event.level.LevelEvent.Load.BUS));
+        Events.LEVEL_UNLOAD.listen(level -> GameEvents.level(new net.minecraftforge.event.level.LevelEvent.Unload(level),net.minecraftforge.event.level.LevelEvent.Unload.BUS));
+        Events.CLIENT_LEVEL_LOAD.listen(level -> GameEvents.level(new net.minecraftforge.event.level.LevelEvent.Load(level),net.minecraftforge.event.level.LevelEvent.Load.BUS));
+        Events.CLIENT_LEVEL_UNLOAD.listen(level -> GameEvents.level(new net.minecraftforge.event.level.LevelEvent.Unload(level),net.minecraftforge.event.level.LevelEvent.Unload.BUS));
+        Events.LEVEL_SAVE.listen(level -> GameEvents.level(new net.minecraftforge.event.level.LevelEvent.Save(level),net.minecraftforge.event.level.LevelEvent.Save.BUS));
         Events.SERVER_STARTING.listen(GameEvents::starting);
         Events.SERVER_STARTED.listen(GameEvents::started);
         Events.SERVER_STOPPING.listen(GameEvents::stopping);

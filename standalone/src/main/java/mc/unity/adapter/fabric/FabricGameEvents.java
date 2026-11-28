@@ -10,6 +10,15 @@ public final class FabricGameEvents implements Actions.Adapter {
         Events.SERVER_STARTED.listen(s -> ServerLifecycleEvents.SERVER_STARTED.invoker().onServerStarted(s));
         Events.SERVER_STOPPING.listen(s -> ServerLifecycleEvents.SERVER_STOPPING.invoker().onServerStopping(s));
         Events.SERVER_STOPPED.listen(s -> ServerLifecycleEvents.SERVER_STOPPED.invoker().onServerStopped(s));
+        Events.CHUNK_LOAD.listen(e->{
+            if(e.chunk().getLevel() instanceof net.minecraft.server.level.ServerLevel world){
+                ServerChunkEvents.CHUNK_LOAD.invoker().onChunkLoad(world,e.chunk(),e.fresh());
+                if(e.fresh())ServerChunkEvents.CHUNK_GENERATE.invoker().onChunkGenerate(world,e.chunk());
+            }
+        });
+        Events.CHUNK_UNLOAD.listen(chunk->{
+            if(chunk.getLevel() instanceof net.minecraft.server.level.ServerLevel world)ServerChunkEvents.CHUNK_UNLOAD.invoker().onChunkUnload(world,chunk);
+        });
         Events.BLOCK_ENTITY_LOAD.listen(e->ServerBlockEntityEvents.BLOCK_ENTITY_LOAD.invoker().onLoad(e.entity(),e.level()));
         Events.BLOCK_ENTITY_UNLOAD.listen(e->ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.invoker().onUnload(e.entity(),e.level()));
         Events.LEVEL_LOAD.listen(

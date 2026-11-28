@@ -9,7 +9,7 @@ import net.minecraft.world.entity.Entity;
 public final class EntityPresentation {
     private static final class State {
         volatile boolean persistent=true, visible=true;
-        final Map<UUID, Set<Object>> flipped=new HashMap<>();
+        final Map<UUID,Map<Object,Boolean>> overrides=new HashMap<>();
     }
     private static final Map<Entity,State> states=Collections.synchronizedMap(new WeakHashMap<>());
     private static volatile boolean used;
@@ -28,7 +28,12 @@ public final class EntityPresentation {
     public static boolean defaultVisible(Entity e){var s=states.get(e);return s==null || s.visible;}
     public static boolean visible(Entity e,ServerPlayer p){
         if(!used)return true;
-        var s=states.get(e);return s==null || s.visible!=s.flipped.containsKey(p.getUUID());
+        var s=states.get(e);if(s==null)return true;
+        synchronized(s){
+            var requests=s.overrides.get(p.getUUID());
+            if(requests==null || requests.isEmpty())return s.visible;
+            return !requests.containsValue(false);
+        }
     }
     public static void defaultVisible(Entity e,boolean value){
         var state=edit(e);if(state.visible==value)return;
@@ -36,11 +41,25 @@ public final class EntityPresentation {
         if(e.level() instanceof ServerLevel level)for(var player:level.players())refresh(level,e,player);
     }
     public static void visible(Entity e,ServerPlayer player,Object plugin,boolean value){
-        if(e.level()!=player.level())return;
-        var state=edit(e);var id=player.getUUID();
-        if(value!=state.visible)state.flipped.computeIfAbsent(id,k->Collections.newSetFromMap(new WeakHashMap<>())).add(plugin);
-        else {var toggles=state.flipped.get(id);if(toggles!=null && toggles.remove(plugin) && toggles.isEmpty())state.flipped.remove(id);}
-        refresh(player.level(),e,player);
+        var state=edit(e);
+        synchronized(state){state.overrides.computeIfAbsent(player.getUUID(),k->new IdentityHashMap<>()).put(plugin,value);}
+        if(e.level()==player.level())refresh(player.level(),e,player);
+    }
+    public static void release(Object plugin){
+        Map<Entity,State> snapshot;
+        synchronized(states){snapshot=new IdentityHashMap<>(states);}
+        for(var entry:snapshot.entrySet()){
+            var state=entry.getValue();var changed=new ArrayList<UUID>();
+            synchronized(state){
+                state.overrides.forEach((id,map)->{if(map.remove(plugin)!=null)changed.add(id);});
+                state.overrides.values().removeIf(Map::isEmpty);
+            }
+            var entity=entry.getKey();
+            if(entity.level() instanceof ServerLevel level)for(var id:changed){
+                var viewer=level.getServer().getPlayerList().getPlayer(id);
+                if(viewer!=null && viewer.level()==level)refresh(level,entity,viewer);
+            }
+        }
     }
     private static void refresh(ServerLevel level,Entity e,ServerPlayer p){
         var tracked=((it.unimi.dsi.fastutil.ints.Int2ObjectMap<?>)TRACKED.get(level.getChunkSource().chunkMap)).get(e.getId());

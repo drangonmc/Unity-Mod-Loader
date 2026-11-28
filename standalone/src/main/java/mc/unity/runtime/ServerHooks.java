@@ -17,6 +17,12 @@ public final class ServerHooks {
     public static MinecraftServer currentServer(){return running!=null?running:preparing;}
     public static void about(MinecraftServer server) {preparing=server;mc.unity.core.Events.about(server); }
     private static boolean stopping;
+    private static final boolean PROFILE_EXIT=Boolean.getBoolean("mc.unity.shutdownDiagnostics");
+    private static long stoppingSince;
+    public static long saveStart(){return PROFILE_EXIT && stopping?System.nanoTime():0L;}
+    public static void saveEnd(long start,net.minecraft.server.level.ServerLevel level){
+        if(start!=0L)System.out.println("[Unity timings] save "+level.dimension().identifier()+" "+((System.nanoTime()-start)/1_000_000)+" ms");
+    }
     private static boolean sharedClientSession;
     static void attachClient(NativeLoader mods, Platforms platforms) {
         if (nativeMods != null) throw new IllegalStateException("Mod session already attached");
@@ -30,7 +36,7 @@ public final class ServerHooks {
     }
 
     static void discover(Path instance) throws Exception {
-        nativeMods = NativeLoader.open(instance);
+        nativeMods = NativeLoader.open(instance,"server",new NativeLoader.Loaded("world-marker",new WorldMarker()));
         try {
             forge = Platforms.open(instance, names());
             try {
@@ -172,7 +178,7 @@ public final class ServerHooks {
         dispatcher.register(Commands.literal("unity").executes(c -> {
             c.getSource().sendSuccess(
                 ()
-                    -> Component.literal("Unity 0.3.3-Beta standalone | MC 26.2 | native " + names() +
+                    -> Component.literal("Unity 0.3.4-Beta standalone | MC 26.2 | native " + names() +
                                          " | platform mods " + forge.ids() + " | plugins " +
                                          (plugins == null ? List.of() : plugins.host().names())),
                 false);
@@ -200,6 +206,7 @@ public final class ServerHooks {
         if (server != running || stopping)
             return;
         stopping = true;
+        if(PROFILE_EXIT)stoppingSince=System.nanoTime();
         mc.unity.core.Events.stopping(server);
         for (var entry : nativeMods.serverCallbacks().reversed()) {
             try {
@@ -247,6 +254,7 @@ public final class ServerHooks {
             Thread.getAllStackTraces().keySet().stream().filter(t->t.isAlive() && !t.isDaemon())
                 .map(Thread::getName).sorted().forEach(n->System.out.println("[Unity] shutdown thread "+n));
         }
+        if(PROFILE_EXIT && stoppingSince!=0L)System.out.println("[Unity timings] shutdown callbacks and vanilla save "+((System.nanoTime()-stoppingSince)/1_000_000)+" ms");
         System.out.println("[Unity] Standalone stopped");
     }
 }
