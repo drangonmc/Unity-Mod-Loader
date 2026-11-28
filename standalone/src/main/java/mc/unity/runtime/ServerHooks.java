@@ -172,7 +172,7 @@ public final class ServerHooks {
         dispatcher.register(Commands.literal("unity").executes(c -> {
             c.getSource().sendSuccess(
                 ()
-                    -> Component.literal("Unity 0.3.1-Beta standalone | MC 26.2 | native " + names() +
+                    -> Component.literal("Unity 0.3.2-Beta standalone | MC 26.2 | native " + names() +
                                          " | platform mods " + forge.ids() + " | plugins " +
                                          (plugins == null ? List.of() : plugins.host().names())),
                 false);
@@ -210,6 +210,7 @@ public final class ServerHooks {
         }
     }
     public static void stopped(MinecraftServer server) {
+        for(var level:server.getAllLevels())net.neoforged.neoforge.common.util.FakePlayerFactory.unloadLevel(level);
         pendingLogins.clear();
         if (nativeMods == null || (sharedClientSession && server!=running && server!=preparing) || (running != null && server != running))
             return;
@@ -242,6 +243,10 @@ public final class ServerHooks {
         }
         nativeMods = null;
         forge = null;
+        if(Boolean.getBoolean("mc.unity.shutdownDiagnostics")){
+            Thread.getAllStackTraces().keySet().stream().filter(t->t.isAlive() && !t.isDaemon())
+                .map(Thread::getName).sorted().forEach(n->System.out.println("[Unity] shutdown thread "+n));
+        }
         System.out.println("[Unity] Standalone stopped");
     }
 }

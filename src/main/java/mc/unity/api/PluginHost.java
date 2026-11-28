@@ -7,8 +7,19 @@ import net.minecraft.server.level.ServerLevel;
 public interface PluginHost extends UnityMod, AutoCloseable {
     default boolean chat(net.minecraft.server.level.ServerPlayer p,net.minecraft.network.chat.PlayerChatMessage message,net.minecraft.network.chat.ChatType.Bound bound){return false;}
     default String command(net.minecraft.server.level.ServerPlayer p,String input){return input;}
-    default boolean move(net.minecraft.server.level.ServerPlayer p,double x,double y,double z,float yaw,float pitch,double fromX,double fromY,double fromZ){return true;}
+    default boolean move(net.minecraft.server.level.ServerPlayer p,double x,double y,double z,float yaw,float pitch,double fromX,double fromY,double fromZ,float oldYaw,float oldPitch){return true;}
     default net.minecraft.world.level.portal.TeleportTransition teleport(net.minecraft.server.level.ServerPlayer p,net.minecraft.world.level.portal.TeleportTransition transition,String cause){return transition;}
+    default boolean creature(net.minecraft.world.entity.Entity entity,String reason){return true;}
+    default java.util.List<net.minecraft.core.BlockPos> explode(net.minecraft.world.level.ServerExplosion e,java.util.List<net.minecraft.core.BlockPos> blocks){return blocks;}
+    default boolean playerDying(net.minecraft.server.level.ServerPlayer p,net.minecraft.world.damagesource.DamageSource source){return false;}
+    default boolean deathEquipment(net.minecraft.server.level.ServerPlayer p){return false;}
+    default int deathXp(net.minecraft.server.level.ServerPlayer p,int vanilla){return vanilla;}
+    default net.minecraft.network.chat.Component deathMessage(net.minecraft.server.level.ServerPlayer p,net.minecraft.network.chat.Component vanilla){return vanilla;}
+    default boolean showDeath(net.minecraft.server.level.ServerPlayer p,boolean original){return original;}
+    default void restored(net.minecraft.server.level.ServerPlayer player,net.minecraft.server.level.ServerPlayer old,boolean alive){}
+    default net.minecraft.world.level.portal.TeleportTransition respawning(net.minecraft.server.level.ServerPlayer p,net.minecraft.world.level.portal.TeleportTransition t,boolean alive){return t;}
+    default boolean menuOpen(net.minecraft.server.level.ServerPlayer p,net.minecraft.world.inventory.AbstractContainerMenu m,net.minecraft.world.MenuProvider provider){return true;}
+    default void menuClose(net.minecraft.server.level.ServerPlayer p,String reason){}
     void tick(MinecraftServer server);
     default void entityUntracked(net.minecraft.world.entity.Entity entity) {}
     default net.minecraft.network.chat.Component preLogin(com.mojang.authlib.GameProfile profile,java.net.InetAddress address){return null;}

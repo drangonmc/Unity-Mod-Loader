@@ -1,0 +1,27 @@
+{
+  "engine": "5ffb1cdd5277f807afdb064edf430f773fae7c5912d1c90edd3b667dde5b3d46",
+  "originals": [
+    {
+      "slug": "fabric-language-kotlin",
+      "filename": "fabric-language-kotlin-1.13.14+kotlin.2.4.20.jar",
+      "version": "1.13.14+kotlin.2.4.20",
+      "url": "https://cdn.modrinth.com/data/Ha28R6CL/versions/KcCe0rZz/fabric-language-kotlin-1.13.14%2Bkotlin.2.4.20.jar",
+      "sha512": "3e6983441805d593eb0f8fece5dcfa3f38a726bc010a680b5acb61aaf6e51b68d4b7a4e8684a12cfcd6f7204aca354626a4eee72bf28c865d10595317d6dec94",
+      "requires": ">=0.16.9"
+    },
+    {
+      "slug": "kotlin-for-forge",
+      "version": "6.5.0",
+      "filename": "kotlinforforge-6.5.0-all.jar",
+      "versionId": "sGsRJU5e",
+      "url": "https://cdn.modrinth.com/data/ordsPcFz/versions/sGsRJU5e/kotlinforforge-6.5.0-all.jar",
+      "sha512": "dc8b47e5af59025570a6d182b4392188d40e3e1ee74545de080c07b0eb52d2c5c13761c21fccbcd1ac09ddf4eeec030c3b167142abbbfd06b1bb4f394792c6cb"
+    }
+  ],
+  "entrypoints": [
+    "preLaunch",
+    "main",
+    "NeoForge @Mod",
+    "FMLCommonSetupEvent"
+  ]
+}

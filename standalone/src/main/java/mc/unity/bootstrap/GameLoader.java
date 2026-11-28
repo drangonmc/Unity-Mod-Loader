@@ -39,6 +39,7 @@ public final class GameLoader extends URLClassLoader {
         return fullFabricApi;
     }
     private final Set<Path> neoMods = new HashSet<>();
+    private Path kffService;
     private Path puzzles;
     private java.util.function.UnaryOperator<byte[]> puzzlesGuard;
     private boolean puzzlesContract(JarFile jar) throws IOException {
@@ -76,6 +77,8 @@ public final class GameLoader extends URLClassLoader {
     private final Map<String, String> mixinOwners = new LinkedHashMap<>();
     private Path mounted;
     private AutoCloseable nested;
+    private Map<Path,String[]> generatedLibraries=Map.of();
+    public String[] generatedLibrary(Path path){return generatedLibraries.get(path);}
     private Set<Path> plainLibraries = Set.of();
     private Map<Path, String> dependencyStamps = Map.of();
     public boolean plainLibrary(Path path) {
@@ -98,6 +101,7 @@ public final class GameLoader extends URLClassLoader {
         }
     }
     public static boolean reserved(String n) {
+        if(n.startsWith("net/fabricmc/language/"))return false; // Language providers are distributed as mods. The Loader APIs live under loader/ and api/.
         return List
             .of("java/", "javax/", "jdk/", "mc/unity/", "net/minecraft/", "net/minecraftforge/",
                 "net/neoforged/", "net/fabricmc/", "org/spongepowered/asm/", "org/objectweb/asm/")
@@ -124,6 +128,7 @@ public final class GameLoader extends URLClassLoader {
             nested = (AutoCloseable)resolver.getMethod("resolve", Path.class, boolean.class)
                          .invoke(null, game.resolve("mods"), client);
             containers = (Map<Path, Path>)resolver.getMethod("containers").invoke(nested);
+            generatedLibraries=(Map<Path,String[]>)resolver.getMethod("generatedLibraries").invoke(nested);
             plainLibraries = (Set<Path>)resolver.getMethod("plainLibraries").invoke(nested);
             dependencyStamps = (Map<Path, String>)resolver.getMethod("fingerprints").invoke(nested);
             {
@@ -133,6 +138,11 @@ public final class GameLoader extends URLClassLoader {
                 for (var file : selected) {
                     var jar = new JarFile(file.toFile(), true, JarFile.OPEN_READ, Runtime.version());
                     mods.put(file, jar);
+                    boolean kff=KffLanguage.provider(jar);
+                    if(kff){
+                        if(kffService!=null)throw new IOException("Multiple KFF language services");
+                        kffService=file;
+                    }
                     if (jar.getJarEntry("fabric.mod.json") == null &&
                         jar.getJarEntry("META-INF/neoforge.mods.toml") != null)
                         neoMods.add(file);
@@ -161,7 +171,7 @@ public final class GameLoader extends URLClassLoader {
                     for (var entries = jar.versionedStream().iterator(); entries.hasNext();) {
                         var entry = entries.next();
                         String n = entry.getName();
-                        if (entry.isDirectory() || omitted.contains(n) ||
+                        if (entry.isDirectory() || kff && KffLanguage.hostInternal(n) || omitted.contains(n) ||
                             n.startsWith("META-INF/versions/") || n.equals("module-info.class") ||
                             n.equals("META-INF/MANIFEST.MF"))
                             continue;
@@ -260,10 +270,11 @@ public final class GameLoader extends URLClassLoader {
         mounted = null;
         fullFabricApi = false;
         containers = Map.of();
+        kffService=null;
         puzzles = null;
         puzzlesGuard = null;
         optionalGuard = null;
-        plainLibraries = Set.of();
+        generatedLibraries=Map.of();plainLibraries = Set.of();
         dependencyStamps = Map.of();
         try (Closeable nestedArchives = this::closeNested; Closeable modFiles = () -> closeAll(handles)) {
             if (metadataFailure != null)
@@ -371,6 +382,7 @@ public final class GameLoader extends URLClassLoader {
     }
     @Override
     public InputStream getResourceAsStream(String name) {
+        if(kffService!=null && name.equals(KffLanguage.CONTAINER+".class"))return new ByteArrayInputStream(KffLanguage.container());
         if (name.endsWith(".class")) {
             var patch = patches.get(name.substring(0, name.length() - 6));
             if (patch != null)
@@ -394,6 +406,7 @@ public final class GameLoader extends URLClassLoader {
         var owners=resources.get(key+".class");
         Path file=owners==null?null:Path.of(owners.getFirst().getName());
         bytes = patches.getOrDefault(key, bytes);
+        if(key.equals(KffLanguage.CONTAINER) && file!=null && file.equals(kffService))bytes=KffLanguage.container();
         if (owners != null && optionalGuard != null) bytes=optionalGuard.apply(file.getFileName().toString(),bytes);
         if (owners != null && puzzlesGuard != null && file.equals(puzzles))
             bytes = puzzlesGuard.apply(bytes);

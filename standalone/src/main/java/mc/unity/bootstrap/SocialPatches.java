@@ -39,6 +39,16 @@ final class SocialPatches {
             b.ldc("COMMAND").invokestatic(HOOK,"teleportTo",sig("(Lnet/minecraft/world/entity/Entity;"+td.substring(1,td.length()-2)+"Ljava/lang/String;)Z")));
         invoke(plan,PLAYER,"teleportTo",GAME,"teleport","(Lnet/minecraft/world/entity/PositionMoveRotation;Ljava/util/Set;)V",
             (b,call)->b.aload(0).invokestatic(HOOK,"directTeleport",sig("(L"+GAME+";Lnet/minecraft/world/entity/PositionMoveRotation;Ljava/util/Set;"+P+")V")));
+        for(String where:List.of("handleTeleportToEntityPacket","setCamera")){
+            invoke(plan,where.equals("setCamera")?PLAYER:GAME,where,PLAYER,"teleportTo",td,(b,i)->
+                b.ldc("SPECTATE").invokestatic(HOOK,"teleportTo",sig("(Lnet/minecraft/world/entity/Entity;"+td.substring(1,td.length()-2)+"Ljava/lang/String;)Z")));
+        }
+        String pearl="net/minecraft/world/entity/projectile/throwableitemprojectile/ThrownEnderpearl";
+        invoke(plan,pearl,"onHit",PLAYER,"teleport","("+TRANS+")"+P,(b,i)->b.ldc("ENDER_PEARL").invokestatic(HOOK,"withCause",sig("("+P+TRANS+"Ljava/lang/String;)"+P)));
+        String entity="net/minecraft/world/entity/Entity";
+        invoke(plan,entity,"handlePortal",entity,"teleport","("+TRANS+")L"+entity+";",(b,i)->b.invokestatic(HOOK,"portal",sig("(L"+entity+";"+TRANS+")L"+entity+";")));
+        invoke(plan,"net/minecraft/world/item/consume_effects/TeleportRandomlyConsumeEffect","apply","net/minecraft/world/entity/LivingEntity","randomTeleport","(DDDZ)Z",
+            (b,i)->{var proceed=b.newLabel();b.invokestatic(HOOK,"random",sig("(Lnet/minecraft/world/entity/LivingEntity;DDDZ)I")).dup().ifge(proceed).pop().iconst_0().ireturn().labelBinding(proceed);});
         plan.add(PLAYER,220,"Unity player events","teleport transition",(cf,model)->{
             int[] hits={0};var data=cf.transformClass(model,ClassTransform.transformingMethodBodies(m->m.methodName().equalsString("teleport") && m.methodType().equalsString("("+TRANS+")"+P),new CodeTransform(){
                 public void atStart(CodeBuilder b){hits[0]++;var valid=b.newLabel();b.aload(0).aload(1).invokestatic(HOOK,"teleport",sig("("+P+TRANS+")"+TRANS))
@@ -52,12 +62,19 @@ final class SocialPatches {
             for(var e:m.code().orElseThrow().elementList())if(e instanceof LocalVariable v && v.type().equalsString("D"))
                 slots.put(v.name().stringValue(),v.slot());
             if(!slots.keySet().containsAll(List.of("startX","startY","startZ")))throw new IOException("Missing original player coordinates");
-            int[] hits={0};var data=cf.transformClass(model,ClassTransform.transformingMethodBodies(v->v.methodName().equalsString("handleMovePlayer"),(b,e)->{
+            int[] hits={0,0};var data=cf.transformClass(model,ClassTransform.transformingMethodBodies(v->v.methodName().equalsString("handleMovePlayer"),new CodeTransform(){
+                int yaw,pitch;
+                public void atStart(CodeBuilder b){yaw=b.allocateLocal(TypeKind.FLOAT);pitch=b.allocateLocal(TypeKind.FLOAT);}
+                public void accept(CodeBuilder b,CodeElement e){
+                    if(e instanceof InvokeInstruction check && check.name().equalsString("ensureRunningOnSameThread")){hits[1]++;b.with(e);
+                    var game=ClassDesc.ofInternalName(GAME);var player=ClassDesc.ofInternalName(PLAYER);
+                    b.aload(0).getfield(game,"player",player).invokevirtual(player,"getYRot",sig("()F")).fstore(yaw)
+                     .aload(0).getfield(game,"player",player).invokevirtual(player,"getXRot",sig("()F")).fstore(pitch);return;}
                 if(e instanceof InvokeInstruction i && i.owner().asInternalName().equals(PLAYER) && i.name().equalsString("absSnapTo") && i.type().equalsString("(DDDFF)V") && ++hits[0]==2){
                     var ok=b.newLabel();b.dload(slots.get("startX")).dload(slots.get("startY")).dload(slots.get("startZ"))
-                        .invokestatic(HOOK,"move",sig("("+P+"DDDFFDDD)Z")).ifne(ok).return_().labelBinding(ok);
+                        .fload(yaw).fload(pitch).invokestatic(HOOK,"move",sig("("+P+"DDDFFDDDFF)Z")).ifne(ok).return_().labelBinding(ok);
                 }else b.with(e);
-            }));if(hits[0]!=2)throw new IOException("Unexpected accepted movement anchors "+hits[0]);return data;
+            }}));if(hits[0]!=2 || hits[1]!=1)throw new IOException("Unexpected accepted movement anchors "+hits[0]);return data;
         });
     }
 }

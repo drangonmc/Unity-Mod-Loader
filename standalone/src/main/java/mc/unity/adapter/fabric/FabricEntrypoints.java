@@ -12,7 +12,7 @@ public final class FabricEntrypoints {
         var inactive = new HashSet<String>();
         for (var row : metadata.getAsJsonObject("entrypoints").entrySet()) {
             var key = row.getKey();
-            var roots = key.equals("main") || key.equals(client ? "client" : "server") ? active : inactive;
+            var roots = key.equals("preLaunch") || key.equals("main") || key.equals(client ? "client" : "server") ? active : inactive;
             for (var entry : row.getValue().getAsJsonArray()) {
                 String value = entry.isJsonPrimitive() ? entry.getAsString()
                                                        : entry.getAsJsonObject().get("value").getAsString();

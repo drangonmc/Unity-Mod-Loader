@@ -1,0 +1,24 @@
+{
+  "timeoutSeconds": 180,
+  "priorRun": "0.3.1 regression scenario on the pre-fix 0.3.2 candidate",
+  "serverLogSHA256": "d46005b2739273f4a30bb92b2ce78ba348cc535edd72217bd50279c63a75095f",
+  "captured": [
+    {
+      "file": "first-threads-0.txt",
+      "sha256": "d41d201fa7d9da5997929a73e26d35ca1c31342e9d3dfeceb22638e45eb4cf22",
+      "thread": "WorldGuard UUID Migration",
+      "state": "java.util.TimerThread.mainLoop / Object.wait"
+    },
+    {
+      "file": "first-threads-1.txt",
+      "sha256": "53f407c6431365598493bd61634014dd220d18bf411aa4fa350bfccc3d875182",
+      "thread": "WorldGuard UUID Migration",
+      "state": "java.util.TimerThread.mainLoop / Object.wait"
+    }
+  ],
+  "after": {
+    "engine": "5ffb1cdd5277f807afdb064edf430f773fae7c5912d1c90edd3b667dde5b3d46",
+    "releasedInFullRun": true,
+    "releasedInAffectedRegression": true
+  }
+}

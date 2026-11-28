@@ -135,7 +135,7 @@ final class BukkitViews {
             case "getUnsafe" -> legacy;
             case "isStopping" -> !host.game.isRunning();
             case "createBlockData" -> createBlockData(a);
-            case "getVersion" -> "Unity 0.3.1-Beta (MC: 26.2)";
+            case "getVersion" -> "Unity 0.3.2-Beta (MC: 26.2)";
             case "getBukkitVersion" -> "26.2-R0.1-SNAPSHOT";
             case "getMinecraftVersion" -> "26.2";
             case "getLogger" -> Host.LOG;
@@ -278,7 +278,7 @@ final class BukkitViews {
         if (src.getEntity() instanceof ServerPlayer p)
             return player(p);
         if (SOURCE.get(src) == host.game)
-            return Views.of(ConsoleCommandSender.class, "Console", (m, a) -> senderCall(src, null, m, a));
+            return Views.of(ConsoleCommandSender.class, "Console", host.game, (m, a) -> senderCall(src, null, m, a));
         return Views.of(CommandSender.class, src.getTextName(), (m, a) -> senderCall(src, null, m, a));
     }
     org.bukkit.entity.Entity entity(net.minecraft.world.entity.Entity raw) {
@@ -331,27 +331,38 @@ final class BukkitViews {
             case "getLocation" ->
                 new Location(world((ServerLevel)raw.level()), raw.getX(), raw.getY(), raw.getZ(),
                              raw.getYRot(), raw.getXRot());
+            case "remove" -> {raw.discard();yield null;}
+            case "getItemStack" -> new BlockViews.Stack(((net.minecraft.world.entity.item.ItemEntity)raw).getItem());
+            case "setItemStack" -> {((net.minecraft.world.entity.item.ItemEntity)raw).setItem(BlockViews.Stack.nativeCopy((org.bukkit.inventory.ItemStack)a[0]));yield null;}
+            case "getSource" -> {
+                if(raw instanceof net.minecraft.world.entity.item.PrimedTnt t){var source=t.getOwner();yield source==null?null:entity(source);}
+                throw Views.unsupported("Entity",m);
+            }
             case "getTarget" -> {
                 var target=((net.minecraft.world.entity.Mob)raw).getTarget();
                 yield target==null?null:entity(target);
             }
             case "isDead" -> !raw.isAlive();
-            case "isValid" -> !raw.isRemoved();
+            case "isValid" -> !raw.isRemoved() && raw.level() instanceof ServerLevel level && level.getEntity(raw.getId())==raw;
             case "getHealth" -> (double)((net.minecraft.world.entity.LivingEntity)raw).getHealth();
             default -> throw Views.unsupported("Entity", m);
         });
     }
     private final Map<UUID,Player> playerViews=new HashMap<>();
     synchronized Player player(ServerPlayer p) {
-        var cached=playerViews.get(p.getUUID());
-        if(cached instanceof org.bukkit.craftbukkit.entity.CraftHumanEntity human && human.getHandle()==p)return cached;
+        boolean machine=mc.unity.api.MachineActors.isMachine(p);
+        var cached=machine?null:playerViews.get(p.getUUID());
+        if(cached instanceof org.bukkit.craftbukkit.entity.CraftHumanEntity human){
+            var current=human.getHandle();
+            if(current==p || p.connection!=null && current.connection==p.connection)return cached;
+        }
         java.util.function.Supplier<ServerPlayer> handle=()->p.connection==null?p:p.connection.getPlayer();
         var view=Views.of(Player.class, p.getGameProfile().name(), p.getUUID(), (method, args) -> {
             var current=handle.get();
             return senderCall(current.createCommandSourceStack(), current, method, args);
         });
         view=org.bukkit.craftbukkit.entity.CraftHumanEntity.create(view,p);
-        playerViews.put(p.getUUID(),view);
+        if(!machine)playerViews.put(p.getUUID(),view);
         return view;
     }
     private final Map<Object,org.bukkit.permissions.PermissibleBase[]> sourcePermissions=new WeakHashMap<>();
@@ -474,6 +485,10 @@ final class BukkitViews {
             case "getPassengers" -> p.getPassengers().stream().map(this::entity).toList();
             case "isInsideVehicle" -> p.isPassenger();
             case "leaveVehicle" -> {boolean riding=p.isPassenger();p.stopRiding();yield riding;}
+            case "getScheduler" -> new PlayerScheduler(()->p.connection!=null && p.connection.isAcceptingMessages());
+            case "setPortalCooldown" -> {p.setPortalCooldown((int)a[0]);yield null;}
+            case "getPortalCooldown" -> p.getPortalCooldown();
+            case "hasPlayedBefore" -> java.nio.file.Files.isRegularFile(host.game.getWorldPath(net.minecraft.world.level.storage.LevelResource.PLAYER_DATA_DIR).resolve(p.getUUID()+".dat"));
             case "isSwimming" -> p.isSwimming();
             case "isGliding" -> p.isFallFlying();
             case "isInWater" -> p.isInWater();
@@ -594,11 +609,19 @@ final class BukkitViews {
             };
             return Views.of(NativeWorldView.class, name, (m, a) -> switch (m) {
                 case "unityLevel" -> l;
+                case "createExplosion" -> host.gameplay.createExplosion(l,a);
+                case "spawnEntity" -> host.gameplay.spawn(l,a);
+                case "dropItem","dropItemNaturally" -> host.gameplay.drop(l,a,m.equals("dropItemNaturally"));
                 case "getName" -> name;
                 case "getUID" ->
                     UUID.nameUUIDFromBytes((base + "/" + l.getSeed() + "/" + id)
                                                .getBytes(java.nio.charset.StandardCharsets.UTF_8));
                 case "getKey" -> NamespacedKey.fromString(id);
+                case "getGameRuleValue" -> {
+                    if(a[0] instanceof LegacyRule<?,?> legacy)yield legacy.current(l);
+                    if(a[0] instanceof BukkitRule<?> rule)yield l.getGameRules().get(rule.rule);
+                    var rule=org.bukkit.GameRule.getByName((String)a[0]);yield rule instanceof BukkitRule<?> r?String.valueOf(l.getGameRules().get(r.rule)):"";
+                }
                 case "getEnvironment" -> l.dimension().equals(net.minecraft.world.level.Level.OVERWORLD) ? World.Environment.NORMAL :
                     l.dimension().equals(net.minecraft.world.level.Level.NETHER) ? World.Environment.NETHER :
                     l.dimension().equals(net.minecraft.world.level.Level.END) ? World.Environment.THE_END : World.Environment.CUSTOM;

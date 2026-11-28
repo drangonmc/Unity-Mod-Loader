@@ -43,7 +43,11 @@ public final class LivingFlow {
     public static boolean shieldBypassed(boolean bypassed){return damage()==null && bypassed;}
     public static float shield(float vanilla,net.minecraft.world.item.component.BlocksAttacks blocks,DamageSource source){
         var d=damage();
-        return d==null?vanilla:d.shield(vanilla,!blocks.bypassedBy().map(t->t.contains(source.typeHolder())).orElse(false));
+        boolean blocked=vanilla>0 && !blocks.bypassedBy().map(t->t.contains(source.typeHolder())).orElse(false);
+        return d==null?vanilla:d.shield(blocked?vanilla:0,blocked);
+    }
+    public static float withoutShield(){
+        var d=damage();return d==null?0:Math.max(0,d.shield(0,false));
     }
     public static int shieldWear(int vanilla){var d=damage();return d==null?vanilla:d.shieldWear(vanilla);}
     public static float reduction(float after,float before,int step){var d=damage();return d==null?after:d.reduce(before,after,step);}
@@ -59,8 +63,9 @@ public final class LivingFlow {
     }
     public static final Events.Signal<Death> DEATH=new Events.Signal<>();
     public static boolean dying(LivingEntity entity,DamageSource source) {
-        if(DEATH.empty() || entity.level().isClientSide())return false;
-        var e=new Death(entity,source);DEATH.post(e);return e.cancelled;
+        if(entity.level().isClientSide())return false;
+        if(!DEATH.empty()){var e=new Death(entity,source);DEATH.post(e);if(e.cancelled)return true;}
+        return entity instanceof net.minecraft.server.level.ServerPlayer p && mc.unity.runtime.LifeHooks.dying(p,source);
     }
     public static final class Drops {
         public final LivingEntity entity;

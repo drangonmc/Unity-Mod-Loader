@@ -38,7 +38,7 @@ public final class InternalBridge implements io.papermc.paper.InternalAPIBridge 
     public <MODERN, LEGACY> org.bukkit.GameRule<LEGACY>
     legacyGameRuleBridge(org.bukkit.GameRule<MODERN> arg0, java.util.function.Function<LEGACY, MODERN> arg1,
                          java.util.function.Function<MODERN, LEGACY> arg2, java.lang.Class<LEGACY> arg3) {
-        throw new UnsupportedOperationException("Paper API: legacyGameRuleBridge");
+        return new LegacyRule<>(arg0,arg1,arg2,arg3);
     }
     @Override
     public java.util.Set<org.bukkit.entity.Pose> validMannequinPoses() {

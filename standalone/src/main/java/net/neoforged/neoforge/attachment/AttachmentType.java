@@ -6,6 +6,7 @@ import mc.unity.core.Attachments;
 import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 public final class AttachmentType<T> implements Attachments.Key<T> {
+    final AttachmentSyncHandler<T> syncHandler;
     final Function<IAttachmentHolder, T> initializer;
     private final Codec<T> codec;
     private final boolean death;
@@ -16,6 +17,8 @@ public final class AttachmentType<T> implements Attachments.Key<T> {
                             : copy.copy(value, (IAttachmentHolder)owner, registries);
     }
     private AttachmentType(Builder<T> builder) {
+        syncHandler=builder.syncHandler;
+        if(syncHandler!=null)AttachmentWire.install();
         initializer = builder.initializer;
         codec = builder.codec;
         death = builder.death;
@@ -37,6 +40,22 @@ public final class AttachmentType<T> implements Attachments.Key<T> {
         private Codec<T> codec;
         private boolean death;
         private IAttachmentCopyHandler<T> copy;
+        private AttachmentSyncHandler<T> syncHandler;
+        public Builder<T> sync(AttachmentSyncHandler<T> handler){
+            if(syncHandler!=null)throw new IllegalStateException("Duplicate attachment sync handler");
+            syncHandler=Objects.requireNonNull(handler);return this;
+        }
+        public Builder<T> sync(net.minecraft.network.codec.StreamCodec<? super net.minecraft.network.RegistryFriendlyByteBuf,T> codec){
+            return sync((holder,player)->true,codec);
+        }
+        public Builder<T> sync(BiPredicate<IAttachmentHolder,net.minecraft.server.level.ServerPlayer> filter,net.minecraft.network.codec.StreamCodec<? super net.minecraft.network.RegistryFriendlyByteBuf,T> codec){
+            Objects.requireNonNull(filter);Objects.requireNonNull(codec);
+            return sync(new AttachmentSyncHandler<T>(){
+                public boolean sendToPlayer(IAttachmentHolder holder,net.minecraft.server.level.ServerPlayer p){return filter.test(holder,p);}
+                public void write(net.minecraft.network.RegistryFriendlyByteBuf b,T v,boolean initial){codec.encode(b,v);}
+                public T read(IAttachmentHolder holder,net.minecraft.network.RegistryFriendlyByteBuf b,T old){return codec.decode(b);}
+            });
+        }
         public Builder<T> copyOnDeath() {
             death = true;
             return this;

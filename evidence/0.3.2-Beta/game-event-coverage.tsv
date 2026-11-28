@@ -1,0 +1,8 @@
+event	unity	paper
+PlayerDeathEvent	observed	observed
+PlayerRespawnEvent	observed	observed
+InventoryOpenEvent	observed	observed
+InventoryCloseEvent	observed	observed
+EntityExplodeEvent	observed	observed
+BlockExplodeEvent	observed	observed
+CreatureSpawnEvent	observed	observed

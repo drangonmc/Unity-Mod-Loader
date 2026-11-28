@@ -12,19 +12,7 @@ final class DamageEvents {
         var target = host.views.entity(entity);
         var direct = nativeSource.getDirectEntity();
         var attacker = nativeSource.getEntity();
-        var source = Views.of(org.bukkit.damage.DamageSource.class, id, (method,args) -> switch(method) {
-            case "getDamageType" -> org.bukkit.Registry.DAMAGE_TYPE.getOrThrow(org.bukkit.NamespacedKey.fromString(id));
-            case "getDirectEntity" -> direct == null ? null : host.views.entity(direct);
-            case "getCausingEntity" -> attacker == null ? null : host.views.entity(attacker);
-            case "isIndirect" -> !nativeSource.isDirect();
-            case "getFoodExhaustion" -> nativeSource.getFoodExhaustion();
-            case "scalesWithDifficulty" -> nativeSource.scalesWithDifficulty();
-            case "getDamageLocation","getSourceLocation" -> {
-                var pos = method.equals("getDamageLocation") ? nativeSource.sourcePositionRaw() : nativeSource.getSourcePosition();
-                yield pos == null ? null : new org.bukkit.Location(target.getWorld(),pos.x,pos.y,pos.z);
-            }
-            default -> throw Views.unsupported("DamageSource",method);
-        });
+        var source=source(host,entity,nativeSource);
         var pearl = id.equals("minecraft:ender_pearl") ? mc.unity.runtime.ServerHooks.pearlDamager(entity,nativeSource) : null;
         var damager = pearl!=null ? pearl : direct == null ? attacker : direct;
         if(pearl!=null)cause=DamageCause.PROJECTILE;
@@ -47,6 +35,23 @@ final class DamageEvents {
         return (float)Math.max(0,event.getFinalDamage()) + previous;
     }
 
+    static org.bukkit.damage.DamageSource source(Host host,net.minecraft.world.entity.LivingEntity entity,net.minecraft.world.damagesource.DamageSource nativeSource){
+        var id=nativeSource.typeHolder().unwrapKey().orElseThrow().identifier().toString();
+        var target=host.views.entity(entity);var direct=nativeSource.getDirectEntity();var attacker=nativeSource.getEntity();
+        return Views.of(org.bukkit.damage.DamageSource.class, id, (method,args) -> switch(method) {
+            case "getDamageType" -> org.bukkit.Registry.DAMAGE_TYPE.getOrThrow(org.bukkit.NamespacedKey.fromString(id));
+            case "getDirectEntity" -> direct == null ? null : host.views.entity(direct);
+            case "getCausingEntity" -> attacker == null ? null : host.views.entity(attacker);
+            case "isIndirect" -> !nativeSource.isDirect();
+            case "getFoodExhaustion" -> nativeSource.getFoodExhaustion();
+            case "scalesWithDifficulty" -> nativeSource.scalesWithDifficulty();
+            case "getDamageLocation","getSourceLocation" -> {
+                var pos = method.equals("getDamageLocation") ? nativeSource.sourcePositionRaw() : nativeSource.getSourcePosition();
+                yield pos == null ? null : new org.bukkit.Location(target.getWorld(),pos.x,pos.y,pos.z);
+            }
+            default -> throw Views.unsupported("DamageSource",method);
+        });
+    }
     private static DamageCause cause(net.minecraft.world.damagesource.DamageSource source,String id) {
         if (source.is(DamageTypeTags.IS_EXPLOSION)) return source.getEntity() == null ? DamageCause.BLOCK_EXPLOSION : DamageCause.ENTITY_EXPLOSION;
         if (source.is(DamageTypeTags.IS_PROJECTILE)) return DamageCause.PROJECTILE;

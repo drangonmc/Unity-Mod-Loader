@@ -11,6 +11,7 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.PlayerInventory;
 
 final class MenuViews {
+    private final Host host;
     final ServerPlayer player;
     final AbstractContainerMenu menu;
     final InventoryView view;
@@ -21,14 +22,19 @@ final class MenuViews {
     final InventoryType type;
 
     MenuViews(Host host, ServerPlayer player) {
-        this.player = player;
-        menu = player.containerMenu;
+        this(host,player,player.containerMenu,null);
+    }
+    MenuViews(Host host,ServerPlayer player,AbstractContainerMenu candidate,net.minecraft.network.chat.Component title) {
+        this.host=host;this.player=player;
+        menu=candidate;
         upperSlots = menu.slots.stream().filter(s -> s.container != player.getInventory()).toList();
         owner = host.views.player(player);
         type = type(menu);
         bottom = Views.of(PlayerInventory.class, "player inventory", player.getUUID(), (m,a) -> inventory(false,m,a));
         top = Views.of(Inventory.class, type.name(), menu, (m,a) -> inventory(true,m,a));
         view = Views.of(InventoryView.class, type.name(), menu, (m,a) -> switch (m) {
+            case "getTitle","getOriginalTitle" -> title==null?type.name():StackMeta.legacy(title);
+            case "title" -> title==null?net.kyori.adventure.text.Component.text(type.name()):host.adventure(title);
             case "getPlayer" -> owner;
             case "getTopInventory" -> top;
             case "getBottomInventory" -> bottom;
@@ -79,7 +85,41 @@ final class MenuViews {
         return switch(m) {
             case "getType" -> upper ? type : InventoryType.PLAYER;
             case "getSize" -> upper ? upperSlots.size() : player.getInventory().getContainerSize();
-            case "getHolder" -> upper ? null : owner;
+            case "getLocation" -> {
+                if(!upper)yield owner.getLocation();
+                var container=upperSlots.isEmpty()?null:upperSlots.getFirst().container;
+                if(container instanceof net.minecraft.world.level.block.entity.BlockEntity be){
+                    var pos=be.getBlockPos();yield new org.bukkit.Location(host.views.world(player.level()),pos.getX(),pos.getY(),pos.getZ());
+                }yield null;
+            }
+            case "getHolder" -> {
+                if(!upper)yield owner;
+                if(!upperSlots.isEmpty() && upperSlots.getFirst().container instanceof net.minecraft.world.level.block.entity.BlockEntity be){
+                    var block=host.views.blocks.block(player.level(),be.getBlockPos());
+                    Class<? extends org.bukkit.block.Container> holder=be instanceof net.minecraft.world.level.block.entity.ChestBlockEntity?org.bukkit.block.Chest.class:
+                        be instanceof net.minecraft.world.level.block.entity.BarrelBlockEntity?org.bukkit.block.Barrel.class:org.bukkit.block.Container.class;
+                    yield Views.of(holder,"container",be,(name,args)->switch(name){
+                        case "getInventory","getBlockInventory","getSnapshotInventory"->top;
+                        case "getBlock"->block;case "getLocation"->block.getLocation();case "getX"->block.getX();case "getY"->block.getY();case "getZ"->block.getZ();
+                        case "getWorld"->block.getWorld();case "getType"->block.getType();case "isPlaced"->true;default->throw Views.unsupported("Container",name);
+                    });
+                }
+                yield null;
+            }
+            case "getContents","getStorageContents" -> {
+                int size=upper?upperSlots.size():m.equals("getStorageContents")?36:player.getInventory().getContainerSize();
+                var array=new org.bukkit.inventory.ItemStack[size];
+                for(int i=0;i<size;i++)array[i]=upper?slotItem(upperSlots.get(i)):playerItem(player.getInventory().getItem(i));yield array;
+            }
+            case "setContents","setStorageContents" -> {
+                var array=(org.bukkit.inventory.ItemStack[])a[0];
+                int size=upper?upperSlots.size():m.equals("setStorageContents")?36:player.getInventory().getContainerSize();
+                if(array.length>size)throw new IllegalArgumentException("Too many inventory slots");
+                var copies=new ItemStack[size];
+                for(int i=0;i<size;i++)copies[i]=i<array.length?nativeItem(array[i]):ItemStack.EMPTY;
+                for(int i=0;i<size;i++)if(upper)upperSlots.get(i).setByPlayer(copies[i]);else player.getInventory().setItem(i,copies[i]);
+                menu.broadcastChanges();yield null;
+            }
             case "getViewers" -> {
                 if(!upper)yield List.of(owner);
                 var containers=Collections.newSetFromMap(new IdentityHashMap<net.minecraft.world.Container,Boolean>());

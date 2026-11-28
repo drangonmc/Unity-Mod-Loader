@@ -145,6 +145,15 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
         final PluginFile file;
         final Host host;
         private URLClassLoader libraries;
+        private final Set<java.util.Timer> migrationTimers=Collections.newSetFromMap(new IdentityHashMap<>());
+        private boolean timersClosed;
+        synchronized void ownTimer(java.util.Timer timer){if(timersClosed)timer.cancel();else migrationTimers.add(timer);}
+        private synchronized void closeTimers(){
+            timersClosed=true;
+            for(var timer:migrationTimers)timer.cancel();
+            if(!migrationTimers.isEmpty())Host.LOG.info("Released WorldGuard UUID migration timers: "+migrationTimers.size());
+            migrationTimers.clear();
+        }
         JavaPlugin plugin;
         private final Map<String,byte[]> platformClasses=new HashMap<>();
         private static final String WE_ADAPTER="mc.unity.adapter.worldedit.UnityWorldEdit";
@@ -156,6 +165,7 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
             finally {if(useUnity && WE_ADAPTER.equals(System.getProperty(key)))System.clearProperty(key);}
         }
         @Override public void close() throws IOException {
+            closeTimers();
             try {
                 // 7.4.6 creates a private non-daemon timer for command feedback and exposes no shutdown method.
                 // Only inspect the feedback class if this loader has already defined it.
@@ -194,6 +204,24 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
             return Collections.enumeration(urls);
         }
         @Override protected Class<?> findClass(String name) throws ClassNotFoundException {
+            if(name.equals("com.sk89q.worldguard.protection.managers.migration.UUIDMigration") &&
+                    file.description().getMain().equals("com.sk89q.worldguard.bukkit.WorldGuardPlugin")){
+                try(var jar=new java.util.jar.JarFile(file.jar().toFile(),true,java.util.zip.ZipFile.OPEN_READ,Runtime.version())){
+                    var item=jar.getJarEntry(name.replace('.','/')+".class");
+                    if(item==null)throw new ClassNotFoundException(name);
+                    byte[] bytes;try(var in=jar.getInputStream(item)){bytes=in.readAllBytes();}
+                    if(item.getCodeSigners()!=null)return super.findClass(name);
+                    var origin=file.jar().toUri().toURL();String pkg=name.substring(0,name.lastIndexOf('.'));
+                    var manifest=jar.getManifest();
+                    if(getDefinedPackage(pkg)==null)try{
+                        if(manifest!=null)definePackage(pkg,manifest,origin);else definePackage(pkg,null,null,null,null,null,null,null);
+                    }catch(IllegalArgumentException race){if(getDefinedPackage(pkg)==null)throw race;}
+                    var defined=getDefinedPackage(pkg);
+                    if(defined.isSealed() && !defined.isSealed(origin))throw new SecurityException("Sealed package "+pkg);
+                    bytes=PluginTimers.migration(bytes,this);
+                    return defineClass(name,bytes,0,bytes.length,new java.security.CodeSource(origin,(java.security.CodeSigner[])null));
+                }catch(IOException failure){throw new ClassNotFoundException(name,failure);}
+            }
             byte[] data=platformClasses.get(name);
             return data==null ? super.findClass(name) : defineClass(name,data,0,data.length);
         }

@@ -1,0 +1,80 @@
+{
+  "engine": "5ffb1cdd5277f807afdb064edf430f773fae7c5912d1c90edd3b667dde5b3d46",
+  "limitSeconds": 180,
+  "runs": {
+    "unity": [
+      {
+        "phase": "first",
+        "seconds": 71.297,
+        "exitCode": 0,
+        "diagnostics": [
+          {
+            "afterSeconds": 35,
+            "nonDaemon": [
+              "main",
+              "Server thread",
+              "IO-Worker-2",
+              "pool-11-thread-1",
+              "pool-11-thread-2",
+              "WorldGuard UUID Migration",
+              "IO-Worker-5",
+              "IO-Worker-6",
+              "IO-Worker-7"
+            ],
+            "sha256": "eb4858eab7ee4bfd2edd85264e34fb1d9b2a4db2746e9e3737fd768a56d86186"
+          }
+        ]
+      },
+      {
+        "phase": "restart",
+        "seconds": 34.922,
+        "exitCode": 0,
+        "diagnostics": []
+      },
+      {
+        "phase": "third",
+        "seconds": 39.188,
+        "exitCode": 0,
+        "diagnostics": [
+          {
+            "afterSeconds": 35,
+            "nonDaemon": [
+              "WorldGuard Region Chunk Table - world",
+              "DestroyJavaVM"
+            ],
+            "sha256": "7c617095aa54b0e8c6bcafe02862ca0114b86889aa094689034887030a5862ee"
+          }
+        ]
+      },
+      {
+        "phase": "fourth",
+        "seconds": 39.219,
+        "exitCode": 0,
+        "diagnostics": [
+          {
+            "afterSeconds": 35,
+            "nonDaemon": [
+              "WorldGuard Region Chunk Table - world",
+              "DestroyJavaVM"
+            ],
+            "sha256": "f548a845834a4f389608880a7439cf88714d55ea2f1e255fb95e744789d5e982"
+          }
+        ]
+      }
+    ],
+    "paper": [
+      {
+        "phase": "first",
+        "seconds": 3.14,
+        "exitCode": 0,
+        "diagnostics": []
+      },
+      {
+        "phase": "restart",
+        "seconds": 9.109,
+        "exitCode": 0,
+        "diagnostics": []
+      }
+    ]
+  }
+}

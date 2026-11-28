@@ -103,6 +103,8 @@ final class BlockViews {
         public Stack clone() {
             return new Stack(stack);
         }
+        public boolean equals(Object other){return other==this || other instanceof org.bukkit.inventory.ItemStack o && getAmount()==o.getAmount() && isSimilar(o);}
+        public int hashCode(){return 31*net.minecraft.world.item.ItemStack.hashItemAndComponents(stack)+getAmount();}
         public String toString() {
             return stack.toString();
         }
@@ -110,6 +112,11 @@ final class BlockViews {
     Block block(ServerLevel level, BlockPos location) {
         var pos = location.immutable();
         return Views.of(Block.class, pos.toShortString(), new Key(level, pos), (m, a) -> {
+            if(m.equals("setType") || m.equals("setBlockData")){
+                BlockState next=m.equals("setType")?BuiltInRegistries.BLOCK.getOptional(net.minecraft.resources.Identifier.parse(((Material)a[0]).getKey().toString())).orElseThrow().defaultBlockState():
+                    net.minecraft.commands.arguments.blocks.BlockStateParser.parseForBlock(level.registryAccess().lookupOrThrow(net.minecraft.core.registries.Registries.BLOCK),((BlockData)a[0]).getAsString(),false).blockState();
+                level.setBlock(pos,next,a.length>1 && Boolean.FALSE.equals(a[1])?net.minecraft.world.level.block.Block.UPDATE_CLIENTS|net.minecraft.world.level.block.Block.UPDATE_KNOWN_SHAPE|net.minecraft.world.level.block.Block.UPDATE_SKIP_ON_PLACE:3);return null;
+            }
             if (m.equals("getState"))
                 return snapshot(level, pos, level.getBlockState(pos));
             if (m.equals("getRelative")) {

@@ -224,6 +224,8 @@ public final class Placement {
                 transition.end.onPlace(level, change.pos, change.old, (change.flags & 64) != 0);
             if (level.getBlockState(change.pos) != transition.end)
                 continue;
+            if(player instanceof net.minecraft.server.level.ServerPlayer sp && transition.end.getBlock()!=change.old.getBlock() && transition.end.hasBlockEntity())
+                mc.unity.api.MachineActors.placed(level.getBlockEntity(change.pos),sp);
             replay.set(change);
             try {
                 level.setBlock(change.pos, transition.end, change.flags, change.depth);

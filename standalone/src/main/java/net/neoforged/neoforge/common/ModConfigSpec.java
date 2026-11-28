@@ -130,11 +130,13 @@ public final class ModConfigSpec implements IConfigSpec {
             Objects.requireNonNull(value);
             return put(k,new ConfigValue<>(value,raw -> {
                 if(value instanceof List<?>)return raw instanceof List<?> ? (T)raw : null;
-                if(value instanceof Enum<?> e && raw instanceof String name)
-                    return (T)Enum.valueOf((Class)e.getDeclaringClass(),name);
+                if(value instanceof Enum<?> e) {
+                    if(raw instanceof String name)return (T)Enum.valueOf((Class)e.getDeclaringClass(),name);
+                    return e.getDeclaringClass().isInstance(raw)?(T)raw:null;
+                }
                 if(value instanceof Number && raw instanceof Number n) {
-                    if(value instanceof Double)return (T)Double.valueOf(n.doubleValue());
-                    if(value instanceof Float)return (T)Float.valueOf(n.floatValue());
+                    if(value instanceof Double)return Double.isFinite(n.doubleValue())?(T)Double.valueOf(n.doubleValue()):null;
+                    if(value instanceof Float)return Float.isFinite(n.floatValue())?(T)Float.valueOf(n.floatValue()):null;
                     var exact=new java.math.BigDecimal(n.toString());
                     if(value instanceof Integer)return (T)Integer.valueOf(exact.intValueExact());
                     if(value instanceof Long)return (T)Long.valueOf(exact.longValueExact());

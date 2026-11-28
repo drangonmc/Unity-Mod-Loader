@@ -10,10 +10,10 @@ import java.util.regex.Pattern;
 public final class PlatformAbi {
     private static boolean platform(String s) {
         return s.startsWith("net/minecraftforge/") || s.startsWith("net/neoforged/")
-            || s.startsWith("net/fabricmc/");
+            || s.startsWith("net/fabricmc/") || s.equals(mc.unity.bootstrap.KffLanguage.CONTAINER) || mc.unity.bootstrap.KffLanguage.hostInternal(s+".class");
     }
     private static final Pattern TYPE =
-        Pattern.compile("L(net/(?:minecraftforge|neoforged|fabricmc)/[a-zA-Z0-9_$/]+)");
+        Pattern.compile("L(net/(?:minecraftforge|neoforged|fabricmc)/[a-zA-Z0-9_$/]+|thedarkcolour/kotlinforforge/neoforge/(?:KotlinModContainer|KotlinLanguageLoader|AutoKotlinEventBusSubscriber)(?:[$][a-zA-Z0-9_$]+)?)");
     private final Map<String,ClassModel> definitions = new HashMap<>();
     public static void check(ClassModel model) throws IOException { new PlatformAbi().verify(model); }
     private java.util.function.Predicate<String> deferred = reason -> false;

@@ -18,6 +18,7 @@ public final class Platforms implements AutoCloseable {
     private boolean client;
     private final Map<String, List<String>> neoSubscribers = new HashMap<>();
     private final Map<String, net.neoforged.fml.ModContainer> neoContainers = new LinkedHashMap<>();
+    private final Set<String> kotlinMods=new HashSet<>();
     private List<Entry> ordered = List.of();
     private Set<String> ids = Set.of();
     private boolean closed;
@@ -58,6 +59,8 @@ public final class Platforms implements AutoCloseable {
             var metadata = new HashMap<String, FmlDescriptor.Meta>();
             var abi = new PlatformAbi();
             var unsupported = new TreeMap<String, LinkedHashMap<String, String>>();
+            String kotlinVersion=null;
+            for(var jar:jars.values())if(mc.unity.bootstrap.KffLanguage.provider(jar))kotlinVersion=jar.getManifest().getMainAttributes().getValue("Implementation-Version");
             for (var j : jars.entrySet()) {
                 Path file = j.getKey();
                 JarFile jar = j.getValue();
@@ -69,6 +72,7 @@ public final class Platforms implements AutoCloseable {
                                         .getClass()
                                         .getMethod("plainLibrary", Path.class)
                                         .invoke(domain(), file);
+                    boolean kffService=mc.unity.bootstrap.KffLanguage.provider(jar);
                     boolean dataPack = f && (g || n) && UniversalData.matches(jar);
                     var choice = PlatformChoice.read(jar);
                     if (choice.multiple())
@@ -83,12 +87,12 @@ public final class Platforms implements AutoCloseable {
                     for (var entry : jar.versionedStream()
                                          .filter(it
                                                  -> !it.getName().startsWith("META-INF/versions/") &&
-                                                        !omitted.contains(it.getName()))
+                                                        !omitted.contains(it.getName()) && !(kffService && mc.unity.bootstrap.KffLanguage.hostInternal(it.getName())))
                                          .toList())
                         if (entry.getName().endsWith(".class") &&
                             !entry.getName().equals("module-info.class")) {
                             try (var in = jar.getInputStream(entry)) {
-                                var m = ClassFile.of().parse(in.readAllBytes());
+                                var m = ClassFile.of().parse(kffService && entry.getName().equals(mc.unity.bootstrap.KffLanguage.CONTAINER+".class")?mc.unity.bootstrap.KffLanguage.container():in.readAllBytes());
                                 if (!(m.thisClass().asInternalName() + ".class").equals(entry.getName()))
                                     throw new IOException("Class name/path mismatch " + entry.getName());
                                 models.add(m);
@@ -130,8 +134,14 @@ public final class Platforms implements AutoCloseable {
                                     .putIfAbsent(missing.getMessage(), model.thisClass().asInternalName());
                             }
                         }
-                    if (plain)
+                    if(plain){
+                        var alias=(String[])domain().getClass().getMethod("generatedLibrary",Path.class).invoke(domain(),file);
+                        if(alias!=null){
+                            var entry=new Entry(alias[0],alias[1],List.of(),Entry.Kind.FABRIC,file,List.of());
+                            if(!seen.add(alias[0]) || byId.putIfAbsent(alias[0],entry)!=null)throw new IOException("Duplicate generated library "+alias[0]);
+                        }
                         continue;
+                    }
                     var entries = new ArrayList<Entry>();
                     if (f) {
                         var e = FabricAdapter.read(jar, file, side, dataPack);
@@ -141,6 +151,11 @@ public final class Platforms implements AutoCloseable {
                         if (!n && jar.getJarEntry("META-INF/coremods.json") != null)
                             throw new IOException("Unsupported Forge coremods");
                         var metas = FmlDescriptor.mods(jar, side, n);
+                        var kRange=FmlDescriptor.kotlinRange(jar,n);
+                        if(kRange!=null){
+                            if(kotlinVersion==null || !FmlDescriptor.inRange(kotlinVersion,kRange))throw new IOException("Missing compatible KFF provider for "+kRange);
+                            metas.forEach(meta->session.kotlinMods.add(meta.id()));
+                        }
                         var ids = metas.stream()
                                       .map(FmlDescriptor.Meta::id)
                                       .collect(java.util.stream.Collectors.toSet());
@@ -203,9 +218,11 @@ public final class Platforms implements AutoCloseable {
                 var jar = jars.get(e.file());
                 if (e.kind() == Entry.Kind.NEOFORGE) {
                     var meta = metadata.get(e.id());
-                    session.neoContainers.put(
-                        e.id(), new net.neoforged.fml.ModContainer(e.id(), new NeoBus(e.id()), meta.title(),
-                                                                   meta.description(),e.version()));
+                    var bus=new NeoBus(e.id());
+                    var container=session.kotlinMods.contains(e.id())?(net.neoforged.fml.ModContainer)Class.forName(
+                        mc.unity.bootstrap.KffLanguage.CONTAINER.replace('/','.'),true,domain()).getConstructor(String.class,net.neoforged.bus.api.IEventBus.class,String.class,String.class,String.class)
+                        .newInstance(e.id(),bus,meta.title(),meta.description(),e.version()):new net.neoforged.fml.ModContainer(e.id(),bus,meta.title(),meta.description(),e.version());
+                    session.neoContainers.put(e.id(),container);
                 }
                 boolean clientOnly=e.kind()==Entry.Kind.FORGE && FmlDescriptor.clientSideOnly(jar);
                 if(clientOnly)Content.localResources(e.id());
@@ -231,6 +248,8 @@ public final class Platforms implements AutoCloseable {
             net.neoforged.fml.loading.FMLPaths.bind(game);
             net.neoforged.fml.config.ModConfigs.bind(game, session.client);
             LoaderView.INSTANCE.bind(game, session.client, session.ordered);
+            for(var pre:LoaderView.INSTANCE.getEntrypointContainers("preLaunch",net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint.class))
+                pre.getEntrypoint().onPreLaunch();
             Events.PLAY_REGISTRATION.listen(v -> {
                 session.dispatchNeo(net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent::new);
                 if (!session.client)
@@ -351,7 +370,13 @@ public final class Platforms implements AutoCloseable {
         return List.copyOf(order);
     }
     public void initialize() throws ReflectiveOperationException, IOException {
-        for (var e : ordered)
+        for (var e : ordered) {
+            if(e.kind()==Entry.Kind.FABRIC){
+                int before=Content.registrySize();
+                for(var point:LoaderView.INSTANCE.entriesFor(e.id(),"main",net.fabricmc.api.ModInitializer.class))point.getEntrypoint().onInitialize();
+                if(before!=Content.registrySize())Content.include(e.id());
+                continue;
+            }
             for (String entry : e.classes()) {
                 Class<?> type = Class.forName(entry.split("::", 2)[0], false, domain());
                 if (type.getClassLoader() != domain() ||
@@ -361,17 +386,18 @@ public final class Platforms implements AutoCloseable {
                             type.getProtectionDomain().getCodeSource().getLocation().toExternalForm()))))
                     throw new IOException("Foreign entrypoint " + entry);
                 switch (e.kind()) {
-                case FABRIC -> {
-                    int size = Content.registrySize();
-                    LoaderView.INSTANCE
-                        .entrypoint(e.id(), "main", entry, net.fabricmc.api.ModInitializer.class)
-                        .onInitialize();
-                    if (size != Content.registrySize())
-                        Content.include(e.id());
-                }
                 case NEOFORGE -> {
                     var container = neoContainers.get(e.id());
                     var bus = container.getEventBus();
+                    if(kotlinMods.contains(e.id())){
+                        java.lang.reflect.Field singleton=null;
+                        try{singleton=type.getField("INSTANCE");}catch(NoSuchFieldException ordinaryClass){}
+                        if(singleton!=null && singleton.getType()==type && java.lang.reflect.Modifier.isStatic(singleton.getModifiers())){
+                            var previous=net.neoforged.fml.ModLoadingContext.enter(container);
+                            try{Objects.requireNonNull(singleton.get(null));}finally{net.neoforged.fml.ModLoadingContext.enter(previous);}
+                            break;
+                        }
+                    }
                     var ctor = NeoAdapter.constructor(type);
                     var args = new ArrayList<Object>();
                     for (var param : ctor.getParameterTypes()) {
@@ -413,6 +439,7 @@ public final class Platforms implements AutoCloseable {
                 }
                 }
             }
+        }
         for (var entry : ordered) {
             var container = neoContainers.get(entry.id());
             if (container == null) continue;
@@ -422,6 +449,15 @@ public final class Platforms implements AutoCloseable {
                     var listener = Class.forName(name, true, domain());
                     ((NeoBus) container.getEventBus()).register(listener, true);
                     ((NeoBus) net.neoforged.neoforge.common.NeoForge.EVENT_BUS).register(listener, true);
+                    if(kotlinMods.contains(entry.id())){
+                        java.lang.reflect.Field singleton=null;
+                        try{singleton=listener.getField("INSTANCE");}catch(NoSuchFieldException ordinaryClass){}
+                        if(singleton!=null && singleton.getType()==listener && java.lang.reflect.Modifier.isStatic(singleton.getModifiers())){
+                            var instance=singleton.get(null);
+                            ((NeoBus)container.getEventBus()).register(instance,true);
+                            ((NeoBus)net.neoforged.neoforge.common.NeoForge.EVENT_BUS).register(instance,true);
+                        }
+                    }
                 }
             } finally { net.neoforged.fml.ModLoadingContext.enter(previous); }
         }
@@ -479,27 +515,16 @@ public final class Platforms implements AutoCloseable {
             work.remove().run();
     }
     private void initializeSided() throws ReflectiveOperationException, IOException {
-        for (var e : ordered)
-            for (String entry : e.sideClasses()) {
-                var type = Class.forName(entry.split("::", 2)[0], false, domain());
-                if (!Files.isSameFile(
-                        e.file(),
-                        Path.of(java.net.URI.create(
-                            type.getProtectionDomain().getCodeSource().getLocation().toExternalForm()))))
-                    throw new IOException("Foreign sided entry point " + entry);
-                int before = Content.registrySize();
-                if (client)
-                    LoaderView.INSTANCE
-                        .entrypoint(e.id(), "client", entry, net.fabricmc.api.ClientModInitializer.class)
-                        .onInitializeClient();
-                else
-                    LoaderView.INSTANCE
-                        .entrypoint(e.id(), "server", entry,
-                                    net.fabricmc.api.DedicatedServerModInitializer.class)
-                        .onInitializeServer();
-                if (before != Content.registrySize())
-                    Content.include(e.id());
+        for(var e:ordered){
+            if(e.kind()!=Entry.Kind.FABRIC || e.sideClasses().isEmpty())continue;
+            int before=Content.registrySize();
+            if(client){
+                for(var point:LoaderView.INSTANCE.entriesFor(e.id(),"client",net.fabricmc.api.ClientModInitializer.class))point.getEntrypoint().onInitializeClient();
+            }else{
+                for(var point:LoaderView.INSTANCE.entriesFor(e.id(),"server",net.fabricmc.api.DedicatedServerModInitializer.class))point.getEntrypoint().onInitializeServer();
             }
+            if(before!=Content.registrySize())Content.include(e.id());
+        }
     }
     public void close() throws IOException {
         if (closed)
@@ -528,6 +553,7 @@ public final class Platforms implements AutoCloseable {
                 SessionEvent.clear();
                 ForgeCommands.clear();
                 mc.unity.adapter.neoforge.MenuData.close();
+                net.neoforged.neoforge.attachment.AttachmentWire.close();
                 NeoBus.clear();
             }
         } finally {

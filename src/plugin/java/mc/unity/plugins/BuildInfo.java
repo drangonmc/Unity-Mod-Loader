@@ -42,6 +42,6 @@ public final class BuildInfo implements ServerBuildInfo {
         return Optional.empty();
     }
     public String asString(StringRepresentation representation) {
-        return "Unity 0.3.1-Beta (MC 26.2)";
+        return "Unity 0.3.2-Beta (MC 26.2)";
     }
 }

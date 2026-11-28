@@ -12,6 +12,7 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.*;
 /** Loopback-only, normal LocalPlayer/MultiPlayerGameMode calls. State queries observe the live client level. */
 final class GameActionProbe {
+    private java.util.concurrent.CompletableFuture<com.mojang.brigadier.suggestion.Suggestions> completions;
     private double walkStart;
     private BlockPos mining;
     private Direction face;
@@ -87,6 +88,17 @@ final class GameActionProbe {
                 var be=mc.level.getBlockEntity(pos);
                 if(be!=null)out.addProperty("nbt",be.saveWithFullMetadata(mc.level.registryAccess()).toString());
             }
+            case "qaAttachmentView" -> {
+                try {out.addProperty("values",(String)Class.forName("qa.unity32.SyncProbe",true,mc.unity.core.Attachments.class.getClassLoader()).getMethod("inspect",net.minecraft.world.entity.player.Player.class).invoke(null,me));}
+                catch(ReflectiveOperationException ex){throw new IllegalStateException("Attachment witness",ex);}
+            }
+            case "qaCompletions" -> {
+                var connection=mc.getConnection();var commands=connection.getCommands();
+                if(first)completions=commands.getCompletionSuggestions(commands.parse(req.get("command").getAsString(),connection.getSuggestionsProvider()));
+                if(!completions.isDone())return false;
+                var choices=new JsonArray();completions.join().getList().forEach(v->choices.add(v.getText()));out.add("choices",choices);
+            }
+            case "qaMenuClosed" -> out.addProperty("closed",me.containerMenu==me.inventoryMenu && mc.gui.screen()==null);
             case "qaChat" -> mc.getConnection().sendChat(req.get("text").getAsString());
             case "qaCommand" -> {
                 mc.getConnection().sendCommand(req.get("cmd").getAsString());
@@ -254,6 +266,10 @@ final class GameActionProbe {
                     mc.options.keyUse.setDown(false);
                     mc.gameMode.releaseUsingItem(me);
                 }
+            }
+            case "qaEat" -> {
+                if(first){me.getInventory().setSelectedSlot(slot);mc.options.keyUse.setDown(true);mc.gameMode.useItem(me,InteractionHand.MAIN_HAND);}
+                if(elapsed<45)return false;mc.options.keyUse.setDown(false);mc.gameMode.releaseUsingItem(me);
             }
             case "qaUseOnce" -> {
                 me.getInventory().setSelectedSlot(slot);

@@ -1,0 +1,123 @@
+[first.log]
+[18:04:33 INFO]: [Not Secure] [Server] WAIT_U32_READY
+[18:04:33 INFO]: [Not Secure] [Server] WAIT_U32_READY
+[18:04:34 INFO]: [Not Secure] [Server] WAIT_U32_READY
+[18:04:34 INFO]: [Not Secure] [Server] U32_READY
+[18:05:05 INFO]: [Unity32Observer] U32 death-low VolumeA 0
+[18:05:05 INFO]: [Unity32Observer] U32 death-high VolumeA true
+[18:05:05 INFO]: [Unity32Observer] U32 death-monitor VolumeA keep=true emeralds=0
+[18:05:05 INFO]: [Unity32Observer] U32 respawn-low VolumeA DEATH
+[18:05:05 INFO]: [Unity32Observer] U32 respawn-monitor VolumeA 62 20
+[18:05:06 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:06 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:06 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:06 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:06 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:06 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:06 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:06 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:06 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:06 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:07 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:07 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:07 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:07 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:07 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:07 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:07 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:07 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:07 INFO]: [Unity32Observer] U32 first-step 62 20
+[18:05:08 INFO]: VolumeA has the following entity data: [62.5d, 80.0d, 20.5d]
+[18:05:08 INFO]: [Unity32Observer] U32 permission VolumeA false
+[18:05:09 INFO]: [Unity32Observer] U32 death-low VolumeB 7
+[18:05:09 INFO]: [Unity32Observer] U32 death-high VolumeB false
+[18:05:09 INFO]: [Unity32Observer] U32 death-monitor VolumeB keep=false emeralds=0
+[18:05:09 INFO]: [Unity32Observer] U32 respawn-low VolumeB DEATH
+[18:05:09 INFO]: [Unity32Observer] U32 respawn-monitor VolumeB 62 20
+[18:05:09 INFO]: [Not Secure] [Server] U32_REPLACED_DROP
+[18:05:09 INFO]: [Unity32Observer] U32 console-removed true
+[18:05:10 INFO]: [Unity32Observer] U32 cause ENDER_PEARL
+[18:05:10 INFO]: VolumeA has the following entity data: [60.5d, 80.0d, 18.5d]
+[18:05:12 INFO]: [Unity32Observer] U32 cause CONSUMABLE_EFFECT
+[18:05:12 INFO]: VolumeA has the following entity data: [60.5d, 80.0d, 18.5d]
+[18:05:13 INFO]: [Not Secure] [Server] U32_PORTAL_READY
+[18:05:13 INFO]: [Unity32Observer] U32 cooldown reset
+[18:05:13 INFO]: [Unity32Observer] U32 permission VolumeA false
+[18:05:13 INFO]: [Unity32Observer] U32 cause NETHER_PORTAL
+[18:05:13 INFO]: [Unity32Observer] U32 cooldown reset
+[18:05:13 INFO]: [Unity32Observer] U32 permission VolumeA false
+[18:05:14 INFO]: [Unity32Observer] U32 cause END_PORTAL
+[18:05:14 INFO]: [Unity32Observer] U32 cooldown reset
+[18:05:14 INFO]: [Unity32Observer] U32 permission VolumeA false
+[18:05:15 INFO]: [Unity32Observer] U32 cause END_GATEWAY
+[18:05:15 INFO]: [Unity32Observer] U32 cause SPECTATE
+[18:05:15 INFO]: [Unity32Observer] U32 cause SPECTATE
+[18:05:15 INFO]: [Unity32Observer] U32 cow denied CUSTOM
+[18:05:15 INFO]: [Unity32Observer] U32 block-blast denied
+[18:05:15 INFO]: [Unity32Observer] U32 world-meta ok
+[18:05:15 INFO]: [Not Secure] [Server] U32_WORLD_WRITE
+[18:05:16 INFO]: [Unity32Observer] U32 entity-blast filtered
+[18:05:16 INFO]: [Not Secure] [Server] U32_EXPLOSION_CONTROL
+[18:05:17 INFO]: [Unity32Observer] U32 open-low VolumeA false
+[18:05:17 INFO]: [Unity32Observer] U32 open-allowed VolumeA
+[18:05:17 INFO]: [Unity32Observer] U32 open-monitor VolumeA false
+[18:05:17 INFO]: [Unity32Observer] U32 close VolumeA PLAYER
+[18:05:17 INFO]: [Not Secure] [Server] U32_CHEST_13
+[18:05:17 INFO]: [Unity32Observer] U32 open-low VolumeA false
+[18:05:17 INFO]: [Unity32Observer] U32 open-allowed VolumeA
+[18:05:17 INFO]: [Unity32Observer] U32 open-monitor VolumeA false
+[18:05:18 INFO]: [Unity32Observer] U32 open-low VolumeB false
+[18:05:18 INFO]: [Unity32Observer] U32 open-monitor VolumeB true
+[18:05:18 INFO]: [Not Secure] [Server] U32_CHEST_13
+[18:05:18 INFO]: VolumeA has the following entity data: [{Slot: 3b, id: "minecraft:gold_ingot", count: 9}]
+[18:05:18 INFO]: VolumeB has the following entity data: []
+[18:05:19 INFO]: [Unity32Observer] U32 permission VolumeB true
+[18:05:19 INFO]: [Unity32Observer] U32 open-low VolumeB false
+[18:05:19 INFO]: [Unity32Observer] U32 open-allowed VolumeB
+[18:05:19 INFO]: [Unity32Observer] U32 open-monitor VolumeB false
+[18:05:20 INFO]: [Not Secure] [Server] U32_CHEST_6
+[18:05:20 INFO]: [Unity32Observer] U32 close VolumeB PLAYER
+[18:05:20 INFO]: [Unity32Observer] U32 close VolumeA PLAYER
+[18:05:20 INFO]: [Not Secure] [Server] U32_CHEST_6
+[18:05:20 INFO]: VolumeA has the following entity data: [{Slot: 3b, id: "minecraft:gold_ingot", count: 9}]
+[18:05:21 INFO]: VolumeB has the following entity data: [{Slot: 4b, id: "minecraft:iron_ingot", count: 7}]
+[18:05:21 INFO]: VolumeA has the following entity data: [64.5d, 80.0d, 20.5d]
+[18:05:21 INFO]: VolumeB has the following entity data: [67.5d, 80.0d, 20.5d]
+[firstVolumeA-client.log]
+[18:05:09] [Render thread/INFO]: [System] [CHAT] [Server] U32_REPLACED_DROP
+[18:05:13] [Render thread/INFO]: [System] [CHAT] [Server] U32_PORTAL_READY
+[18:05:15] [Render thread/INFO]: [System] [CHAT] [Server] U32_WORLD_WRITE
+[18:05:16] [Render thread/INFO]: [System] [CHAT] [Server] U32_EXPLOSION_CONTROL
+[18:05:17] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_13
+[18:05:18] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_13
+[18:05:20] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6
+[18:05:20] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6
+[firstVolumeB-client.log]
+[18:05:09] [Render thread/INFO]: [System] [CHAT] [Server] U32_REPLACED_DROP
+[18:05:13] [Render thread/INFO]: [System] [CHAT] [Server] U32_PORTAL_READY
+[18:05:15] [Render thread/INFO]: [System] [CHAT] [Server] U32_WORLD_WRITE
+[18:05:16] [Render thread/INFO]: [System] [CHAT] [Server] U32_EXPLOSION_CONTROL
+[18:05:17] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_13
+[18:05:18] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_13
+[18:05:20] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6
+[18:05:20] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6
+[restart.log]
+[18:06:18 INFO]: VolumeA has the following entity data: [64.5d, 80.0d, 20.5d]
+[18:06:19 INFO]: VolumeB has the following entity data: [67.5d, 80.0d, 20.5d]
+[18:06:21 INFO]: [Unity32Observer] U32 open-low VolumeA false
+[18:06:21 INFO]: [Unity32Observer] U32 open-allowed VolumeA
+[18:06:21 INFO]: [Unity32Observer] U32 open-monitor VolumeA false
+[18:06:22 INFO]: [Unity32Observer] U32 open-low VolumeB false
+[18:06:22 INFO]: [Unity32Observer] U32 open-allowed VolumeB
+[18:06:22 INFO]: [Unity32Observer] U32 open-monitor VolumeB false
+[18:06:23 INFO]: [Unity32Observer] U32 close VolumeA PLAYER
+[18:06:24 INFO]: [Unity32Observer] U32 close VolumeB PLAYER
+[18:06:24 INFO]: [Not Secure] [Server] U32_CHEST_6
+[18:06:25 INFO]: VolumeA has the following entity data: [{Slot: 3b, id: "minecraft:gold_ingot", count: 9}]
+[18:06:25 INFO]: VolumeB has the following entity data: [{Slot: 4b, id: "minecraft:iron_ingot", count: 7}]
+[18:06:25 INFO]: VolumeA has the following entity data: [64.5d, 80.0d, 20.5d]
+[18:06:26 INFO]: VolumeB has the following entity data: [67.5d, 80.0d, 20.5d]
+[restartVolumeA-client.log]
+[18:06:24] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6
+[restartVolumeB-client.log]
+[18:06:24] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6

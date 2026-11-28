@@ -41,14 +41,15 @@ final class PlayerEvents implements AutoCloseable {
         return event.isCancelled() || value==null || !value.startsWith("/")?null:value.substring(1);
     }
     void forget(UUID id){lastMove.remove(id);}
-    boolean move(ServerPlayer raw,double x,double y,double z,float yaw,float pitch,double ox,double oy,double oz){
+    boolean move(ServerPlayer raw,double x,double y,double z,float yaw,float pitch,double ox,double oy,double oz,float oldYaw,float oldPitch){
         if(PlayerMoveEvent.getHandlerList().getRegisteredListeners().length==0)return true;
         var world=host.views.world(raw.level());
-        var before=new Location(world,ox,oy,oz,raw.getYRot(),raw.getXRot());
+        var before=new Location(world,ox,oy,oz,oldYaw,oldPitch);
         var from=lastMove.getOrDefault(raw.getUUID(),before);
+        if(from.getWorld()!=world)from=before;
         var to=new Location(world,x,y,z,yaw,pitch);
         if(from.getWorld()==world && from.distanceSquared(to)<=1d/256 &&
-                Math.abs(from.getYaw()-yaw)+Math.abs(from.getPitch()-pitch)<=10)return true;
+                net.minecraft.util.Mth.degreesDifferenceAbs(from.getYaw(),yaw)+Math.abs(from.getPitch()-pitch)<=10)return true;
         raw.absSnapTo(ox,oy,oz,before.getYaw(),before.getPitch());
         var player=host.views.player(raw);
         var event=new PlayerMoveEvent(player,from.clone(),to.clone());
@@ -76,7 +77,7 @@ final class PlayerEvents implements AutoCloseable {
         return new TeleportTransition(level,new net.minecraft.world.phys.Vec3(dest.getX(),dest.getY(),dest.getZ()),absolute.deltaMovement(),
             dest.getYaw(),dest.getPitch(),t.missingRespawnBlock(),t.asPassenger(),Set.of(),t.postTeleportTransition());
     }
-    private Component adventure(net.minecraft.network.chat.Component c){
+    Component adventure(net.minecraft.network.chat.Component c){
         var ops=host.game.registryAccess().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE);
         return net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().deserializeFromTree(
             net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(ops,c).getOrThrow());
@@ -139,7 +140,7 @@ final class PlayerEvents implements AutoCloseable {
                     boolean filtered=raw.shouldFilterMessageTo(peer);
                     if(render==normal)outgoing.sendToPlayer(peer,filtered,bound);
                     else if(!filtered || wire.filterMask().isEmpty())peer.sendSystemMessage(host.nativeReason(render.render(sender,sender.displayName(),result,target)));
-                }else if(target==console)host.game.sendSystemMessage(host.nativeReason(render.render(sender,sender.displayName(),result,target)));
+                }else if(target.equals(console))host.game.sendSystemMessage(host.nativeReason(render.render(sender,sender.displayName(),result,target)));
                 else target.sendMessage(render.render(sender,sender.displayName(),result,target));
             }
         };

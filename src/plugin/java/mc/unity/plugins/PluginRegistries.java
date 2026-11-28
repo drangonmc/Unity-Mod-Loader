@@ -14,6 +14,8 @@ import org.bukkit.damage.DamageType;
 /** The SDK initializes its static registry handles together, but resolves their contents lazily. */
 public final class PluginRegistries implements RegistryAccess {
     private final Map<Object,Registry<?>> registries = new ConcurrentHashMap<>();
+    private final Map<NamespacedKey,BukkitEnchant> enchantments=new ConcurrentHashMap<>();
+    private final Map<NamespacedKey,org.bukkit.GameRule<?>> rules=new ConcurrentHashMap<>();
     private final Map<NamespacedKey,MenuType> menus = new ConcurrentHashMap<>();
     private final Map<NamespacedKey,DamageType> damage = new ConcurrentHashMap<>();
     private final Map<NamespacedKey,Keyed> blocks=new ConcurrentHashMap<>(), items=new ConcurrentHashMap<>();
@@ -21,6 +23,8 @@ public final class PluginRegistries implements RegistryAccess {
     private final Map<NamespacedKey,Keyed> effects=new ConcurrentHashMap<>();
     public <T extends Keyed> Registry<T> getRegistry(Class<T> type) {
         if (type==org.bukkit.potion.PotionEffectType.class)return registry(RegistryKey.MOB_EFFECT);
+        if(type==org.bukkit.enchantments.Enchantment.class)return registry(RegistryKey.ENCHANTMENT);
+        if(type==org.bukkit.GameRule.class)return registry(RegistryKey.GAME_RULE);
         if (type==org.bukkit.Fluid.class)return registry(RegistryKey.FLUID);
         if (type==org.bukkit.GameEvent.class)return registry(RegistryKey.GAME_EVENT);
         if (type==org.bukkit.entity.EntityType.class) return registry(RegistryKey.ENTITY_TYPE);
@@ -35,7 +39,9 @@ public final class PluginRegistries implements RegistryAccess {
     private <T extends Keyed> Registry<T> registry(Object kind) {
         return (Registry<T>)registries.computeIfAbsent(kind, key -> Views.of(Registry.class,key.toString(),(m,a)->{
             net.minecraft.core.Registry<?> source;
-            if(key==RegistryKey.MENU)source=BuiltInRegistries.MENU;
+            if(key==RegistryKey.ENCHANTMENT)source=Host.active().game.registryAccess().lookupOrThrow(Registries.ENCHANTMENT);
+            else if(key==RegistryKey.GAME_RULE)source=BuiltInRegistries.GAME_RULE;
+            else if(key==RegistryKey.MENU)source=BuiltInRegistries.MENU;
             else if(key==RegistryKey.MOB_EFFECT)source=BuiltInRegistries.MOB_EFFECT;
             else if(key==RegistryKey.FLUID)source=BuiltInRegistries.FLUID;
             else if(key==RegistryKey.GAME_EVENT)source=BuiltInRegistries.GAME_EVENT;
@@ -73,6 +79,16 @@ public final class PluginRegistries implements RegistryAccess {
             var found=effects.get(name);if(found!=null)return found;
             var value=new EffectView(name,BuiltInRegistries.MOB_EFFECT.getOptional(Identifier.parse(name.toString())).orElseThrow());
             var old=effects.putIfAbsent(name,value);return old==null?value:old;
+        }
+        if(key==RegistryKey.ENCHANTMENT){
+            var entry=Host.active().game.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).get(Identifier.parse(name.toString())).orElseThrow();
+            var old=enchantments.get(name);if(old!=null && old.holder==entry)return old;
+            var wrapped=new BukkitEnchant(entry);enchantments.put(name,wrapped);return wrapped;
+        }
+        if(key==RegistryKey.GAME_RULE){
+            var old=rules.get(name);if(old!=null)return old;
+            var rule=BuiltInRegistries.GAME_RULE.getValue(Identifier.parse(name.toString()));
+            var wrapped=new BukkitRule(rule);old=rules.putIfAbsent(name,wrapped);return old==null?wrapped:old;
         }
         if(key==RegistryKey.ENTITY_TYPE)return entityType(name.toString());
         if(key==RegistryKey.GAME_EVENT){

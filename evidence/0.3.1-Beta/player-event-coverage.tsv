@@ -1,6 +1,0 @@
-event	unityGameOrigin	paperWitness	case
-org.bukkit.event.player.AsyncPlayerChatEvent	observed	observed	asynchronous legacy processing
-io.papermc.paper.event.player.AsyncChatEvent	observed	observed	priority, cancellation, recipients and rewritten text
-org.bukkit.event.player.PlayerCommandPreprocessEvent	observed	observed	blocked command and rewritten allowed control
-org.bukkit.event.player.PlayerMoveEvent	observed	observed	cancelled walk and WorldGuard entry rule
-org.bukkit.event.player.PlayerTeleportEvent	observed	observed	COMMAND and PLUGIN cancellations, region destination

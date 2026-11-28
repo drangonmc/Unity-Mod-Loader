@@ -27,7 +27,7 @@ final class StackMeta implements InvocationHandler {
         var json = net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().serializeToTree(rich);
         return net.minecraft.network.chat.ComponentSerialization.CODEC.parse(com.mojang.serialization.JsonOps.INSTANCE,json).getOrThrow();
     }
-    private static String legacy(net.minecraft.network.chat.Component value) {
+    static String legacy(net.minecraft.network.chat.Component value) {
         var json = net.minecraft.network.chat.ComponentSerialization.CODEC.encodeStart(com.mojang.serialization.JsonOps.INSTANCE,value).getOrThrow();
         return net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer.legacySection().serialize(
             net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().deserializeFromTree(json));
@@ -51,6 +51,33 @@ final class StackMeta implements InvocationHandler {
                 if(args[0]==null)item.remove(DataComponents.LORE);
                 else item.set(DataComponents.LORE, new ItemLore(((java.util.List<?>)args[0]).stream().map(x->fromLegacy((String)x)).toList()));
                 yield null;
+            }
+            case "lore" -> {
+                if(args==null || args.length==0)yield lore.lines().isEmpty()?null:lore.lines().stream().map(Host.active()::adventure).toList();
+                if(args[0]==null)item.remove(DataComponents.LORE);
+                else item.set(DataComponents.LORE,new ItemLore(((List<net.kyori.adventure.text.Component>)args[0]).stream().map(Host.active()::nativeReason).toList()));
+                yield null;
+            }
+            case "getEnchants" -> {
+                var enchants=new LinkedHashMap<org.bukkit.enchantments.Enchantment,Integer>();
+                for(var e:item.getEnchantments().entrySet())enchants.put(org.bukkit.Registry.ENCHANTMENT.getOrThrow(
+                    org.bukkit.NamespacedKey.fromString(e.getKey().unwrapKey().orElseThrow().identifier().toString())),e.getIntValue());
+                yield Collections.unmodifiableMap(enchants);
+            }
+            case "hasEnchant","getEnchantLevel" -> {
+                int level=item.getEnchantments().getLevel(((BukkitEnchant)args[0]).holder);
+                if(method.getName().equals("hasEnchant"))yield level>0;yield level;
+            }
+            case "addEnchant","removeEnchant" -> {
+                var e=(BukkitEnchant)args[0];int level=args.length==1?0:(int)args[1];
+                if(args.length>1 && !(boolean)args[2] && (level<e.getStartLevel() || level>e.getMaxLevel()))yield false;
+                int old=item.getEnchantments().getLevel(e.holder);if(old==level)yield false;
+                var copy=new net.minecraft.world.item.enchantment.ItemEnchantments.Mutable(item.getEnchantments());
+                copy.set(e.holder,level);item.set(DataComponents.ENCHANTMENTS,copy.toImmutable());yield true;
+            }
+            case "removeEnchantments" -> {item.remove(DataComponents.ENCHANTMENTS);yield null;}
+            case "hasConflictingEnchant" -> {
+                var candidate=(BukkitEnchant)args[0];yield item.getEnchantments().keySet().stream().anyMatch(h->!h.equals(candidate.holder) && !net.minecraft.world.item.enchantment.Enchantment.areCompatible(h,candidate.holder));
             }
             case "hasEnchants" -> !item.getEnchantments().isEmpty();
             case "hasDamage", "hasDamageValue" -> item.getDamageValue() > 0;

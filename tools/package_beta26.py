@@ -16,7 +16,7 @@ import acceptance
 import unpacked
 from acceptance import digest
 
-VERSION = "0.3.1-Beta"
+VERSION = "0.3.2-Beta"
 
 def validated(options, version=VERSION, alternate=False):
     reports = {}
@@ -82,7 +82,10 @@ def main(o):
     version=getattr(o,"version",VERSION)
     number=version.split("-")[0]
     jars=[f"unity-loader-{version}.jar","unity-world-marker.jar","unity-client-witness.jar","UnityEditRegions.jar"]
-    if version=="0.3.1-Beta":
+    if version=="0.3.2-Beta":
+        from validate_beta32 import validate
+        reports=validate(ROOT,o,digest)
+    elif version=="0.3.1-Beta":
         from validate_beta31 import validate
         reports=validate(ROOT,o,digest)
     elif version=="0.3.0-Beta":
@@ -109,9 +112,14 @@ def main(o):
         more["contracts/contracts.log"]=o.contract_result.parent/"contracts.log"
         for n,src in more.items():
             dest=evidence/n;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dest)
-    if version in ("0.2.9-Beta","0.3.0-Beta","0.3.1-Beta"):
+    if version in ("0.2.9-Beta","0.3.0-Beta","0.3.1-Beta","0.3.2-Beta"):
         more["contracts/result.json"]=o.contract_result
         more["contracts/contracts.log"]=o.contract_result.parent/"contracts.log"
+        if version=="0.3.2-Beta":
+            for host in ("unity","paper"):
+                for name in ("players.json","world.json"):more[host+"/"+name]=o.runs/host/name
+            for name in ("language.json","game-event-coverage.tsv","shutdowns.json","prior-regression.json","exit-regression.json"):
+                more[name]=o.runs/name
         if version=="0.3.1-Beta":
             for host in ("unity","paper"):more[host+"/offline.json"]=o.runs/host/"offline.json"
             more["previous/result.json"]=o.runs/"previous/result.json"
@@ -155,7 +163,7 @@ def main(o):
                 if any(s in line for s in ("Operation completed", "available edits", "clipboard has been pasted",
                           "has the following block data:", "REGION_CHEST_INTACT", "UNITY_NEO26_TICKS_OK",
                           "has the following entity data:", "BLOCK_OK_gold_block", "BLOCK_OK_smooth_stone",
-                          "U31 ", "NEO31 ", "FORGE31 ", "PLAYER_REPLACEMENT","SHIELD_WEAR_2","UNITY30 ", "U30_", "UNITY29 ", "UNITY29_PIPE_READY","[Server] FLUID_MOVED","[Server] ENERGY_MOVED","[Server] ITEM_MOVED","UNITY28_", "[Server] NO_ITEM_DROP","[Server] NORMAL_ITEM_DROP","[Server] VANILLA_XP","UNITY_NEO27_FUEL_OK", "[Server] MACHINE_FUEL", "[Server] CUSTOM_FUEL_COOKED",
+                           "U32 ","U32SYNC ","U32MACHINE ","U32 Kotlin","U32_","U31 ", "NEO31 ", "FORGE31 ", "PLAYER_REPLACEMENT","SHIELD_WEAR_2","UNITY30 ", "U30_", "UNITY29 ", "UNITY29_PIPE_READY","[Server] FLUID_MOVED","[Server] ENERGY_MOVED","[Server] ITEM_MOVED","UNITY28_", "[Server] NO_ITEM_DROP","[Server] NORMAL_ITEM_DROP","[Server] VANILLA_XP","UNITY_NEO27_FUEL_OK", "[Server] MACHINE_FUEL", "[Server] CUSTOM_FUEL_COOKED",
                           "[Server] FURNACE_COOKED", "[Server] HOPPER_OUTPUT", "[Server] HOPPER_FILTER", "[Server] HOPPER_REJECTED")):
                     excerpts.append(line)
         (out/"observations.txt").write_text("\n".join(excerpts)+"\n","utf8")
@@ -167,11 +175,12 @@ def main(o):
               "src/main/java/mc/unity/loader/NativeLoader.java","src/main/java/net/minecraftforge/fml/common/Mod.java"):
         files[n]=(ROOT/n).read_bytes()
     for n in ("Install-Unity-Client.cmd","Start-Unity.cmd"):
-        files[n]=re.sub(rb"0\.2\.\d+-Beta",version.encode(),(ROOT/n).read_bytes())
-    if version=="0.3.1-Beta":files["tools/validate_beta31.py"]=(ROOT/"tools/validate_beta31.py").read_bytes()
-    if version in ("0.3.0-Beta","0.3.1-Beta"):
+        files[n]=re.sub(rb"\d+\.\d+\.\d+-Beta",version.encode(),(ROOT/n).read_bytes())
+    if version=="0.3.2-Beta":files["tools/validate_beta32.py"]=(ROOT/"tools/validate_beta32.py").read_bytes()
+    if version in ("0.3.1-Beta","0.3.2-Beta"):files["tools/validate_beta31.py"]=(ROOT/"tools/validate_beta31.py").read_bytes()
+    if version in ("0.3.0-Beta","0.3.1-Beta","0.3.2-Beta"):
         for n in ("tools/validate_beta30.py","NOTICE.md"):files[n]=(ROOT/n).read_bytes()
-    if version in ("0.2.9-Beta","0.3.0-Beta","0.3.1-Beta"):
+    if version in ("0.2.9-Beta","0.3.0-Beta","0.3.1-Beta","0.3.2-Beta"):
         for n in ("tools/validate_beta29.py","tools/bukkit-library-resolver.lock.json"):files[n]=(ROOT/n).read_bytes()
     for base in ("standalone","src/plugin"):
         for f in sorted((ROOT/base).rglob("*")):
@@ -202,7 +211,7 @@ def main(o):
     print("Verified",delivered,digest(delivered))
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
-    parser.add_argument("--version",choices=("0.2.6-Beta","0.2.7-Beta","0.2.8-Beta","0.2.9-Beta","0.3.0-Beta","0.3.1-Beta"),default=VERSION)
+    parser.add_argument("--version",choices=("0.2.6-Beta","0.2.7-Beta","0.2.8-Beta","0.2.9-Beta","0.3.0-Beta","0.3.1-Beta","0.3.2-Beta"),default=VERSION)
     parser.add_argument("--neo-source",type=lambda s:Path(s).resolve())
     parser.add_argument("--variant-runs",type=lambda s:Path(s).resolve())
     parser.add_argument("--contract-result",type=lambda s:Path(s).resolve())

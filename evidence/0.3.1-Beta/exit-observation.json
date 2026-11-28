@@ -1,7 +1,0 @@
-{
-  "engine": "1a17940cdf0f36a39ef3cdcd51ca766cf8293d71dda3c6d76098bdcf59601e9f",
-  "observed": "A preliminary mixed-server process exceeded a 180 s exit deadline after recording its world saves and standalone shutdown.",
-  "cause": "undetermined",
-  "logTime": "16:11:29",
-  "serverLogSHA256": "a4b1d02c80742835f1fc8d7a87fd0d1cbede622093eb77354561905969b462e5"
-}

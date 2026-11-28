@@ -23,7 +23,7 @@ def fixture(source, libs, descriptor, value, dest):
     with tempfile.TemporaryDirectory(dir=dest.parent) as tmp:
         out=Path(tmp)
         subprocess.run(["javac","--release","25","-proc:none","-g:none","-cp",os.pathsep.join(map(str,libs)),
-                        "-d",out,HERE/source],check=True)
+                        "-d",out,*([HERE/source] if isinstance(source,str) else [HERE/f for f in source])],check=True)
         with zipfile.ZipFile(dest,"w") as jar:
             jar.writestr(zipfile.ZipInfo(descriptor),value)
             for f in sorted(out.rglob("*.class")):jar.writestr(zipfile.ZipInfo(f.relative_to(out).as_posix()),f.read_bytes())

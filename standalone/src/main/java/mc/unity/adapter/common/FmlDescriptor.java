@@ -60,6 +60,11 @@ public final class FmlDescriptor {
             return parsed;
         }
     }
+    public static String kotlinRange(JarFile jar,boolean neo)throws IOException{
+        if(!neo)return null;
+        var doc=document(jar,true);
+        return "kotlinforforge".equals(string(doc,"modLoader","javafml"))?string(doc,"loaderVersion","[0,)"):null;
+    }
     public static boolean clientSideOnly(JarFile jar) throws IOException {
         Object value=document(jar,false).getRaw("clientSideOnly");
         if(value==null)return false;
@@ -128,9 +133,10 @@ public final class FmlDescriptor {
     }
     private static List<Meta> mods(UnmodifiableConfig doc, String side, boolean neo, String jarVersion)
         throws IOException {
-        if (!"javafml".equals(string(doc, "modLoader", neo ? "javafml" : "")))
-            throw new IOException("Expected javafml mod loader");
-        checkRange(neo ? "11.0.16" : "65.1.5", string(doc, "loaderVersion", null));
+        var language=string(doc,"modLoader",neo?"javafml":"");
+        boolean kotlin=neo && language.equals("kotlinforforge");
+        if(!kotlin && !language.equals("javafml"))throw new IOException("Unsupported FML language "+language);
+        if(!kotlin)checkRange(neo?"11.0.16":"65.1.5",string(doc,"loaderVersion",null));
         Object raw = doc.getRaw("dependencies");
         if (raw != null && !(raw instanceof UnmodifiableConfig))
             throw new IOException("Expected dependencies table");
@@ -142,6 +148,7 @@ public final class FmlDescriptor {
             if (!id.matches("[a-z][a-z0-9_]{1,63}") || !ids.add(id))
                 throw new IOException("Invalid or duplicate mod ID " + id);
             var deps = new ArrayList<Dependency>();
+            if(kotlin && !id.equals("kotlinforforge"))deps.add(new Dependency("kotlinforforge",string(doc,"loaderVersion",null),true,"AFTER"));
             if (dependencies != null)
                 for (var d : tables(dependencies, id)) {
                     String targetSide = string(d, "side", "BOTH");

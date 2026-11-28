@@ -52,6 +52,10 @@ public final class Attachments {
         if (keys.putIfAbsent(key.id(), key) != null)
             throw new IllegalArgumentException("Duplicate attachment " + key.id());
     }
+    public static synchronized Key<?> lookup(Identifier id){return keys.get(id);}
+    public static List<Key<?>> presentKeys(Owner owner){
+        var state=owner.unity$attachments(false);return state==null?List.of():List.copyOf(state.values.keySet());
+    }
     static synchronized void clear() { keys.clear(); }
     public boolean any() { return !values.isEmpty() || !unknown.isEmpty(); }
     @SuppressWarnings("unchecked")

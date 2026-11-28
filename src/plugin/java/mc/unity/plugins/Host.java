@@ -33,10 +33,40 @@ public final class Host implements PluginHost {
     MinecraftServer game;
     Server server;
     BukkitViews views;
+    final WorldGameplay gameplay=new WorldGameplay(this);
+    public boolean creature(net.minecraft.world.entity.Entity entity,String reason){return gameplay.creature(entity,reason);}
+    public List<net.minecraft.core.BlockPos> explode(net.minecraft.world.level.ServerExplosion e,List<net.minecraft.core.BlockPos> blocks){return gameplay.explode(e,blocks);}
+    private final PlayerLife life=new PlayerLife(this);
+    private final Map<net.minecraft.world.inventory.AbstractContainerMenu,net.minecraft.network.chat.Component> menuTitles=new WeakHashMap<>();
+    void clearMove(ServerPlayer p){playerEvents.forget(p.getUUID());}
+    net.kyori.adventure.text.Component adventure(net.minecraft.network.chat.Component c){return playerEvents.adventure(c);}
+    public boolean playerDying(ServerPlayer p,net.minecraft.world.damagesource.DamageSource s){return life.dying(p,s);}
+    public boolean deathEquipment(ServerPlayer p){return life.equipment(p);}
+    public int deathXp(ServerPlayer p,int original){return life.xp(p,original);}
+    public boolean showDeath(ServerPlayer p,boolean original){return life.show(p,original);}
+    public net.minecraft.network.chat.Component deathMessage(ServerPlayer p,net.minecraft.network.chat.Component c){return life.message(p,c);}
+    public void restored(ServerPlayer p,ServerPlayer old,boolean alive){life.restored(p,old,alive);}
+    public net.minecraft.world.level.portal.TeleportTransition respawning(ServerPlayer p,net.minecraft.world.level.portal.TeleportTransition t,boolean alive){return life.respawn(p,t,alive);}
+    public boolean menuOpen(ServerPlayer p,net.minecraft.world.inventory.AbstractContainerMenu m,net.minecraft.world.MenuProvider provider){
+        var title=provider.getDisplayName();
+        if(org.bukkit.event.inventory.InventoryOpenEvent.getHandlerList().getRegisteredListeners().length!=0){
+            var e=new org.bukkit.event.inventory.InventoryOpenEvent(new MenuViews(this,p,m,title).view);
+            fire(e);if(e.isCancelled())return false;
+        }
+        menuTitles.put(m,title);return true;
+    }
+    public void menuClose(ServerPlayer p,String reason){
+        var title=menuTitles.remove(p.containerMenu);
+        if(org.bukkit.event.inventory.InventoryCloseEvent.getHandlerList().getRegisteredListeners().length!=0){
+            var e=new org.bukkit.event.inventory.InventoryCloseEvent(new MenuViews(this,p,p.containerMenu,title).view,
+                org.bukkit.event.inventory.InventoryCloseEvent.Reason.valueOf(reason));
+            fire(e);
+        }
+    }
     private final PlayerEvents playerEvents=new PlayerEvents(this);
     public boolean chat(ServerPlayer p,net.minecraft.network.chat.PlayerChatMessage msg,net.minecraft.network.chat.ChatType.Bound bound){return playerEvents.chat(p,msg,bound);}
     public String command(ServerPlayer p,String input){return playerEvents.command(p,input);}
-    public boolean move(ServerPlayer p,double x,double y,double z,float yaw,float pitch,double ox,double oy,double oz){return playerEvents.move(p,x,y,z,yaw,pitch,ox,oy,oz);}
+    public boolean move(ServerPlayer p,double x,double y,double z,float yaw,float pitch,double ox,double oy,double oz,float oldYaw,float oldPitch){return playerEvents.move(p,x,y,z,yaw,pitch,ox,oy,oz,oldYaw,oldPitch);}
     public net.minecraft.world.level.portal.TeleportTransition teleport(ServerPlayer p,net.minecraft.world.level.portal.TeleportTransition t,String cause){return playerEvents.teleport(p,t,cause);}
     final Map<String, PluginFile.Loader> loaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     final Map<String, org.bukkit.command.Command> commands = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -180,11 +210,20 @@ public final class Host implements PluginHost {
             var cmd = entry.getValue();
             var name = entry.getKey();
             register(name, cmd::testPermissionSilent,
-                     (source, args) -> cmd.execute(views.sender(source), name, args) ? 1 : 0);
+                     (source, args) -> cmd.execute(views.sender(source), name, args) ? 1 : 0,
+                     (source,args)->cmd.tabComplete(views.sender(source),name,args));
         }
         for (var entry : paper) {
             var registrar =
                 Views.of(io.papermc.paper.command.brigadier.Commands.class, "Paper commands", (m, a) -> {
+                    if(m.equals("register")){
+                        for(Object v:a)if(v instanceof com.mojang.brigadier.tree.LiteralCommandNode tree){
+                            var labels=new LinkedHashSet<String>();labels.add(tree.getLiteral());labels.add(entry.plugin.getName().toLowerCase(Locale.ROOT)+":"+tree.getLiteral());
+                            for(Object param:a)if(param instanceof Collection<?> aliases)for(var alias:aliases)labels.add(alias.toString());
+                            for(var label:labels)if(dispatcher.getRoot().getChild(label)==null)dispatcher.getRoot().addChild(PaperTree.convert(tree,label,this::paperSource));
+                            return Set.copyOf(labels);
+                        }
+                    }
                     if (m.equals("register") && a[0] instanceof String name &&
                         a[a.length - 1] instanceof BasicCommand cmd) {
                         Set<String> labels = new LinkedHashSet<>();
@@ -196,18 +235,10 @@ public final class Host implements PluginHost {
                                     labels.add(s.toString());
                         for (var label : labels)
                             register(label, cmd::canUse, (source, args) -> {
-                                var paperSource = Views.of(
-                                    io.papermc.paper.command.brigadier.CommandSourceStack.class,
-                                    "Paper source", (method, params) -> {
-                                        if (method.equals("getSender"))
-                                            return views.sender(source);
-                                        if (method.equals("getExecutor") || method.equals("getPlayerOrThrow"))
-                                            return views.player(source.getPlayerOrException());
-                                        throw Views.unsupported("Paper source", method);
-                                    });
+                                var paperSource=paperSource(source);
                                 cmd.execute(paperSource, args);
                                 return 1;
-                            });
+                            },(source,args)->cmd.suggest(paperSource(source),args));
                         return Set.copyOf(labels);
                     }
                     throw Views.unsupported("Paper commands", m);
@@ -219,8 +250,17 @@ public final class Host implements PluginHost {
             }));
         }
     }
+    private io.papermc.paper.command.brigadier.CommandSourceStack paperSource(CommandSourceStack source){
+        return Views.of(io.papermc.paper.command.brigadier.CommandSourceStack.class,"Paper command source",(m,args)->switch(m){
+            case "getSender"->views.sender(source);
+            case "getExecutor"->source.getEntity()==null?null:views.entity(source.getEntity());
+            case "getPlayerOrThrow"->views.player(source.getPlayerOrException());
+            case "getLocation"->{var p=source.getPosition();var rot=source.getRotation();yield new org.bukkit.Location(views.world(source.getLevel()),p.x,p.y,p.z,rot.y,rot.x);}
+            default->throw Views.unsupported("Paper command source",m);
+        });
+    }
     private void register(String name, Predicate<CommandSender> allowed,
-                          ToIntBiFunction<CommandSourceStack, String[]> callback) {
+                          ToIntBiFunction<CommandSourceStack, String[]> callback, java.util.function.BiFunction<CommandSourceStack,String[],java.util.Collection<String>> suggest) {
         if (dispatcher.getRoot().getChild(name) != null)
             return;
         var node =
@@ -228,6 +268,8 @@ public final class Host implements PluginHost {
                 .requires(s -> allowed.test(views.sender(s)))
                 .executes(c -> callback.applyAsInt(c.getSource(), new String[0]))
                 .then(Commands.argument("args", StringArgumentType.greedyString())
+                          .suggests((ctx,b)->{String raw=b.getRemaining();var out=b.createOffset(b.getStart()+raw.lastIndexOf(' ')+1);
+                              for(String option:suggest.apply(ctx.getSource(),raw.split(" +",-1)))out.suggest(option);return out.buildFuture();})
                           .executes(c
                                     -> callback.applyAsInt(
                                         c.getSource(), StringArgumentType.getString(c, "args").split(" +"))));
@@ -284,7 +326,7 @@ public final class Host implements PluginHost {
                                                       : net.minecraft.network.chat.ComponentSerialization.CODEC
                                                             .parse(ops, serializer.serializeToTree(changed))
                                                             .getOrThrow();
-        } finally { if (!join && views != null) {playerEvents.forget(player.getUUID());views.forget(player.getUUID());} }
+        } finally { if (!join && views != null) {life.forget(player);playerEvents.forget(player.getUUID());views.forget(player.getUUID());} }
     }
     @Override
     public boolean changeSlot(ServerPlayer player, int slot) {

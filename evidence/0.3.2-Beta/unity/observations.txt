@@ -1,0 +1,250 @@
+[first.log]
+U32 Kotlin preLaunch
+[18:04:32] [main/INFO]: [STDOUT]: U32 KFF object main
+[18:04:32] [main/INFO]: [STDOUT]: U32 Kotlin object main
+[18:04:33] [main/INFO]: [STDOUT]: U32 KFF lifecycle
+[18:05:06] [Server thread/INFO]: [Not Secure] [Server] WAIT_U32_READY
+[18:05:06] [Server thread/INFO]: [Not Secure] [Server] U32_READY
+信息: U32 death-low VolumeA 0
+信息: U32 death-high VolumeA true
+信息: U32 death-monitor VolumeA keep=true emeralds=0
+信息: U32 respawn-low VolumeA DEATH
+信息: U32 respawn-monitor VolumeA 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+信息: U32 first-step 62 20
+[18:06:06] [Server thread/INFO]: VolumeA has the following entity data: [62.5d, 80.0d, 20.5d]
+信息: U32 permission VolumeA false
+信息: U32 death-low VolumeB 7
+信息: U32 death-high VolumeB false
+信息: U32 death-monitor VolumeB keep=false emeralds=0
+信息: U32 respawn-low VolumeB DEATH
+信息: U32 respawn-monitor VolumeB 62 20
+[18:06:08] [Server thread/INFO]: [Not Secure] [Server] U32_REPLACED_DROP
+信息: U32 console-removed true
+信息: U32 cause ENDER_PEARL
+[18:06:09] [Server thread/INFO]: VolumeA has the following entity data: [60.5d, 80.0d, 18.5d]
+信息: U32 cause CONSUMABLE_EFFECT
+[18:06:12] [Server thread/INFO]: VolumeA has the following entity data: [60.5d, 80.0d, 18.5d]
+[18:06:12] [Server thread/INFO]: [Not Secure] [Server] U32_PORTAL_READY
+信息: U32 cooldown reset
+信息: U32 permission VolumeA false
+信息: U32 cause NETHER_PORTAL
+信息: U32 cooldown reset
+信息: U32 permission VolumeA false
+信息: U32 cause END_PORTAL
+信息: U32 cooldown reset
+信息: U32 permission VolumeA false
+信息: U32 cause END_GATEWAY
+信息: U32 cause SPECTATE
+信息: U32 cause SPECTATE
+信息: U32 cow denied CUSTOM
+信息: U32 block-blast denied
+信息: U32 world-meta ok
+[18:06:17] [Server thread/INFO]: [Not Secure] [Server] U32_WORLD_WRITE
+信息: U32 entity-blast filtered
+[18:06:17] [Server thread/INFO]: [Not Secure] [Server] U32_EXPLOSION_CONTROL
+信息: U32 open-low VolumeA false
+信息: U32 open-allowed VolumeA
+信息: U32 open-monitor VolumeA false
+信息: U32 close VolumeA PLAYER
+[18:06:19] [Server thread/INFO]: [Not Secure] [Server] U32_CHEST_13
+信息: U32 open-low VolumeA false
+信息: U32 open-allowed VolumeA
+信息: U32 open-monitor VolumeA false
+信息: U32 open-low VolumeB false
+信息: U32 open-monitor VolumeB true
+[18:06:20] [Server thread/INFO]: [Not Secure] [Server] U32_CHEST_13
+[18:06:20] [Server thread/INFO]: VolumeA has the following entity data: [{count: 9, Slot: 3b, id: "minecraft:gold_ingot"}]
+[18:06:21] [Server thread/INFO]: VolumeB has the following entity data: []
+信息: U32 permission VolumeB true
+信息: U32 open-low VolumeB false
+信息: U32 open-allowed VolumeB
+信息: U32 open-monitor VolumeB false
+[18:06:26] [Server thread/INFO]: [Not Secure] [Server] U32_CHEST_6
+信息: U32 close VolumeB PLAYER
+信息: U32 close VolumeA PLAYER
+[18:06:28] [Server thread/INFO]: [Not Secure] [Server] U32_INTACT_u32abs
+[18:06:28] [Server thread/INFO]: [Not Secure] [Server] U32_INTACT_u32parry
+[18:06:29] [Server thread/INFO]: [Not Secure] [Server] U32_MACHINE_PLACED
+[18:06:29] [Server thread/INFO]: [STDOUT]: U32SYNC server write 3201 3202 3211
+[18:06:30] [Server thread/INFO]: [STDOUT]: U32SYNC server remove 3201 3202 null
+[18:06:30] [Server thread/INFO]: [STDOUT]: U32MACHINE Fabric and NeoForge share WorldGuard ownership checks
+[18:06:30] [Server thread/INFO]: [STDOUT]: U32MACHINE owner VolumeA allowed; VolumeB denied
+[18:06:30] [Server thread/INFO]: [STDOUT]: U32SYNC server check 3201 3202 null
+[18:06:31] [Server thread/INFO]: [Not Secure] [Server] U32_CHEST_6
+[18:06:31] [Server thread/INFO]: VolumeA has the following entity data: [{count: 9, Slot: 3b, id: "minecraft:gold_ingot"}]
+[18:06:32] [Server thread/INFO]: VolumeB has the following entity data: [{count: 7, Slot: 4b, id: "minecraft:iron_ingot"}]
+[18:06:32] [Server thread/INFO]: VolumeA has the following entity data: [64.5d, 80.0d, 20.5d]
+[18:06:33] [Server thread/INFO]: VolumeB has the following entity data: [67.5d, 80.0d, 20.5d]
+[firstVolumeA-client.log]
+U32 Kotlin preLaunch
+[18:05:24] [Render thread/INFO]: [STDOUT]: U32 KFF object main
+[18:05:24] [Render thread/INFO]: [STDOUT]: U32 Kotlin object main
+[18:05:25] [Render thread/INFO]: [STDOUT]: U32 KFF lifecycle
+[18:06:08] [Render thread/INFO]: [System] [CHAT] [Server] U32_REPLACED_DROP
+[18:06:12] [Render thread/INFO]: [System] [CHAT] [Server] U32_PORTAL_READY
+[18:06:17] [Render thread/INFO]: [System] [CHAT] [Server] U32_WORLD_WRITE
+[18:06:17] [Render thread/INFO]: [System] [CHAT] [Server] U32_EXPLOSION_CONTROL
+[18:06:19] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_13
+[18:06:20] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_13
+[18:06:26] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6
+[18:06:28] [Render thread/INFO]: [System] [CHAT] [Server] U32_INTACT_u32abs
+[18:06:28] [Render thread/INFO]: [System] [CHAT] [Server] U32_INTACT_u32parry
+[18:06:29] [Render thread/INFO]: [System] [CHAT] [Server] U32_MACHINE_PLACED
+[18:06:29] [Render thread/INFO]: [STDOUT]: U32SYNC update 3201 previous=null
+[18:06:29] [Render thread/INFO]: [STDOUT]: U32SYNC update 3202 previous=null
+[18:06:29] [Render thread/INFO]: [STDOUT]: U32SYNC update 3202 previous=3202
+[18:06:31] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6
+[firstVolumeB-client.log]
+U32 Kotlin preLaunch
+[18:05:50] [Render thread/INFO]: [STDOUT]: U32 KFF object main
+[18:05:50] [Render thread/INFO]: [STDOUT]: U32 Kotlin object main
+[18:05:51] [Render thread/INFO]: [STDOUT]: U32 KFF lifecycle
+[18:06:08] [Render thread/INFO]: [System] [CHAT] [Server] U32_REPLACED_DROP
+[18:06:12] [Render thread/INFO]: [System] [CHAT] [Server] U32_PORTAL_READY
+[18:06:17] [Render thread/INFO]: [System] [CHAT] [Server] U32_WORLD_WRITE
+[18:06:17] [Render thread/INFO]: [System] [CHAT] [Server] U32_EXPLOSION_CONTROL
+[18:06:19] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_13
+[18:06:20] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_13
+[18:06:26] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6
+[18:06:28] [Render thread/INFO]: [System] [CHAT] [Server] U32_INTACT_u32abs
+[18:06:28] [Render thread/INFO]: [System] [CHAT] [Server] U32_INTACT_u32parry
+[18:06:29] [Render thread/INFO]: [System] [CHAT] [Server] U32_MACHINE_PLACED
+[18:06:29] [Render thread/INFO]: [STDOUT]: U32SYNC update 3201 previous=null
+[18:06:29] [Render thread/INFO]: [STDOUT]: U32SYNC update 3202 previous=null
+[18:06:29] [Render thread/INFO]: [STDOUT]: U32SYNC update 3202 previous=3202
+[18:06:31] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6
+[fourth.log]
+U32 Kotlin preLaunch
+[18:12:02] [main/INFO]: [STDOUT]: U32 KFF object main
+[18:12:02] [main/INFO]: [STDOUT]: U32 Kotlin object main
+[18:12:02] [main/INFO]: [STDOUT]: U32 KFF lifecycle
+[18:12:41] [Server thread/INFO]: VolumeA has the following entity data: [64.5d, 80.0d, 20.5d]
+[18:12:41] [Server thread/INFO]: VolumeB has the following entity data: [67.5d, 80.0d, 20.5d]
+信息: U32 open-low VolumeA false
+信息: U32 open-allowed VolumeA
+信息: U32 open-monitor VolumeA false
+信息: U32 open-low VolumeB false
+信息: U32 open-allowed VolumeB
+信息: U32 open-monitor VolumeB false
+信息: U32 close VolumeA PLAYER
+信息: U32 close VolumeB PLAYER
+[18:12:42] [Server thread/INFO]: [STDOUT]: U32MACHINE Fabric and NeoForge share WorldGuard ownership checks
+[18:12:42] [Server thread/INFO]: [STDOUT]: U32MACHINE owner VolumeA allowed; VolumeB denied
+[18:12:42] [Server thread/INFO]: [STDOUT]: U32SYNC server check 3201 3202 null
+[18:12:43] [Server thread/INFO]: [Not Secure] [Server] U32_CHEST_6
+[18:12:43] [Server thread/INFO]: VolumeA has the following entity data: [{count: 9, Slot: 3b, id: "minecraft:gold_ingot"}]
+[18:12:43] [Server thread/INFO]: VolumeB has the following entity data: [{count: 7, Slot: 4b, id: "minecraft:iron_ingot"}]
+[18:12:43] [Server thread/INFO]: VolumeA has the following entity data: [64.5d, 80.0d, 20.5d]
+[18:12:43] [Server thread/INFO]: VolumeB has the following entity data: [67.5d, 80.0d, 20.5d]
+[fourthVolumeA-client.log]
+U32 Kotlin preLaunch
+[18:12:19] [Render thread/INFO]: [STDOUT]: U32 KFF object main
+[18:12:19] [Render thread/INFO]: [STDOUT]: U32 Kotlin object main
+[18:12:20] [Render thread/INFO]: [STDOUT]: U32 KFF lifecycle
+[18:12:25] [Render thread/INFO]: [STDOUT]: U32SYNC initial 3201 previous=null
+[18:12:25] [Render thread/INFO]: [STDOUT]: U32SYNC initial 3202 previous=null
+[18:12:43] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6
+[fourthVolumeB-client.log]
+U32 Kotlin preLaunch
+[18:12:36] [Render thread/INFO]: [STDOUT]: U32 KFF object main
+[18:12:36] [Render thread/INFO]: [STDOUT]: U32 Kotlin object main
+[18:12:36] [Render thread/INFO]: [STDOUT]: U32 KFF lifecycle
+[18:12:40] [Render thread/INFO]: [STDOUT]: U32SYNC initial 3202 previous=null
+[18:12:40] [Render thread/INFO]: [STDOUT]: U32SYNC initial 3201 previous=null
+[18:12:43] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6
+[restart.log]
+U32 Kotlin preLaunch
+[18:08:55] [main/INFO]: [STDOUT]: U32 KFF object main
+[18:08:55] [main/INFO]: [STDOUT]: U32 Kotlin object main
+[18:08:55] [main/INFO]: [STDOUT]: U32 KFF lifecycle
+[18:09:43] [Server thread/INFO]: VolumeA has the following entity data: [64.5d, 80.0d, 20.5d]
+[18:09:43] [Server thread/INFO]: VolumeB has the following entity data: [67.5d, 80.0d, 20.5d]
+信息: U32 open-low VolumeA false
+信息: U32 open-allowed VolumeA
+信息: U32 open-monitor VolumeA false
+信息: U32 open-low VolumeB false
+信息: U32 open-allowed VolumeB
+信息: U32 open-monitor VolumeB false
+信息: U32 close VolumeA PLAYER
+信息: U32 close VolumeB PLAYER
+[18:09:45] [Server thread/INFO]: [STDOUT]: U32MACHINE Fabric and NeoForge share WorldGuard ownership checks
+[18:09:45] [Server thread/INFO]: [STDOUT]: U32MACHINE owner VolumeA allowed; VolumeB denied
+[18:09:45] [Server thread/INFO]: [STDOUT]: U32SYNC server check 3201 3202 null
+[18:09:45] [Server thread/INFO]: [Not Secure] [Server] U32_CHEST_6
+[18:09:45] [Server thread/INFO]: VolumeA has the following entity data: [{count: 9, Slot: 3b, id: "minecraft:gold_ingot"}]
+[18:09:45] [Server thread/INFO]: VolumeB has the following entity data: [{count: 7, Slot: 4b, id: "minecraft:iron_ingot"}]
+[18:09:46] [Server thread/INFO]: VolumeA has the following entity data: [64.5d, 80.0d, 20.5d]
+[18:09:46] [Server thread/INFO]: VolumeB has the following entity data: [67.5d, 80.0d, 20.5d]
+[restartVolumeA-client.log]
+U32 Kotlin preLaunch
+[18:09:16] [Render thread/INFO]: [STDOUT]: U32 KFF object main
+[18:09:16] [Render thread/INFO]: [STDOUT]: U32 Kotlin object main
+[18:09:17] [Render thread/INFO]: [STDOUT]: U32 KFF lifecycle
+[18:09:23] [Render thread/INFO]: [STDOUT]: U32SYNC initial 3201 previous=null
+[18:09:23] [Render thread/INFO]: [STDOUT]: U32SYNC initial 3202 previous=null
+[18:09:45] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6
+[restartVolumeB-client.log]
+U32 Kotlin preLaunch
+[18:09:38] [Render thread/INFO]: [STDOUT]: U32 KFF object main
+[18:09:38] [Render thread/INFO]: [STDOUT]: U32 Kotlin object main
+[18:09:38] [Render thread/INFO]: [STDOUT]: U32 KFF lifecycle
+[18:09:43] [Render thread/INFO]: [STDOUT]: U32SYNC initial 3202 previous=null
+[18:09:43] [Render thread/INFO]: [STDOUT]: U32SYNC initial 3201 previous=null
+[18:09:45] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6
+[third.log]
+U32 Kotlin preLaunch
+[18:10:32] [main/INFO]: [STDOUT]: U32 KFF object main
+[18:10:32] [main/INFO]: [STDOUT]: U32 Kotlin object main
+[18:10:32] [main/INFO]: [STDOUT]: U32 KFF lifecycle
+[18:11:10] [Server thread/INFO]: VolumeA has the following entity data: [64.5d, 80.0d, 20.5d]
+[18:11:10] [Server thread/INFO]: VolumeB has the following entity data: [67.5d, 80.0d, 20.5d]
+信息: U32 open-low VolumeA false
+信息: U32 open-allowed VolumeA
+信息: U32 open-monitor VolumeA false
+信息: U32 open-low VolumeB false
+信息: U32 open-allowed VolumeB
+信息: U32 open-monitor VolumeB false
+信息: U32 close VolumeA PLAYER
+信息: U32 close VolumeB PLAYER
+[18:11:11] [Server thread/INFO]: [STDOUT]: U32MACHINE Fabric and NeoForge share WorldGuard ownership checks
+[18:11:11] [Server thread/INFO]: [STDOUT]: U32MACHINE owner VolumeA allowed; VolumeB denied
+[18:11:11] [Server thread/INFO]: [STDOUT]: U32SYNC server check 3201 3202 null
+[18:11:11] [Server thread/INFO]: [Not Secure] [Server] U32_CHEST_6
+[18:11:12] [Server thread/INFO]: VolumeA has the following entity data: [{count: 9, Slot: 3b, id: "minecraft:gold_ingot"}]
+[18:11:12] [Server thread/INFO]: VolumeB has the following entity data: [{count: 7, Slot: 4b, id: "minecraft:iron_ingot"}]
+[18:11:12] [Server thread/INFO]: VolumeA has the following entity data: [64.5d, 80.0d, 20.5d]
+[18:11:12] [Server thread/INFO]: VolumeB has the following entity data: [67.5d, 80.0d, 20.5d]
+[thirdVolumeA-client.log]
+U32 Kotlin preLaunch
+[18:10:48] [Render thread/INFO]: [STDOUT]: U32 KFF object main
+[18:10:48] [Render thread/INFO]: [STDOUT]: U32 Kotlin object main
+[18:10:48] [Render thread/INFO]: [STDOUT]: U32 KFF lifecycle
+[18:10:53] [Render thread/INFO]: [STDOUT]: U32SYNC initial 3201 previous=null
+[18:10:53] [Render thread/INFO]: [STDOUT]: U32SYNC initial 3202 previous=null
+[18:11:11] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6
+[thirdVolumeB-client.log]
+U32 Kotlin preLaunch
+[18:11:04] [Render thread/INFO]: [STDOUT]: U32 KFF object main
+[18:11:04] [Render thread/INFO]: [STDOUT]: U32 Kotlin object main
+[18:11:04] [Render thread/INFO]: [STDOUT]: U32 KFF lifecycle
+[18:11:09] [Render thread/INFO]: [STDOUT]: U32SYNC initial 3202 previous=null
+[18:11:10] [Render thread/INFO]: [STDOUT]: U32SYNC initial 3201 previous=null
+[18:11:11] [Render thread/INFO]: [System] [CHAT] [Server] U32_CHEST_6

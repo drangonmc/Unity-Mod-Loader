@@ -166,6 +166,7 @@ public final class Content {
                         group.register.accept(registry);
             }
             Attachments.register(PluginData.KEY);
+            Attachments.register(mc.unity.api.MachineActors.OWNER);
             ExtraRegistries.freeze();
             frozen = true;
             Events.PLAY_REGISTRATION.post(null);

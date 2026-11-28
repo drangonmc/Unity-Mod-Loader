@@ -43,9 +43,6 @@ public final class FabricAdapter {
         String env = json.has("environment") ? json.get("environment").getAsString() : "*";
         if (!env.equals("*") && !env.equals(side.toLowerCase(Locale.ROOT)))
             return null;
-        for (String unsupported : List.of("languageAdapters"))
-            if (json.has(unsupported))
-                throw new IOException("Unsupported Fabric feature " + unsupported);
         String id = json.get("id").getAsString();
         var names = new ArrayList<String>();
         var sided = new ArrayList<String>();
@@ -63,8 +60,7 @@ public final class FabricAdapter {
                         entries.add(n.getAsString());
                     else {
                         var obj = n.getAsJsonObject();
-                        if (!obj.has("value") ||
-                            obj.has("adapter") && !obj.get("adapter").getAsString().equals("default"))
+                        if (!obj.has("value"))
                             throw new IOException("Unsupported Fabric entrypoint adapter");
                         entries.add(obj.get("value").getAsString());
                     }

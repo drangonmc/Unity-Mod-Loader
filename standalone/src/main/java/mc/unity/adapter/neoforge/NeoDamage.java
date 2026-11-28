@@ -39,7 +39,10 @@ final class NeoDamage implements LivingFlow.Damage {
         damage.setNewDamage(before);damage.setReduction(reduction,before-after);return damage.getNewDamage();
     }
     public float pre(float amount){damage.setNewDamage(amount);bus.post(new LivingDamageEvent.Pre(entity,damage));damage.captureInflictedDamage();return damage.getNewDamage();}
-    public void finalAmount(float amount){damage.setNewDamage(Math.max(0,amount));}
+    public void finalAmount(float amount){
+        damage.setNewDamage(Math.max(0,amount));
+        if(amount==0 && damage.getInflictedDamage()>0 && damage.getReduction(DamageContainer.Reduction.ABSORPTION)>0)post();
+    }
     public void post(){bus.post(new LivingDamageEvent.Post(entity,damage));}
     public int ticks(int vanilla){return damage.getPostAttackInvulnerabilityTicks();}
     public void excess(int ticks){damage.setShouldCauseSideEffects(false);damage.setPostAttackInvulnerabilityTicks(ticks);}

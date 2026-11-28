@@ -9,6 +9,13 @@ import mc.unity.adapter.Entry;
 import mc.unity.adapter.common.FmlDescriptor;
 public final class LoaderView implements FabricLoader, AutoCloseable {
     public static final LoaderView INSTANCE = new LoaderView();
+    public static final LanguageAdapter DEFAULT_ADAPTER=new LanguageAdapter(){
+        public <T>T create(ModContainer owner,String definition,Class<T> type)throws LanguageAdapterException{
+            try{return type.cast(resolve(definition,type));}catch(ReflectiveOperationException ex){throw new LanguageAdapterException(definition,ex);}
+        }
+    };
+    private record Provider(View owner,String implementation){}
+    private Map<String,Provider> adapters=Map.of();
     private Map<String, View> mods = Map.of();
     private Path game;
     private boolean upstream;
@@ -167,7 +174,16 @@ public final class LoaderView implements FabricLoader, AutoCloseable {
                 }
             }
         } catch (NoSuchMethodException ordinaryClasspath) {}
-        mods = Collections.unmodifiableMap(map);
+        var providers=new LinkedHashMap<String,Provider>();
+        for(var view:map.values()){
+            if(!view.metadata.has("languageAdapters"))continue;
+            for(var row:view.metadata.getAsJsonObject("languageAdapters").entrySet()){
+                var name=row.getKey();var klass=row.getValue().getAsString();
+                if(name.isBlank() || name.equals("default") || providers.putIfAbsent(name,new Provider(view,klass))!=null)
+                    throw new IOException("Duplicate or reserved Fabric language adapter "+name+" in "+view.getId());
+            }
+        }
+        adapters=Map.copyOf(providers);mods=Collections.unmodifiableMap(map);
     }
     public MappingResolver getMappingResolver() {
         return Names.INSTANCE;
@@ -175,16 +191,21 @@ public final class LoaderView implements FabricLoader, AutoCloseable {
     public <T> List<net.fabricmc.loader.api.entrypoint.EntrypointContainer<T>>
     getEntrypointContainers(String key, Class<T> type) {
         var result = new ArrayList<net.fabricmc.loader.api.entrypoint.EntrypointContainer<T>>();
-        for (var v : mods.values()) {
+        for(var v:mods.values())result.addAll(entriesFor(v,key,type));
+        return List.copyOf(result);
+    }
+    public <T> List<net.fabricmc.loader.api.entrypoint.EntrypointContainer<T>> entriesFor(String id,String key,Class<T> type){
+        var v=mods.get(id);return v==null?List.of():entriesFor(v,key,type);
+    }
+    private <T> List<net.fabricmc.loader.api.entrypoint.EntrypointContainer<T>> entriesFor(View v,String key,Class<T> type){
+        var result=new ArrayList<net.fabricmc.loader.api.entrypoint.EntrypointContainer<T>>();
+        {
             var points = v.metadata.getAsJsonObject("entrypoints");
-            if (points == null || !points.has(key))
-                continue;
+            if (points == null || !points.has(key))return List.of();
             for (var row : points.getAsJsonArray(key)) {
                 var definition = row.isJsonPrimitive() ? row.getAsString()
                                                        : row.getAsJsonObject().get("value").getAsString();
-                if (!row.isJsonPrimitive() && row.getAsJsonObject().has("adapter") &&
-                    !row.getAsJsonObject().get("adapter").getAsString().equals("default"))
-                    throw new IllegalArgumentException("Unsupported entrypoint adapter for " + definition);
+                String adapter=row.isJsonPrimitive() || !row.getAsJsonObject().has("adapter")?"default":row.getAsJsonObject().get("adapter").getAsString();
                 result.add(new net.fabricmc.loader.api.entrypoint.EntrypointContainer<T>() {
                     public ModContainer getProvider() {
                         return v;
@@ -193,14 +214,14 @@ public final class LoaderView implements FabricLoader, AutoCloseable {
                         return definition;
                     }
                     public T getEntrypoint() {
-                        return instance(v, new EntryKey(key, definition, type), type);
+                        return instance(v, new EntryKey(key,definition,type,adapter), type);
                     }
                 });
             }
         }
         return List.copyOf(result);
     }
-    private record EntryKey(String stage, String definition, Class<?> type) {}
+    private record EntryKey(String stage,String definition,Class<?> type,String adapter) {}
     private static final class Resolution {
         Thread owner = Thread.currentThread();
         final java.util.concurrent.CompletableFuture<Object> result =
@@ -229,7 +250,22 @@ public final class LoaderView implements FabricLoader, AutoCloseable {
         }
         if (construct) {
             try {
-                Object value = Objects.requireNonNull(resolve(key.definition, type), "null entrypoint");
+                LanguageAdapter adapter=DEFAULT_ADAPTER;
+                if(!key.adapter.equals("default")){
+                    Provider provider=adapters.get(key.adapter);
+                    if(provider==null)throw new LanguageAdapterException("Unknown "+key.adapter+" for "+view.getId()+"/"+key.stage);
+                    adapter=instance(provider.owner,new EntryKey("languageAdapter",provider.implementation,LanguageAdapter.class,"default"),LanguageAdapter.class);
+                }
+                if(key.stage.equals("languageAdapter")){
+                    var impl=Class.forName(key.definition,false,getClass().getClassLoader());
+                    if(!LanguageAdapter.class.isAssignableFrom(impl) || !Files.isSameFile(view.entry.file(),Path.of(impl.getProtectionDomain().getCodeSource().getLocation().toURI())))
+                        throw new IOException("Foreign Fabric language adapter "+key.definition+" in "+view.getId());
+                }
+                if(key.adapter.equals("default") && Set.of("preLaunch","main","client","server").contains(key.stage)){
+                    var origin=Class.forName(key.definition.split("::",2)[0],false,getClass().getClassLoader()).getProtectionDomain().getCodeSource();
+                    if(origin==null || !Files.isSameFile(view.entry.file(),Path.of(origin.getLocation().toURI())))throw new IOException("Foreign "+key.stage+" entrypoint "+key.definition);
+                }
+                Object value=Objects.requireNonNull(adapter.create(view,key.definition,type),"null entrypoint");
                 synchronized (waiting) {
                     slot.owner = null;
                 }
@@ -330,7 +366,7 @@ public final class LoaderView implements FabricLoader, AutoCloseable {
             if (failure != null)
                 throw failure;
         } finally {
-            mods = Map.of();
+            adapters=Map.of();mods=Map.of();
             upstream = false;
             game = null;
         }

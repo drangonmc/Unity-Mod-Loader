@@ -59,7 +59,7 @@ def install(o,g,clients):
         try:
             for name,mod,loader in (("NeoReview","unity31review","neoforge"),("ForgeReview","unity31forgereview","forge")):
                 test=g/"mods"/(mod+".jar")
-                cp=([o.sdk/n for n in ("neo.jar","neo-bus.jar","neo-loader.jar","dist.jar")] if loader=="neoforge" else [o.dist/"unity-loader-0.3.1-Beta.jar"])
+                cp=([o.sdk/n for n in ("neo.jar","neo-bus.jar","neo-loader.jar","dist.jar")] if loader=="neoforge" else [o.dist/("unity-loader-"+getattr(o,"version","0.3.1-Beta")+".jar")])
                 desc="META-INF/neoforge.mods.toml" if loader=="neoforge" else "META-INF/mods.toml"
                 fixture(name+".java",[*cp,game,*libs],desc,'modLoader="javafml"\nloaderVersion="[1,)"\nlicense="MIT"\n[[mods]]\nmodId="'+mod+'"\nversion="1"\ndisplayName="Unity QA"\n',test)
                 for client in clients:shutil.copy2(test,client/"mods")
@@ -73,7 +73,7 @@ def run(o):
     inst=d/"instance";inst.mkdir();empty=qa.observer(inst,o.cache)
     g,games,port,_,_=qa.setup_game(o,inst,True,empty)
     plugins,witness,matrix=install(o,g,games)
-    loader=o.dist/"unity-loader-0.3.1-Beta.jar";bundle=o.cache/"mojang-server-26.2.jar"
+    loader=o.dist/("unity-loader-"+getattr(o,"version","0.3.1-Beta")+".jar");bundle=o.cache/"mojang-server-26.2.jar"
     if o.host=="paper":
         (g/"cache").mkdir();shutil.copy2(bundle,g/"cache/mojang_26.2.jar")
     os.environ["PAPER_DEFAULT_CENTRAL_REPOSITORY"]="https://repo.maven.apache.org/maven2/"
@@ -179,5 +179,6 @@ def run(o):
         logs={f.name:digest(f) for f in d.glob("*.log")}),indent=2),"utf8")
 if __name__=="__main__":
     p=argparse.ArgumentParser();p.add_argument("--host",choices=("paper","unity"),required=True)
+    p.add_argument("--version",default="0.3.1-Beta")
     for key in ("out","dist","cache","eula","plugins","guard","authors","baseline","original_matrix","paper","sdk"):p.add_argument("--"+key,required=True,type=lambda v:Path(v).resolve())
     run(p.parse_args())

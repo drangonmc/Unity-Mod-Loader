@@ -3,6 +3,8 @@ import java.util.*;
 import java.util.function.Supplier;
 import mc.unity.core.Attachments;
 public interface IAttachmentHolder extends Attachments.Owner {
+    default void syncData(AttachmentType<?> key){AttachmentWire.changed(this,key);}
+    default void syncData(Supplier<? extends AttachmentType<?>> key){syncData(key.get());}
     default boolean hasAttachments() {
         var data = unity$attachments(false);
         return data != null && data.any();
@@ -24,14 +26,15 @@ public interface IAttachmentHolder extends Attachments.Owner {
         if (result == null) {
             result = Objects.requireNonNull(type.initializer.apply(this));
             Attachments.initialize(this, type, result);
+            syncData(type);
         }
         return result;
     }
     default<T> T getData(Supplier<AttachmentType<T>> type) { return getData(type.get()); }
     default<T> T setData(AttachmentType<T> type, T value) {
-        return Attachments.set(this, type, Objects.requireNonNull(value));
+        T previous=Attachments.set(this, type, Objects.requireNonNull(value));syncData(type);return previous;
     }
     default<T> T setData(Supplier<AttachmentType<T>> type, T value) { return setData(type.get(), value); }
-    default<T> T removeData(AttachmentType<T> type) { return Attachments.set(this, type, null); }
+    default<T> T removeData(AttachmentType<T> type) { T old=Attachments.set(this,type,null);if(old!=null)syncData(type);return old; }
     default<T> T removeData(Supplier<AttachmentType<T>> type) { return removeData(type.get()); }
 }

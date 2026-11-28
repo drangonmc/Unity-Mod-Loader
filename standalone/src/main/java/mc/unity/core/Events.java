@@ -89,8 +89,9 @@ public final class Events {
     }
     public static final Signal<Joining> ENTITY_JOIN=new Signal<>();
     public static boolean joinEntity(Object object,boolean loaded){
-        if(ENTITY_JOIN.empty() || !(object instanceof net.minecraft.world.entity.Entity entity))return true;
-        var joining=new Joining(entity,loaded);ENTITY_JOIN.post(joining);return !joining.cancelled;
+        if(!(object instanceof net.minecraft.world.entity.Entity entity))return true;
+        if(!ENTITY_JOIN.empty()){var joining=new Joining(entity,loaded);ENTITY_JOIN.post(joining);if(joining.cancelled)return false;}
+        return mc.unity.runtime.WorldActions.allowed(entity,loaded);
     }
     public static void beforeLevelTick(net.minecraft.server.level.ServerLevel level,java.util.function.BooleanSupplier time) {
         beforeLevelTick(level);if(!LEVEL_TIME_PRE.empty())LEVEL_TIME_PRE.post(new LevelTick(level,time));

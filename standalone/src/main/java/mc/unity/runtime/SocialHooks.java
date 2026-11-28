@@ -22,9 +22,9 @@ public final class SocialHooks {
         if(result.equals(original))commands.performCommand(parsed,original);
         else commands.performPrefixedCommand(player.createCommandSourceStack(),result);
     }
-    public static boolean move(ServerPlayer p,double x,double y,double z,float yaw,float pitch,double oldX,double oldY,double oldZ) {
+    public static boolean move(ServerPlayer p,double x,double y,double z,float yaw,float pitch,double oldX,double oldY,double oldZ,float oldYaw,float oldPitch) {
         var host=ServerHooks.pluginHost();
-        if(host!=null && !host.move(p,x,y,z,yaw,pitch,oldX,oldY,oldZ))return false;
+        if(host!=null && !host.move(p,x,y,z,yaw,pitch,oldX,oldY,oldZ,oldYaw,oldPitch))return false;
         p.absSnapTo(x,y,z,yaw,pitch);return true;
     }
     private static final ThreadLocal<TeleportTransition> redirected=new ThreadLocal<>();
@@ -40,6 +40,30 @@ public final class SocialHooks {
         if(redirected.get()==transition)return transition;
         var host=ServerHooks.pluginHost();
         return host==null?transition:host.teleport(p,transition,cause.get()==null?"UNKNOWN":cause.get());
+    }
+    public static ServerPlayer withCause(ServerPlayer p,TeleportTransition t,String reason){
+        var previous=cause.get();cause.set(reason);
+        try{return p.teleport(t);}finally{if(previous==null)cause.remove();else cause.set(previous);}
+    }
+    public static Entity portal(Entity e,TeleportTransition t){
+        if(!(e instanceof ServerPlayer p) || e.portalProcess==null)return e.teleport(t);
+        var portal=e.portalProcess;
+        String reason=portal.isSamePortal((net.minecraft.world.level.block.Portal)net.minecraft.world.level.block.Blocks.NETHER_PORTAL)?"NETHER_PORTAL":
+            portal.isSamePortal((net.minecraft.world.level.block.Portal)net.minecraft.world.level.block.Blocks.END_PORTAL)?"END_PORTAL":
+            portal.isSamePortal((net.minecraft.world.level.block.Portal)net.minecraft.world.level.block.Blocks.END_GATEWAY)?"END_GATEWAY":"UNKNOWN";
+        return withCause(p,t,reason);
+    }
+    public static int random(net.minecraft.world.entity.LivingEntity e,double x,double y,double z,boolean effects){
+        if(!(e instanceof ServerPlayer p))return e.randomTeleport(x,y,z,effects)?1:0;
+        var level=p.level();var pos=net.minecraft.core.BlockPos.containing(x,y,z);
+        if(!level.hasChunkAt(pos))return 0;
+        while(pos.getY()>level.getMinY() && !level.getBlockState(pos.below()).blocksMotion()){pos=pos.below();y--;}
+        if(pos.getY()<=level.getMinY())return 0;
+        var box=p.getBoundingBox().move(x-p.getX(),y-p.getY(),z-p.getZ());
+        if(!level.noCollision(p,box)||level.containsAnyLiquid(box))return 0;
+        boolean ok=teleportTo(p,level,x,y,z,java.util.Set.of(),p.getYRot(),p.getXRot(),true,"CONSUMABLE_EFFECT");
+        if(ok && effects)level.broadcastEntityEvent(p,(byte)46);
+        return ok?1:-1;
     }
     public static boolean teleportTo(Entity entity,ServerLevel level,double x,double y,double z,Set<Relative> flags,float yaw,float pitch,boolean camera,String reason) {
         var previous=cause.get();cause.set(reason);

@@ -21,6 +21,9 @@ public final class NestedArchives implements AutoCloseable {
     private final List<Node> roots = new ArrayList<>();
     private final Map<String, Selection> topCoordinates = new HashMap<>();
     private final Map<String, Node> topIds = new HashMap<>();
+    private final Map<Path,String[]> generatedLibraries=new HashMap<>();
+    public Map<Path,String[]> generatedLibraries(){return Map.copyOf(generatedLibraries);}
+    private final Set<Path> containersOnly=new HashSet<>();
     private final Set<Path> owned = new LinkedHashSet<>(), libraries = new HashSet<>();
     private final Map<Path, String> stamps = new HashMap<>();
     private final List<mc.unity.adapter.Entry> metadata = new ArrayList<>();
@@ -115,9 +118,11 @@ public final class NestedArchives implements AutoCloseable {
             if (solution == null)
                 throw new IOException("Incompatible nested artifact requirements: " +
                                       result.choices.keySet());
-            var all = new LinkedHashSet<Node>(result.roots);
-            all.addAll(solution.values().stream().map(Selection::node).toList());
-            for (var n : all) {
+            result.shareGeneratedLibraries(solution);
+            var all = new LinkedHashMap<Path,Node>();
+            result.roots.forEach(n->all.put(n.file,n));
+            solution.values().forEach(s->all.merge(s.node.file,s.node,(a,b)->b.mod?b:a));
+            for (var n : all.values()) {
                 result.selected.add(n.file);
                 for (var edge : n.deps) {
                     var member = solution.get(edge.key).node;
@@ -129,7 +134,7 @@ public final class NestedArchives implements AutoCloseable {
                         (id, version)
                             -> result.metadata.add(new mc.unity.adapter.Entry(
                                 id, version, List.of(), result.kinds.get(n.file), n.file, List.of())));
-                if (!n.mod && !result.roots.contains(n))
+                if (!n.mod && (!result.roots.contains(n) || result.containersOnly.contains(n.file)) || result.generatedLibraries.containsKey(n.file))
                     result.libraries.add(n.file);
                 var fingerprint = new TreeMap<String, String>();
                 result.trace(n, solution, fingerprint, new HashSet<>());
@@ -144,6 +149,37 @@ public final class NestedArchives implements AutoCloseable {
                 ex.addSuppressed(close);
             }
             throw ex;
+        }
+    }
+    private void shareGeneratedLibraries(Map<String,Selection> selected)throws Exception{
+        var maven=new HashMap<LibraryIdentity.Family,Map.Entry<Selection,LibraryIdentity>>();
+        for(var row:selected.entrySet()){
+            var plain=row.getValue();
+            if(!row.getKey().startsWith("maven:") || plain.node.mod || !plain.node.deps.isEmpty())continue;
+            var id=LibraryIdentity.read(plain.node.file,false);if(id==null)continue;
+            var old=maven.putIfAbsent(id.family(),Map.entry(plain,id));
+            if(old!=null && !old.getKey().node.file.equals(plain.node.file))throw new IOException("Conflicting Maven modules "+id.module());
+        }
+        if(maven.isEmpty())return;
+        var reachable=new ArrayList<Node>(roots);selected.values().forEach(s->reachable.add(s.node));
+        for(var row:selected.entrySet()){
+            var node=row.getValue().node;
+            if(!row.getKey().startsWith("mod:") || roots.contains(node) || !node.deps.isEmpty())continue;
+            var wrapper=LibraryIdentity.read(node.file,true);if(wrapper==null)continue;
+            var offer=maven.get(wrapper.family());if(offer==null)continue;
+            var actual=offer.getValue();var real=offer.getKey().node;
+            if(!wrapper.version().equals(node.version) || compare(actual.version(),node.version)<0 ||
+                    !actual.version().split("\\.")[0].equals(node.version.split("\\.")[0]))throw new IOException("Incompatible shared library "+node.id);
+            if(actual.version().equals(wrapper.version()) && !LibraryIdentity.payload(node.file).equals(LibraryIdentity.payload(real.file)))
+                throw new IOException("Different payloads for "+wrapper.family()+" "+wrapper.version());
+            for(var parent:reachable)for(var r:parent.requires)if(r.id.equals(node.id)){
+                if(r.fabric)mc.unity.adapter.fabric.FabricVersions.check(actual.version(),r.range);
+                else if(FmlDescriptor.inRange(actual.version(),r.range)==r.exclude)throw new IOException("Incompatible shared library requirement "+r);
+            }
+            var alias=new Node(real.file,node.id,actual.version(),true,real.deps,node.requires);
+            provided.put(real.file,Map.of(node.id,actual.version()));kinds.put(real.file,mc.unity.adapter.Entry.Kind.FABRIC);
+            generatedLibraries.put(real.file,new String[]{node.id,actual.version()});
+            row.setValue(new Selection(alias,actual.version()));
         }
     }
     private void indexCoordinates(Node node) throws IOException {
@@ -298,7 +334,7 @@ public final class NestedArchives implements AutoCloseable {
         }
     }
     private static boolean accepts(String version, String range) {
-        if (range == null || range.isBlank() || range.equals("*"))
+        if (range == null || range.isBlank() || range.equals("*") || range.equals("["+version+"]"))
             return true;
         try {
             FmlDescriptor.checkRange(version, range);
@@ -367,6 +403,8 @@ public final class NestedArchives implements AutoCloseable {
                     add(edges, "mod:" + inner.id, "*", inner.version, inner);
                 }
             var jij = json(jar, "META-INF/jarjar/metadata.json");
+            if(!isMod && jij!=null && jar.getManifest()!=null && "LIBRARY".equals(jar.getManifest().getMainAttributes().getValue("FMLModType")) &&
+                    jar.stream().noneMatch(e->e.getName().endsWith(".class") && !e.getName().endsWith("module-info.class")))containersOnly.add(f);
             if (jij != null && !(fabric != null && PlatformChoice.read(jar).multiple()))
                 for (var value : jij.getAsJsonArray("jars")) {
                     var child = value.getAsJsonObject();

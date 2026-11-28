@@ -1,10 +1,10 @@
-# Unity 0.3.1 Beta 的第三方组件
+# Unity 0.3.2 Beta 的第三方组件
 
 Unity 自有代码使用根目录 `LICENSE` 中的 MIT 许可证。下表列出加载器及 Bukkit 插件域随附的主要上游实现。各组件保留其原作者的版权声明和许可证。
 
 | 随附组件 | 许可证与来源 |
 | --- | --- |
-| NeoForge 26.2.0.93 游戏事件、伤害容器和传输 API | LGPL-2.1-only。`standalone/lib/unity-neo-transfer-26.2.0.93.jar` 内含 `META-INF/LICENSE-NeoForge.txt`、`META-INF/README-LICENSE-NeoForge.md` 和对应的 `META-INF/unity-sources/`。主加载器保留同一份源码，许可证归档于 `META-INF/licenses/unity-neo-transfer-26.2.0.93.jar/`。提取清单、输入摘要和重建入口见 `standalone/adapters/neo-transfer/`。[NeoForge 源码](https://github.com/neoforged/NeoForge) |
+| NeoForge 26.2.0.93 游戏事件、FakePlayer、伤害容器和传输 API | LGPL-2.1-only。`standalone/lib/unity-neo-transfer-26.2.0.93.jar` 内含 `META-INF/LICENSE-NeoForge.txt`、`META-INF/README-LICENSE-NeoForge.md` 和对应的 `META-INF/unity-sources/`。主加载器保留同一份源码，许可证归档于 `META-INF/licenses/unity-neo-transfer-26.2.0.93.jar/`。提取清单、输入摘要和重建入口见 `standalone/adapters/neo-transfer/`。[NeoForge 源码](https://github.com/neoforged/NeoForge) |
 | Paper API 26.2 build 121、Bukkit/Spigot 继承部分 | Paper 声明项目继承 GPL v3，部分贡献者另行提供 MIT 授权。按来源保留适用条款。[Paper 项目许可证](https://github.com/PaperMC/Paper/blob/main/LICENSE.md) |
 | Adventure API 与文本序列化器 5.2.0 | MIT。[Adventure 项目](https://github.com/PaperMC/adventure) |
 | Apache Maven 3.9.6、Maven Resolver 1.9.18、HttpComponents、Commons Codec 1.16.0 | Apache License 2.0。各 Maven 组件的原包保留在插件域中，包括组件自带的 LICENSE 与 NOTICE。[Maven Resolver](https://maven.apache.org/resolver/) |

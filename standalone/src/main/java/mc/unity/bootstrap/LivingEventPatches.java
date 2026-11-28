@@ -83,19 +83,22 @@ final class LivingEventPatches {
             }));count(hits,2);return bytes;
         });
         plan.add(LIVING,250,"Unity living events","shield block",(cf,model)->{
-            int[] hits={0,0};
+            int[] hits={0,0,0};
             var method=model.methods().stream().filter(m->m.methodName().equalsString("applyItemBlocking")).findFirst().orElseThrow();
             var local=method.code().orElseThrow().elementStream().filter(LocalVariable.class::isInstance).map(LocalVariable.class::cast)
                 .filter(v->v.name().equalsString("blocksAttacks")).findFirst().orElseThrow();
             var bytes=cf.transformClass(model,ClassTransform.transformingMethodBodies(m->m.methodName().equalsString("applyItemBlocking"),(b,e)->{
                 b.with(e);
                 if(call(e,"booleanValue")){hits[0]++;b.invokestatic(FLOW,"shieldBypassed",mt(CD_boolean,CD_boolean));}
+                if(call(e,"getItemBlockingWith")){
+                    hits[2]++;var held=b.newLabel();b.dup().ifnonnull(held).pop().invokestatic(FLOW,"withoutShield",mt(CD_float)).freturn().labelBinding(held);
+                }
                 if(call(e,"resolveBlockedDamage")){
                     hits[1]++;var ok=b.newLabel();b.aload(local.slot()).aload(2).invokestatic(FLOW,"shield",mt(CD_float,CD_float,
                         ClassDesc.of("net.minecraft.world.item.component.BlocksAttacks"),SOURCE))
                         .dup().fconst_0().fcmpg().ifge(ok).pop().fconst_0().freturn().labelBinding(ok);
                 }
-            }));count(hits,1,1);return bytes;
+            }));count(hits,1,1,1);return bytes;
         });
         plan.add("net/minecraft/world/item/component/BlocksAttacks",250,"Unity living events","shield durability",(cf,model)->{
             int[] hits={0};var bytes=cf.transformClass(model,ClassTransform.transformingMethodBodies(m->m.methodName().equalsString("hurtBlockingItem"),(b,e)->{

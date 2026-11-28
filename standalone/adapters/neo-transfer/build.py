@@ -15,7 +15,7 @@ CLASSES=("transfer/TransferPreconditions","transfer/ResourceHandler","transfer/R
          "common/extensions/ContainerExtension","common/MutableDataComponentHolder","world/inventory/StackCopySlot","transfer/DelegatingResourceHandler","transfer/IndexModifier","transfer/ItemAccessResourceHandler","fluids/capability/FluidResourceHandlerAdapter",
          "common/extensions/IMenuTypeExtension","network/IContainerFactory","client/event/RegisterItemModelsEvent","client/event/RegisterSpecialModelRendererEvent",
          "client/event/ExtractBlockOutlineRenderStateEvent","client/event/SubmitCustomGeometryEvent","client/IRenderableSection","client/CustomBlockOutlineRenderer","event/entity/player/FluidTooltipEvent",
-         "event/level/BlockEvent","event/level/block/BreakBlockEvent","common/util/BlockSnapshot",
+         "event/level/BlockEvent","event/level/block/BreakBlockEvent","common/util/BlockSnapshot","common/util/FakePlayer","common/util/FakePlayerFactory",
          "event/entity/player/AttackEntityEvent","event/tick/LevelTickEvent","event/level/LevelEvent","event/level/ChunkEvent","event/entity/EntityJoinLevelEvent",
          "common/damagesource/DamageContainer","common/damagesource/IReductionFunction",
          "event/entity/living/LivingShieldBlockEvent","event/entity/living/LivingIncomingDamageEvent","event/entity/living/LivingDamageEvent",
