@@ -141,7 +141,7 @@ def verify(s,ws,first):
     return record(s,ws)
 
 def main(o):
-    o.version="0.3.0-Beta"
+    o.version=getattr(o,"version","0.3.0-Beta")
     o.install_events=lambda g,clients,corpus:fixtures(o,g,clients,corpus)
     o.verify_events=verify
     full.main(o)
@@ -151,6 +151,7 @@ def main(o):
 
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
+    parser.add_argument("--version",default="0.3.0-Beta")
     for k in ("dist","cache","authors","eula","out","samples","plugins","machines","sdk","region_bridge","old_machines","event_authors"):
         parser.add_argument("--"+k,required=True,type=lambda s:Path(s).resolve())
     main(parser.parse_args())

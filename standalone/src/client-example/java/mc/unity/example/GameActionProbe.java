@@ -87,6 +87,7 @@ final class GameActionProbe {
                 var be=mc.level.getBlockEntity(pos);
                 if(be!=null)out.addProperty("nbt",be.saveWithFullMetadata(mc.level.registryAccess()).toString());
             }
+            case "qaChat" -> mc.getConnection().sendChat(req.get("text").getAsString());
             case "qaCommand" -> {
                 mc.getConnection().sendCommand(req.get("cmd").getAsString());
             }
@@ -278,6 +279,7 @@ final class GameActionProbe {
                 out.addProperty("entity", stand.getUUID().toString());
             }
             case "qaHoldShield" -> {
+                mc.options.keyUse.setDown(true);
                 me.getInventory().setSelectedSlot(slot);
                 var interaction = mc.gameMode.useItem(me, InteractionHand.MAIN_HAND);
                 var blocking = me.getItemBlockingWith();
@@ -287,6 +289,7 @@ final class GameActionProbe {
                 out.addProperty("used", interaction.consumesAction());
             }
             case "qaRelease" -> {
+                mc.options.keyUse.setDown(false);
                 mc.gameMode.releaseUsingItem(me);
             }
             case "qaAttack" -> {

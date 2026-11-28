@@ -16,7 +16,7 @@ import acceptance
 import unpacked
 from acceptance import digest
 
-VERSION = "0.3.0-Beta"
+VERSION = "0.3.1-Beta"
 
 def validated(options, version=VERSION, alternate=False):
     reports = {}
@@ -82,7 +82,10 @@ def main(o):
     version=getattr(o,"version",VERSION)
     number=version.split("-")[0]
     jars=[f"unity-loader-{version}.jar","unity-world-marker.jar","unity-client-witness.jar","UnityEditRegions.jar"]
-    if version=="0.3.0-Beta":
+    if version=="0.3.1-Beta":
+        from validate_beta31 import validate
+        reports=validate(ROOT,o,digest)
+    elif version=="0.3.0-Beta":
         from validate_beta30 import validate
         reports=validate(ROOT,o,digest)
     elif version=="0.2.9-Beta":
@@ -106,9 +109,26 @@ def main(o):
         more["contracts/contracts.log"]=o.contract_result.parent/"contracts.log"
         for n,src in more.items():
             dest=evidence/n;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dest)
-    if version in ("0.2.9-Beta","0.3.0-Beta"):
+    if version in ("0.2.9-Beta","0.3.0-Beta","0.3.1-Beta"):
         more["contracts/result.json"]=o.contract_result
         more["contracts/contracts.log"]=o.contract_result.parent/"contracts.log"
+        if version=="0.3.1-Beta":
+            for host in ("unity","paper"):more[host+"/offline.json"]=o.runs/host/"offline.json"
+            more["previous/result.json"]=o.runs/"previous/result.json"
+            if (o.runs/"exit-observation.json").is_file():more["exit-observation.json"]=o.runs/"exit-observation.json"
+            first={host:(o.runs/host/"first.log").read_text("utf8",errors="replace") for host in ("unity","paper")}
+            table=["event\tunityGameOrigin\tpaperWitness\tcase"]
+            for kind,marker,case in (
+                ("org.bukkit.event.player.AsyncPlayerChatEvent","U31 legacy-u31cancelchat true","asynchronous legacy processing"),
+                ("io.papermc.paper.event.player.AsyncChatEvent","U31 monitor-u31cancelchat true","priority, cancellation, recipients and rewritten text"),
+                ("org.bukkit.event.player.PlayerCommandPreprocessEvent","U31 cmd-u31forbid true","blocked command and rewritten allowed control"),
+                ("org.bukkit.event.player.PlayerMoveEvent","U31 move-cancel true","cancelled walk and WorldGuard entry rule"),
+                ("org.bukkit.event.player.PlayerTeleportEvent","U31 region-tp true","COMMAND and PLUGIN cancellations, region destination")):
+                assert "Unity Bukkit game event "+kind in first["unity"] and all(marker in log for log in first.values())
+                table.append("\t".join((kind,"observed","observed",case)))
+            coverage=evidence/"player-event-coverage.tsv"
+            coverage.write_text("\n".join(table)+"\n","utf8")
+            more[coverage.name]=coverage
         if version=="0.3.0-Beta":more["unity/offline.json"]=o.runs/"unity/offline.json"
         if version=="0.2.9-Beta":more["lifecycle/lifecycle.json"]=evidence/"lifecycle/lifecycle.json"
         for n,src in more.items():
@@ -135,7 +155,7 @@ def main(o):
                 if any(s in line for s in ("Operation completed", "available edits", "clipboard has been pasted",
                           "has the following block data:", "REGION_CHEST_INTACT", "UNITY_NEO26_TICKS_OK",
                           "has the following entity data:", "BLOCK_OK_gold_block", "BLOCK_OK_smooth_stone",
-                          "UNITY30 ", "U30_", "UNITY29 ", "UNITY29_PIPE_READY","[Server] FLUID_MOVED","[Server] ENERGY_MOVED","[Server] ITEM_MOVED","UNITY28_", "[Server] NO_ITEM_DROP","[Server] NORMAL_ITEM_DROP","[Server] VANILLA_XP","UNITY_NEO27_FUEL_OK", "[Server] MACHINE_FUEL", "[Server] CUSTOM_FUEL_COOKED",
+                          "U31 ", "NEO31 ", "FORGE31 ", "PLAYER_REPLACEMENT","SHIELD_WEAR_2","UNITY30 ", "U30_", "UNITY29 ", "UNITY29_PIPE_READY","[Server] FLUID_MOVED","[Server] ENERGY_MOVED","[Server] ITEM_MOVED","UNITY28_", "[Server] NO_ITEM_DROP","[Server] NORMAL_ITEM_DROP","[Server] VANILLA_XP","UNITY_NEO27_FUEL_OK", "[Server] MACHINE_FUEL", "[Server] CUSTOM_FUEL_COOKED",
                           "[Server] FURNACE_COOKED", "[Server] HOPPER_OUTPUT", "[Server] HOPPER_FILTER", "[Server] HOPPER_REJECTED")):
                     excerpts.append(line)
         (out/"observations.txt").write_text("\n".join(excerpts)+"\n","utf8")
@@ -148,9 +168,10 @@ def main(o):
         files[n]=(ROOT/n).read_bytes()
     for n in ("Install-Unity-Client.cmd","Start-Unity.cmd"):
         files[n]=re.sub(rb"0\.2\.\d+-Beta",version.encode(),(ROOT/n).read_bytes())
-    if version=="0.3.0-Beta":
+    if version=="0.3.1-Beta":files["tools/validate_beta31.py"]=(ROOT/"tools/validate_beta31.py").read_bytes()
+    if version in ("0.3.0-Beta","0.3.1-Beta"):
         for n in ("tools/validate_beta30.py","NOTICE.md"):files[n]=(ROOT/n).read_bytes()
-    if version in ("0.2.9-Beta","0.3.0-Beta"):
+    if version in ("0.2.9-Beta","0.3.0-Beta","0.3.1-Beta"):
         for n in ("tools/validate_beta29.py","tools/bukkit-library-resolver.lock.json"):files[n]=(ROOT/n).read_bytes()
     for base in ("standalone","src/plugin"):
         for f in sorted((ROOT/base).rglob("*")):
@@ -181,7 +202,7 @@ def main(o):
     print("Verified",delivered,digest(delivered))
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
-    parser.add_argument("--version",choices=("0.2.6-Beta","0.2.7-Beta","0.2.8-Beta","0.2.9-Beta","0.3.0-Beta"),default=VERSION)
+    parser.add_argument("--version",choices=("0.2.6-Beta","0.2.7-Beta","0.2.8-Beta","0.2.9-Beta","0.3.0-Beta","0.3.1-Beta"),default=VERSION)
     parser.add_argument("--neo-source",type=lambda s:Path(s).resolve())
     parser.add_argument("--variant-runs",type=lambda s:Path(s).resolve())
     parser.add_argument("--contract-result",type=lambda s:Path(s).resolve())

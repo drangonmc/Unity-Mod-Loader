@@ -135,7 +135,7 @@ final class BukkitViews {
             case "getUnsafe" -> legacy;
             case "isStopping" -> !host.game.isRunning();
             case "createBlockData" -> createBlockData(a);
-            case "getVersion" -> "Unity 0.3.0-Beta (MC: 26.2)";
+            case "getVersion" -> "Unity 0.3.1-Beta (MC: 26.2)";
             case "getBukkitVersion" -> "26.2-R0.1-SNAPSHOT";
             case "getMinecraftVersion" -> "26.2";
             case "getLogger" -> Host.LOG;
@@ -331,6 +331,10 @@ final class BukkitViews {
             case "getLocation" ->
                 new Location(world((ServerLevel)raw.level()), raw.getX(), raw.getY(), raw.getZ(),
                              raw.getYRot(), raw.getXRot());
+            case "getTarget" -> {
+                var target=((net.minecraft.world.entity.Mob)raw).getTarget();
+                yield target==null?null:entity(target);
+            }
             case "isDead" -> !raw.isAlive();
             case "isValid" -> !raw.isRemoved();
             case "getHealth" -> (double)((net.minecraft.world.entity.LivingEntity)raw).getHealth();
@@ -350,9 +354,21 @@ final class BukkitViews {
         playerViews.put(p.getUUID(),view);
         return view;
     }
+    private final Map<Object,org.bukkit.permissions.PermissibleBase[]> sourcePermissions=new WeakHashMap<>();
     private org.bukkit.permissions.PermissibleBase consolePermissions;
     private synchronized org.bukkit.permissions.Permissible permissible(CommandSourceStack src,ServerPlayer p) {
         if(p!=null)return player(p);
+        var source=(net.minecraft.commands.CommandSource)SOURCE.get(src);
+        boolean op=src.permissions().hasPermission(Permissions.COMMANDS_GAMEMASTER);
+        if(source!=host.game || src.getEntity()!=null || !op){
+            var pair=sourcePermissions.computeIfAbsent(src.getEntity()==null?source:src.getEntity(),key->new org.bukkit.permissions.PermissibleBase[2]);
+            int slot=op?1:0;
+            if(pair[slot]==null)pair[slot]=new org.bukkit.permissions.PermissibleBase(new org.bukkit.permissions.ServerOperator(){
+                public boolean isOp(){return op;}
+                public void setOp(boolean value){throw new UnsupportedOperationException("Command-source authority belongs to the server");}
+            });
+            return pair[slot];
+        }
         if(consolePermissions==null)consolePermissions=new org.bukkit.permissions.PermissibleBase(sender(src));
         return consolePermissions;
     }
@@ -458,6 +474,8 @@ final class BukkitViews {
             case "getPassengers" -> p.getPassengers().stream().map(this::entity).toList();
             case "isInsideVehicle" -> p.isPassenger();
             case "leaveVehicle" -> {boolean riding=p.isPassenger();p.stopRiding();yield riding;}
+            case "isSwimming" -> p.isSwimming();
+            case "isGliding" -> p.isFallFlying();
             case "isInWater" -> p.isInWater();
             case "isOnGround" -> p.onGround();
             case "getFallDistance" -> (float)p.fallDistance;
@@ -474,12 +492,8 @@ final class BukkitViews {
                 at.checkFinite();
                 var cause=a.length==2?(org.bukkit.event.player.PlayerTeleportEvent.TeleportCause)a[1]:
                     org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.PLUGIN;
-                var moved=new org.bukkit.event.player.PlayerTeleportEvent(player(p),player(p).getLocation(),at,cause);
-                host.fire(moved);
-                if(moved.isCancelled() || moved.getTo()==null)yield false;
-                at=moved.getTo();at.checkFinite();
                 var world=((NativeWorldView)Objects.requireNonNull(at.getWorld())).unityLevel();
-                yield p.teleportTo(world,at.getX(),at.getY(),at.getZ(),Set.of(),at.getYaw(),at.getPitch(),true);
+                yield mc.unity.runtime.SocialHooks.teleportTo(p,world,at.getX(),at.getY(),at.getZ(),Set.of(),at.getYaw(),at.getPitch(),true,cause.name());
             }
             case "kickPlayer","kick" -> {
                 var reason=a.length==0 || a[0]==null ? net.minecraft.network.chat.Component.translatable("multiplayer.disconnect.kicked")

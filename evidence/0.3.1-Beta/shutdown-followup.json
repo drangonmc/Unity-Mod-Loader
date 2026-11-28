@@ -1,0 +1,19 @@
+{
+  "engine": "1a17940cdf0f36a39ef3cdcd51ca766cf8293d71dda3c6d76098bdcf59601e9f",
+  "mixedRunsCompleted": 2,
+  "normalServerExit": true,
+  "previousTimeoutCause": "unknown; no contemporaneous thread dump",
+  "followupWorker": "WorldGuard Region Chunk Table - world",
+  "followupState": "TIMED_WAITING in LinkedBlockingDeque.poll; the process exited without termination",
+  "worldGuardWorkerIdleTimeoutSeconds": 60,
+  "threadDumps": [
+    {
+      "capture": "restart-threads-0.txt",
+      "sha256": "ba34bd5feb11e7bedca58ca3936aac8c3ea3f89943ebdf9ee6394af41cbb79b7"
+    },
+    {
+      "capture": "restart-threads-1.txt",
+      "sha256": "a19e44d9cdd7e3c85bc4385b6ce8440d552bdee324597d43548fd64bd2e0b7e8"
+    }
+  ]
+}

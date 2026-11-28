@@ -39,11 +39,12 @@ final class NeoActions implements Actions.Adapter {
             case BREAK -> {
                 var event=new BreakBlockEvent(a.level,a.pos,a.state,a.player);
                 event.setCanceled(a.cancelled || a.initiallyDenied);
-                bus.post(event);a.cancelled=event.isCanceled();a.initiallyDenied=a.cancelled;
+                bus.post(event);a.cancelled=a.hardDenied || event.isCanceled();a.initiallyDenied=a.cancelled;
             }
             case PLACE -> {
                 var list=a.changes.stream().map(NeoActions::snapshot).toList();
-                var against=a.level.getBlockState(a.pos.relative(a.face.getOpposite()));
+                var against=a.changes.stream().filter(change->change.pos().equals(a.against)).findFirst()
+                    .map(Placement.Change::old).orElseGet(()->a.level.getBlockState(a.against));
                 dispatch(a,list.size()==1?new EntityPlaceEvent(list.getFirst(),against,a.player):new EntityMultiPlaceEvent(list,against,a.player));
             }
             case RIGHT_ITEM -> {var e=dispatch(a,new PlayerInteractEvent.RightClickItem(a.player,a.hand));if(a.cancelled)a.result=e.getCancellationResult();}

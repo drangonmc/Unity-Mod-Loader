@@ -8,7 +8,7 @@ import javax.tools.ToolProvider;
 
 /** JDK-only source build. Arguments: project directory, original 26.2 Mojang server bundle. */
 class Build {
-    static final String VERSION = "0.3.0-Beta";
+    static final String VERSION = "0.3.1-Beta";
     public static void main(String[] args) throws Exception {
         if (args.length < 2 || args.length > 3)
             throw new IllegalArgumentException(

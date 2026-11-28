@@ -83,6 +83,8 @@ final class GamePatches {
         LifecyclePatches.add(plan, client);
         LevelPatches.add(plan);
         BukkitPatches.add(plan);
+        SocialPatches.add(plan);
+        if(client)ClientLevelPatches.add(plan);
         ActionPatches.add(plan, client);
         LivingEventPatches.add(plan);
         PluginLoginPatches.add(plan);

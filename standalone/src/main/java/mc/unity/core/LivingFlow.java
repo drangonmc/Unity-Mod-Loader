@@ -11,6 +11,8 @@ import net.minecraft.world.level.Level;
 public final class LivingFlow {
     public interface Damage {
         float incoming(float amount);
+        float shield(float vanilla,boolean originallyBlocked);
+        int shieldWear(int vanilla);
         float reduce(float before,float after,int step);
         float pre(float amount);
         void finalAmount(float amount);
@@ -21,7 +23,11 @@ public final class LivingFlow {
     }
     public interface Factory { Damage open(LivingEntity target,DamageSource source,float original); }
     private static volatile Factory factory;
-    public static Runnable bind(Factory f){factory=f;return ()->{if(factory==f)factory=null;};}
+    public static synchronized Runnable bind(Factory f) {
+        if(factory!=null)throw new IllegalStateException("A damage adapter is already registered");
+        factory=Objects.requireNonNull(f);
+        return ()->{synchronized(LivingFlow.class){if(factory==f)factory=null;}};
+    }
     private record Hit(Damage damage,Hit parent){}
     private static final ThreadLocal<Hit> current=new ThreadLocal<>();
     public static Object begin(LivingEntity target,DamageSource source,float amount){
@@ -34,6 +40,12 @@ public final class LivingFlow {
     }
     private static Damage damage(){var frame=current.get();return frame==null?null:frame.damage();}
     public static float incoming(float amount){var d=damage();return d==null?amount:d.incoming(amount);}
+    public static boolean shieldBypassed(boolean bypassed){return damage()==null && bypassed;}
+    public static float shield(float vanilla,net.minecraft.world.item.component.BlocksAttacks blocks,DamageSource source){
+        var d=damage();
+        return d==null?vanilla:d.shield(vanilla,!blocks.bypassedBy().map(t->t.contains(source.typeHolder())).orElse(false));
+    }
+    public static int shieldWear(int vanilla){var d=damage();return d==null?vanilla:d.shieldWear(vanilla);}
     public static float reduction(float after,float before,int step){var d=damage();return d==null?after:d.reduce(before,after,step);}
     public static float pre(float amount){var d=damage();return d==null?amount:d.pre(amount);}
     public static void finalAmount(float amount){var d=damage();if(d!=null)d.finalAmount(amount);}

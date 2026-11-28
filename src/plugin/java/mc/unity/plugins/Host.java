@@ -33,6 +33,11 @@ public final class Host implements PluginHost {
     MinecraftServer game;
     Server server;
     BukkitViews views;
+    private final PlayerEvents playerEvents=new PlayerEvents(this);
+    public boolean chat(ServerPlayer p,net.minecraft.network.chat.PlayerChatMessage msg,net.minecraft.network.chat.ChatType.Bound bound){return playerEvents.chat(p,msg,bound);}
+    public String command(ServerPlayer p,String input){return playerEvents.command(p,input);}
+    public boolean move(ServerPlayer p,double x,double y,double z,float yaw,float pitch,double ox,double oy,double oz){return playerEvents.move(p,x,y,z,yaw,pitch,ox,oy,oz);}
+    public net.minecraft.world.level.portal.TeleportTransition teleport(ServerPlayer p,net.minecraft.world.level.portal.TeleportTransition t,String cause){return playerEvents.teleport(p,t,cause);}
     final Map<String, PluginFile.Loader> loaders = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     final Map<String, org.bukkit.command.Command> commands = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     final List<JavaPlugin> enabled = new ArrayList<>();
@@ -279,7 +284,7 @@ public final class Host implements PluginHost {
                                                       : net.minecraft.network.chat.ComponentSerialization.CODEC
                                                             .parse(ops, serializer.serializeToTree(changed))
                                                             .getOrThrow();
-        } finally { if (!join && views != null) views.forget(player.getUUID()); }
+        } finally { if (!join && views != null) {playerEvents.forget(player.getUUID());views.forget(player.getUUID());} }
     }
     @Override
     public boolean changeSlot(ServerPlayer player, int slot) {
@@ -439,7 +444,8 @@ public final class Host implements PluginHost {
     }
     @Override
     public void entityUntracked(net.minecraft.world.entity.Entity e) { if (views!=null) views.forget(e); }
-    private net.minecraft.network.chat.Component nativeReason(net.kyori.adventure.text.Component rich) {
+    net.minecraft.network.chat.Component nativeReason(net.kyori.adventure.text.Component rich) {
+        if(rich==null)return net.minecraft.network.chat.Component.empty();
         var json=net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().serializeToTree(rich);
         return net.minecraft.network.chat.ComponentSerialization.CODEC.parse(game.registryAccess().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE),json).getOrThrow();
     }
@@ -499,6 +505,7 @@ public final class Host implements PluginHost {
     }
     @Override
     public void close() {
+        playerEvents.close();
         if (closed)
             return;
         closed = true;

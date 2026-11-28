@@ -62,7 +62,7 @@ final class PluginEvents {
         try (var lines = new java.io.BufferedReader(new java.io.InputStreamReader(
                 java.util.Objects.requireNonNull(PluginEvents.class.getResourceAsStream("game-events.tsv")),
                 java.nio.charset.StandardCharsets.UTF_8))) {
-            GAME_EVENTS = lines.lines().map(line -> "org.bukkit.event." + line.substring(0, line.indexOf('\t')))
+            GAME_EVENTS = lines.lines().map(line -> line.substring(0, line.indexOf('\t'))).map(name -> name.startsWith("io.papermc.") ? name : "org.bukkit.event."+name)
                 .collect(java.util.stream.Collectors.toUnmodifiableSet());
         } catch (java.io.IOException e) { throw new ExceptionInInitializerError(e); }
     }

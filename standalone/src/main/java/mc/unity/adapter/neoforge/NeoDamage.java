@@ -18,6 +18,15 @@ final class NeoDamage implements LivingFlow.Damage {
         var e=bus.post(new LivingIncomingDamageEvent(entity,damage));
         return e.isCanceled()?-1:Math.max(0,damage.getNewDamage());
     }
+    private int itemDamage=-1;
+    public float shield(float vanilla,boolean originallyBlocked){
+        var event=bus.post(new LivingShieldBlockEvent(entity,damage,vanilla,originallyBlocked));
+        if(!event.getBlocked())return -1;
+        damage.setBlockedDamage(event);
+        itemDamage=event.shieldDamage();
+        return damage.getBlockedDamage();
+    }
+    public int shieldWear(int vanilla){return itemDamage<0?vanilla:itemDamage;}
     public float reduce(float before,float after,int step){
         var reduction=switch(step){
             case 0->DamageContainer.Reduction.INVULNERABILITY;

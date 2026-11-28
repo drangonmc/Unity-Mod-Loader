@@ -57,7 +57,26 @@ public final class Events {
     }
     public static final TickSignal SERVER_TICK_PRE = new TickSignal(), SERVER_TICK_POST = new TickSignal();
     public static final Signal<Void> CLIENT_TICK_PRE = new Signal<>(), CLIENT_TICK_POST = new Signal<>();
-    public record LevelTick(net.minecraft.server.level.ServerLevel level,java.util.function.BooleanSupplier time) {}
+    public record LevelTick(net.minecraft.world.level.Level level,java.util.function.BooleanSupplier time) {}
+    public static void clientTickPre(net.minecraft.world.level.Level level,java.util.function.BooleanSupplier time){
+        if(!LEVEL_TIME_PRE.empty())LEVEL_TIME_PRE.post(new LevelTick(level,time));
+    }
+    public static void clientTickPost(net.minecraft.world.level.Level level,java.util.function.BooleanSupplier time){
+        if(!LEVEL_TIME_POST.empty())LEVEL_TIME_POST.post(new LevelTick(level,time));
+    }
+    public static void clientChunkLoaded(net.minecraft.world.level.chunk.LevelChunk chunk){
+        if(chunk!=null && !CHUNK_LOAD.empty())CHUNK_LOAD.post(new ChunkTransition(chunk,false));
+    }
+    public static final Signal<Actions.Action> CLIENT_BREAK=new Signal<>();
+    public static boolean restrictedClientBreak(net.minecraft.world.entity.player.Player p,net.minecraft.world.level.Level level,
+            net.minecraft.core.BlockPos pos,net.minecraft.world.level.GameType mode){
+        var state=level.getBlockState(pos);
+        boolean hard=p.blockActionRestricted(level,pos,mode) || state.getBlock() instanceof net.minecraft.world.level.block.GameMasterBlock && !p.canUseGameMasterBlocks();
+        boolean tool=!p.getMainHandItem().canDestroyBlock(state,level,pos,p);
+        if(CLIENT_BREAK.empty())return hard || tool;
+        var a=Actions.player(Actions.Kind.BREAK,p);a.pos=pos;a.state=state;a.hardDenied=hard;a.initiallyDenied=tool || hard;
+        CLIENT_BREAK.post(a);return hard || a.cancelled;
+    }
     public record ChunkTransition(net.minecraft.world.level.chunk.LevelChunk chunk,boolean fresh) {}
     public static final Signal<LevelTick> LEVEL_TIME_PRE=new Signal<>(),LEVEL_TIME_POST=new Signal<>();
     public static final Signal<ChunkTransition> CHUNK_LOAD=new Signal<>();
@@ -207,7 +226,7 @@ public final class Events {
         LEVEL_LOAD.clear();
         LEVEL_UNLOAD.clear();
         REGISTRY.clear();
-        LEVEL_TIME_PRE.clear();LEVEL_TIME_POST.clear();CHUNK_LOAD.clear();CHUNK_UNLOAD.clear();ENTITY_JOIN.clear();
+        CLIENT_BREAK.clear();LEVEL_TIME_PRE.clear();LEVEL_TIME_POST.clear();CHUNK_LOAD.clear();CHUNK_UNLOAD.clear();ENTITY_JOIN.clear();
         LEVEL_TICK_PRE.clear();
         LEVEL_TICK_POST.clear();
         SERVER_TICK_PRE.clear();

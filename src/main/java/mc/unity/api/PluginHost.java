@@ -5,6 +5,10 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 
 public interface PluginHost extends UnityMod, AutoCloseable {
+    default boolean chat(net.minecraft.server.level.ServerPlayer p,net.minecraft.network.chat.PlayerChatMessage message,net.minecraft.network.chat.ChatType.Bound bound){return false;}
+    default String command(net.minecraft.server.level.ServerPlayer p,String input){return input;}
+    default boolean move(net.minecraft.server.level.ServerPlayer p,double x,double y,double z,float yaw,float pitch,double fromX,double fromY,double fromZ){return true;}
+    default net.minecraft.world.level.portal.TeleportTransition teleport(net.minecraft.server.level.ServerPlayer p,net.minecraft.world.level.portal.TeleportTransition transition,String cause){return transition;}
     void tick(MinecraftServer server);
     default void entityUntracked(net.minecraft.world.entity.Entity entity) {}
     default net.minecraft.network.chat.Component preLogin(com.mojang.authlib.GameProfile profile,java.net.InetAddress address){return null;}

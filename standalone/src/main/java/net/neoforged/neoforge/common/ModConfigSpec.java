@@ -128,7 +128,21 @@ public final class ModConfigSpec implements IConfigSpec {
         @SuppressWarnings("unchecked")
         public <T> ConfigValue<T> define(String k,T value) {
             Objects.requireNonNull(value);
-            return define(k,value,value.getClass()::isInstance);
+            return put(k,new ConfigValue<>(value,raw -> {
+                if(value instanceof List<?>)return raw instanceof List<?> ? (T)raw : null;
+                if(value instanceof Enum<?> e && raw instanceof String name)
+                    return (T)Enum.valueOf((Class)e.getDeclaringClass(),name);
+                if(value instanceof Number && raw instanceof Number n) {
+                    if(value instanceof Double)return (T)Double.valueOf(n.doubleValue());
+                    if(value instanceof Float)return (T)Float.valueOf(n.floatValue());
+                    var exact=new java.math.BigDecimal(n.toString());
+                    if(value instanceof Integer)return (T)Integer.valueOf(exact.intValueExact());
+                    if(value instanceof Long)return (T)Long.valueOf(exact.longValueExact());
+                    if(value instanceof Short)return (T)Short.valueOf(exact.shortValueExact());
+                    if(value instanceof Byte)return (T)Byte.valueOf(exact.byteValueExact());
+                }
+                return value.getClass().isInstance(raw)?(T)raw:null;
+            }));
         }
         public <T> ConfigValue<T> define(String k, T v, Predicate<Object> valid) {
             return put(k, new ConfigValue<>(v, raw -> valid.test(raw) ? (T)raw : null));

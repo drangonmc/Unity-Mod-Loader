@@ -1,0 +1,35 @@
+[
+  {
+    "slug": "commandblocker-ashkiano",
+    "versionId": "pvcW2eo6",
+    "version": "1.1",
+    "filename": "CommandBlocker-1.1.jar",
+    "sha512": "ff3b118d46ccb9cc83cc8ccb5f9ef4ad98a8d08257cfa6a5b1456307c957bee6ec7e77f890b664822a1439984020e54e2e0eb0842751080a35dd95ceaea7f423",
+    "url": "https://cdn.modrinth.com/data/C4YFH8DQ/versions/pvcW2eo6/CommandBlocker-1.1.jar",
+    "events": [
+      "PlayerCommandPreprocessEvent"
+    ]
+  },
+  {
+    "slug": "easychatfilter",
+    "versionId": "dbtstqIx",
+    "version": "1.0",
+    "filename": "EasyChatFilter-26.1.2+ v1.0.jar",
+    "sha512": "dd059b73032a0548792fe8c39e8f290a61510bac329008226cbeeb3ce947ddc77fff107cfa1992a8a07f71677f1411f5a01055196f21fd97b2aba507bcd718f1",
+    "url": "https://cdn.modrinth.com/data/6MmLfnt5/versions/dbtstqIx/EasyChatFilter-26.1.2%2B%20v1.0.jar",
+    "events": [
+      "AsyncChatEvent"
+    ]
+  },
+  {
+    "slug": "mute-chat",
+    "versionId": "fV1rFk3D",
+    "version": "1.0.0",
+    "filename": "MuteChat.jar",
+    "sha512": "f8212a79dbde541fcb35368856fade2b2a25dbcf67803f62a6ed04a674ffc02b38915e58e12a797fe1a2db77a35e6152c79b00172b1a58ff74e535990c4dc828",
+    "url": "https://cdn.modrinth.com/data/9aBfF3uR/versions/fV1rFk3D/MuteChat.jar",
+    "events": [
+      "AsyncChatEvent"
+    ]
+  }
+]

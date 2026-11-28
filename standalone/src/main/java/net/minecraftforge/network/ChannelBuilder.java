@@ -28,7 +28,7 @@ public final class ChannelBuilder {
         if (accepted != null
             && (!(accepted instanceof Channel.VersionTest.Exact exact) || exact.version() != version))
             throw new IllegalArgumentException(
-                "This Alpha supports exact Forge play channel versions: " + name);
+                "This Beta supports exact Forge play channel versions: " + name);
         return PlayChannels.create(name, version);
     }
 }

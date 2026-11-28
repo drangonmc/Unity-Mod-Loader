@@ -13,7 +13,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.config.ModConfigs;
 
 /** The standard two-argument factory opens this mod's local TOML files. */
-public final class ConfigurationScreen extends OptionsSubScreen {
+public class ConfigurationScreen extends OptionsSubScreen {
     private static Component text(String key, net.minecraft.ChatFormatting... format) {
         return Component.translatable("neoforge.configuration.uitext." + key).withStyle(format);
     }
@@ -26,9 +26,15 @@ public final class ConfigurationScreen extends OptionsSubScreen {
     public static final Component SERVER_RESTART_TITLE = text("restart.server.title");
     public static final Component SERVER_RESTART_MESSAGE = text("restart.server.text");
     private final ModContainer mod;
+    private final com.mojang.datafixers.util.Function4<ConfigurationScreen,ModConfig.Type,ModConfig,Component,Screen> factory;
     public ConfigurationScreen(ModContainer mod, Screen parent) {
+        this(mod,parent,null);
+    }
+    public ConfigurationScreen(ModContainer mod, Screen parent,
+            com.mojang.datafixers.util.Function4<ConfigurationScreen,ModConfig.Type,ModConfig,Component,Screen> factory) {
         super(parent, Minecraft.getInstance().options, Component.literal(mod.getModId()));
         this.mod = mod;
+        this.factory = factory;
     }
     @Override protected void addOptions() {
         for (var type : ModConfig.Type.values()) {
@@ -37,7 +43,11 @@ public final class ConfigurationScreen extends OptionsSubScreen {
                 .sorted(Comparator.comparing(ModConfig::getFileName))
                 .forEach(config -> {
                     var path = config.getFullPath();
-                    var button = Button.builder(Component.literal(config.getFileName()), b -> Util.getPlatform().openPath(path)).build();
+                    var title=Component.literal(config.getFileName());
+                    var button = Button.builder(title, b -> {
+                        if(factory==null)Util.getPlatform().openPath(path);
+                        else Minecraft.getInstance().gui.setScreen(factory.apply(this,type,config,title));
+                    }).build();
                     button.active = path != null && Files.isRegularFile(path) &&
                         (type != ModConfig.Type.SERVER || Minecraft.getInstance().hasSingleplayerServer());
                     if (!button.active) button.setTooltip(net.minecraft.client.gui.components.Tooltip.create(

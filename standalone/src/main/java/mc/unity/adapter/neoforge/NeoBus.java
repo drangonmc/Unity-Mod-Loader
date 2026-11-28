@@ -229,8 +229,12 @@ public final class NeoBus implements IEventBus {
             });
         }
     }
+    private static final class ClientBreakBinding {}
     private boolean gameplay(Class<?> kind) {
         boolean bound=false;
+        if(kind.isAssignableFrom(net.neoforged.neoforge.event.level.block.BreakBlockEvent.class)){
+            bridges.computeIfAbsent(ClientBreakBinding.class,k->Events.CLIENT_BREAK.listen(new NeoActions(this,mc.unity.core.Actions.Kind.BREAK)::accept));bound=true;
+        }
         if(kind.isAssignableFrom(net.neoforged.neoforge.event.entity.EntityJoinLevelEvent.class)){
             bridges.computeIfAbsent(net.neoforged.neoforge.event.entity.EntityJoinLevelEvent.class,k->Events.ENTITY_JOIN.listen(v->
                 v.cancelled=post(new net.neoforged.neoforge.event.entity.EntityJoinLevelEvent(v.entity,v.entity.level(),v.loaded)).isCanceled()));bound=true;
@@ -264,7 +268,7 @@ public final class NeoBus implements IEventBus {
             var key=entry.getValue()==mc.unity.core.Actions.Kind.PLACE?net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent.class:entry.getKey();
             bridges.computeIfAbsent(key,k->mc.unity.core.Actions.attachScoped(new NeoActions(this,entry.getValue())));bound=true;
         }
-        if(List.of(net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent.class,
+        if(List.of(net.neoforged.neoforge.event.entity.living.LivingShieldBlockEvent.class,net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent.class,
                 net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Pre.class,
                 net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Post.class).stream().anyMatch(kind::isAssignableFrom)){
             bridges.computeIfAbsent(NeoDamage.class,k->mc.unity.core.LivingFlow.bind((e,s,a)->new NeoDamage(this,e,s,a)));bound=true;

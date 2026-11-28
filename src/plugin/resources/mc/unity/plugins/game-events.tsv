@@ -1,8 +1,8 @@
-block.BlockDispenseEvent	Bucket dispenser actions; cancellation before inventory or fluid mutation
-block.CauldronLevelChangeEvent	Player bucket fill and empty after bucket event approval
 block.BlockBreakEvent	Player block break, cancellation, drop-items switch and experience
+block.BlockDispenseEvent	Bucket dispenser actions; cancellation before inventory or fluid mutation
 block.BlockMultiPlaceEvent	Multi-position placement journal and rollback
 block.BlockPlaceEvent	Server-authoritative placement journal; rollback and hand resynchronization
+block.CauldronLevelChangeEvent	Player bucket fill and empty after bucket event approval
 entity.EntityDamageByEntityEvent	Living targets with a source entity, including player-on-player damage; common damage HandlerList.
 entity.EntityDamageEvent	Living targets: incoming damage and cancellation before vanilla damage processing. Armor modifier breakdown pending.
 entity.EntityShootBowEvent	Prepared arrow before admission and bow wear
@@ -10,8 +10,11 @@ entity.ProjectileHitEvent	Projectile impact before hit processing
 entity.ProjectileLaunchEvent	Server projectile admission before tracking
 inventory.InventoryClickEvent	Validated menu packet before client predictions. Ordinary container slots, cursor and cancellation.
 inventory.InventoryDragEvent	Server quick-craft slot selection and distribution; cancellable before slot writes.
+io.papermc.paper.event.player.AsyncChatEvent	26.2 network chat after filtering and signature validation, recipient and renderer dispatch
+player.AsyncPlayerChatEvent	Legacy async chat before the modern event
 player.PlayerBucketEmptyEvent	Player fluid bucket empty decision at the placement target
 player.PlayerBucketFillEvent	Player pickup from a source, with authoritative block and hand resync
+player.PlayerCommandPreprocessEvent	Validated player command before Brigadier execution
 player.PlayerGameModeChangeEvent	Game mode decision and cancellation; detailed change cause pending
 player.PlayerInteractAtEntityEvent	Interaction hit position, hand and cancellation
 player.PlayerInteractEntityEvent	Player.interactOn; common inherited HandlerList
@@ -19,7 +22,9 @@ player.PlayerInteractEvent	Left click block and right click item/block; physical
 player.PlayerItemHeldEvent	Valid incoming slot change; cancellation sends previous slot to client
 player.PlayerJoinEvent	Original join broadcast; mutable Adventure message
 player.PlayerLevelChangeEvent	Joined player's level change observed at player tick
+player.PlayerMoveEvent	Accepted movement with correction and listener redirection
 player.PlayerQuitEvent	Original quit broadcast; disconnected reason; cause classification pending
+player.PlayerTeleportEvent	Server player transition with cancellation and destination replacement
 player.PlayerToggleFlightEvent	Incoming change to flying state and abilities resynchronization
 server.PluginDisableEvent	Before plugin disable and handler cleanup
 server.PluginEnableEvent	Plugin enable transition

@@ -45,7 +45,7 @@ public final class Actions {
         public boolean dropItems = true;
         public BlockPos against;
         public net.minecraft.world.item.ItemStack usedStack;
-        public boolean initiallyDenied;
+        public boolean initiallyDenied, hardDenied;
         public boolean cancelled;
         public InteractionResult result = InteractionResult.PASS;
         public int blockPolicy, itemPolicy;
@@ -108,9 +108,11 @@ public final class Actions {
         var e = player(Kind.BREAK, player);
         e.pos = pos;
         e.state = state;
-        e.initiallyDenied =
-            !vanilla || p.blockActionRestricted(level, pos, p.gameMode.getGameModeForPlayer());
+        e.hardDenied = p.blockActionRestricted(level,pos,p.gameMode.getGameModeForPlayer()) ||
+            state.getBlock() instanceof net.minecraft.world.level.block.GameMasterBlock && !p.canUseGameMasterBlocks();
+        e.initiallyDenied = !vanilla || e.hardDenied;
         post(e);
+        e.cancelled |= e.hardDenied;
         if (e.cancelled)
             resync(player, pos);
         return e;
