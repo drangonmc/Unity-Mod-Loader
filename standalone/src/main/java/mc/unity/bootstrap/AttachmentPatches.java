@@ -19,7 +19,11 @@ final class AttachmentPatches {
         return descriptor.substring(1, descriptor.length() - 1);
     }
     static void add(TransformPlan plan) {
-        for (var type : List.of(CHUNK, ClassDesc.of("net.minecraft.world.entity.Entity"),
+        plan.add(name(LEVEL),86,"Unity level attachments","dimension saved data",(cf,m)->cf.transformClass(m,ClassTransform.endHandler(b->
+            b.withMethodBody("unity$attachments",MethodTypeDesc.of(DATA,ConstantDescs.CD_boolean),ClassFile.ACC_PUBLIC,c->c.aload(0).iload(1)
+                .invokestatic(DATA,"ofLevel",MethodTypeDesc.of(DATA,LEVEL,ConstantDescs.CD_boolean)).areturn()))));
+
+        for (var type : List.of(CHUNK, ClassDesc.of("net.minecraft.world.level.Level"), ClassDesc.of("net.minecraft.world.entity.Entity"),
                                 ClassDesc.of("net.minecraft.world.level.block.entity.BlockEntity"))) {
             plan.add(name(type), 85, "Unity attachments", "holder fields",
                      (cf, m) -> cf.transformClass(m, ClassTransform.endHandler(b -> {
@@ -50,7 +54,7 @@ final class AttachmentPatches {
                                                      .areturn();
                                              });
                      })));
-            if (type.equals(CHUNK))
+            if (type.equals(CHUNK) || name(type).equals("net/minecraft/world/level/Level"))
                 continue;
             boolean block = name(type).endsWith("/BlockEntity");
             var methods = block ? Set.of("loadCustomOnly", "loadWithComponents", "saveCustomOnly",

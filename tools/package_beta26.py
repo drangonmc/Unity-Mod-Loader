@@ -16,7 +16,7 @@ import acceptance
 import unpacked
 from acceptance import digest
 
-VERSION = "0.3.2-Beta"
+VERSION = "0.3.3-Beta"
 
 def validated(options, version=VERSION, alternate=False):
     reports = {}
@@ -82,7 +82,10 @@ def main(o):
     version=getattr(o,"version",VERSION)
     number=version.split("-")[0]
     jars=[f"unity-loader-{version}.jar","unity-world-marker.jar","unity-client-witness.jar","UnityEditRegions.jar"]
-    if version=="0.3.2-Beta":
+    if version=="0.3.3-Beta":
+        from validate_beta33 import validate
+        reports=validate(ROOT,o,digest)
+    elif version=="0.3.2-Beta":
         from validate_beta32 import validate
         reports=validate(ROOT,o,digest)
     elif version=="0.3.1-Beta":
@@ -112,9 +115,14 @@ def main(o):
         more["contracts/contracts.log"]=o.contract_result.parent/"contracts.log"
         for n,src in more.items():
             dest=evidence/n;dest.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(src,dest)
-    if version in ("0.2.9-Beta","0.3.0-Beta","0.3.1-Beta","0.3.2-Beta"):
+    if version in ("0.2.9-Beta","0.3.0-Beta","0.3.1-Beta","0.3.2-Beta","0.3.3-Beta"):
         more["contracts/result.json"]=o.contract_result
         more["contracts/contracts.log"]=o.contract_result.parent/"contracts.log"
+        if version=="0.3.3-Beta":
+            more["machine-compatibility.json"]=o.runs/"machine-compatibility.json"
+            for n in ("world.json","result.json"):more["other-owner/"+n]=o.runs/"other-owner"/n
+            for host in ("unity","paper"):
+                for name in ("players.json","world.json"):more[host+"/"+name]=o.runs/host/name
         if version=="0.3.2-Beta":
             for host in ("unity","paper"):
                 for name in ("players.json","world.json"):more[host+"/"+name]=o.runs/host/name
@@ -160,7 +168,7 @@ def main(o):
             for raw in (o.runs/host/name).read_text("utf8",errors="replace").splitlines():
                 line = re.sub(r"\x1b\[[0-9;]*m","",raw)
                 if any(word in line.lower() for word in ("cookie header","authorization:","access_token=")):continue
-                if any(s in line for s in ("Operation completed", "available edits", "clipboard has been pasted",
+                if any(s in line for s in ("U33 RULE ","U33 CHEST ","U33 POLICY ","U33 CARGO ","U33 ROUTE ","U33 SYNC WRITTEN","Operation completed", "available edits", "clipboard has been pasted",
                           "has the following block data:", "REGION_CHEST_INTACT", "UNITY_NEO26_TICKS_OK",
                           "has the following entity data:", "BLOCK_OK_gold_block", "BLOCK_OK_smooth_stone",
                            "U32 ","U32SYNC ","U32MACHINE ","U32 Kotlin","U32_","U31 ", "NEO31 ", "FORGE31 ", "PLAYER_REPLACEMENT","SHIELD_WEAR_2","UNITY30 ", "U30_", "UNITY29 ", "UNITY29_PIPE_READY","[Server] FLUID_MOVED","[Server] ENERGY_MOVED","[Server] ITEM_MOVED","UNITY28_", "[Server] NO_ITEM_DROP","[Server] NORMAL_ITEM_DROP","[Server] VANILLA_XP","UNITY_NEO27_FUEL_OK", "[Server] MACHINE_FUEL", "[Server] CUSTOM_FUEL_COOKED",
@@ -176,11 +184,12 @@ def main(o):
         files[n]=(ROOT/n).read_bytes()
     for n in ("Install-Unity-Client.cmd","Start-Unity.cmd"):
         files[n]=re.sub(rb"\d+\.\d+\.\d+-Beta",version.encode(),(ROOT/n).read_bytes())
-    if version=="0.3.2-Beta":files["tools/validate_beta32.py"]=(ROOT/"tools/validate_beta32.py").read_bytes()
-    if version in ("0.3.1-Beta","0.3.2-Beta"):files["tools/validate_beta31.py"]=(ROOT/"tools/validate_beta31.py").read_bytes()
-    if version in ("0.3.0-Beta","0.3.1-Beta","0.3.2-Beta"):
+    if version=="0.3.3-Beta":files["tools/validate_beta33.py"]=(ROOT/"tools/validate_beta33.py").read_bytes()
+    if version in ("0.3.2-Beta","0.3.3-Beta"):files["tools/validate_beta32.py"]=(ROOT/"tools/validate_beta32.py").read_bytes()
+    if version in ("0.3.1-Beta","0.3.2-Beta","0.3.3-Beta"):files["tools/validate_beta31.py"]=(ROOT/"tools/validate_beta31.py").read_bytes()
+    if version in ("0.3.0-Beta","0.3.1-Beta","0.3.2-Beta","0.3.3-Beta"):
         for n in ("tools/validate_beta30.py","NOTICE.md"):files[n]=(ROOT/n).read_bytes()
-    if version in ("0.2.9-Beta","0.3.0-Beta","0.3.1-Beta","0.3.2-Beta"):
+    if version in ("0.2.9-Beta","0.3.0-Beta","0.3.1-Beta","0.3.2-Beta","0.3.3-Beta"):
         for n in ("tools/validate_beta29.py","tools/bukkit-library-resolver.lock.json"):files[n]=(ROOT/n).read_bytes()
     for base in ("standalone","src/plugin"):
         for f in sorted((ROOT/base).rglob("*")):
@@ -211,7 +220,7 @@ def main(o):
     print("Verified",delivered,digest(delivered))
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
-    parser.add_argument("--version",choices=("0.2.6-Beta","0.2.7-Beta","0.2.8-Beta","0.2.9-Beta","0.3.0-Beta","0.3.1-Beta","0.3.2-Beta"),default=VERSION)
+    parser.add_argument("--version",choices=("0.2.6-Beta","0.2.7-Beta","0.2.8-Beta","0.2.9-Beta","0.3.0-Beta","0.3.1-Beta","0.3.2-Beta","0.3.3-Beta"),default=VERSION)
     parser.add_argument("--neo-source",type=lambda s:Path(s).resolve())
     parser.add_argument("--variant-runs",type=lambda s:Path(s).resolve())
     parser.add_argument("--contract-result",type=lambda s:Path(s).resolve())

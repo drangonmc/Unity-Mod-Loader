@@ -1,0 +1,26 @@
+[
+  {
+    "slug": "quite-quarry",
+    "filename": "quietquarry-1.1.0-26.2.jar",
+    "version": "1.1.0",
+    "url": "https://cdn.modrinth.com/data/NuvxN782/versions/7W4JxMLg/quietquarry-1.1.0-26.2.jar",
+    "sha512": "19c5b66de6439bf12e648952fd6ccc488bd156421dfe51441c0e00ef392265e2c1903dcbf1bab8ee4d28a494dc2d2606e9585ea456c4a3ad0366401716cf0b9c",
+    "size": 61589
+  },
+  {
+    "slug": "residence",
+    "filename": "Residence6.0.4.2.jar",
+    "version": "6.0.4.2",
+    "url": "https://zrips.net/Residence/download.php?file=Residence6.0.4.2.jar",
+    "sha512": "9f720194b57d467fbcdd9266a62b30191eb340a3bfddb6d330fc156852a905e790ffa4dc8ca842cbc05eb2eeb4d57b9f249a4372b1fe128a4463400514677857",
+    "size": 1300685
+  },
+  {
+    "slug": "cmilib",
+    "filename": "CMILib1.6.1.4.jar",
+    "version": "1.6.1.4",
+    "url": "https://www.zrips.net/CMILib/CMILib1.6.1.4.jar",
+    "sha512": "1f665b9b415ab78631fe5c88538a7276a572eb9b60b833ad7a0257d6b9e78935245e282904c79dce11b6b2b54d4760628304fce9e42d2c8fcb8b375ec700eb09",
+    "size": 1061373
+  }
+]

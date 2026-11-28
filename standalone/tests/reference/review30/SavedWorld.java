@@ -9,7 +9,9 @@ import net.minecraft.nbt.*;
 /** Offline check of the closed 26.2 test world using the vanilla NBT reader. */
 class SavedWorld {
     static CompoundTag chunk(Path world,int x,int z) throws IOException {
-        var dir=world.resolve("dimensions/minecraft/overworld/region");
+        return region(world.resolve("dimensions/minecraft/overworld/region"),x,z);
+    }
+    static CompoundTag region(Path dir,int x,int z) throws IOException {
         try (var f=new RandomAccessFile(dir.resolve("r."+Math.floorDiv(x,512)+"."+Math.floorDiv(z,512)+".mca").toFile(),"r")) {
             int slot=Math.floorMod(x>>4,32)+32*Math.floorMod(z>>4,32);
             f.seek(4L*slot);

@@ -211,6 +211,7 @@ public final class GameLoader extends URLClassLoader {
                 patches = Map.copyOf(updated);
                 System.out.println("[Unity] Access transforms " + overlay.keySet());
             }
+            var machinePlan=new HashMap<>(patches);MachineModPatches.prepare(mods.values(),(Collection<?>)resolver.getMethod("metadata").invoke(nested),machinePlan,this);patches=Map.copyOf(machinePlan);
             optionalGuard=(BiFunction<String,byte[],byte[]>)Class.forName("mc.unity.adapter.common.OptionalLinkage",true,this)
                 .getMethod("transformer").invoke(null);
             if (puzzles != null) {

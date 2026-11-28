@@ -1,4 +1,4 @@
-# Unity 0.3.2 Beta 的第三方组件
+# Unity 0.3.3 Beta 的第三方组件
 
 Unity 自有代码使用根目录 `LICENSE` 中的 MIT 许可证。下表列出加载器及 Bukkit 插件域随附的主要上游实现。各组件保留其原作者的版权声明和许可证。
 
@@ -13,3 +13,5 @@ Unity 自有代码使用根目录 `LICENSE` 中的 MIT 许可证。下表列出�
 | Fabric API、SpongePowered Mixin、MixinExtras | Fabric API 使用 Apache License 2.0，Mixin 与 MixinExtras 使用 MIT 各自的授权。随包版本及内容摘要见 `standalone/vendor/` 和 `standalone/lib/SHA256SUMS`。[Fabric API](https://github.com/FabricMC/fabric) · [Mixin](https://github.com/SpongePowered/Mixin) · [MixinExtras](https://github.com/LlamaLad7/MixinExtras) |
 
 Bukkit 插件宿主按原包加载 `META-INF/unity/bukkit/` 中的库。构件清单与 SHA-256 在 `standalone/vendor/bukkit/SHA256SUMS`。编译和重建入口是 `standalone/Build.java`。验收使用的机器模组、事件模组和第三方插件的下载标识、版本与散列记录在对应的测试清单中。
+
+随 Bukkit 插件域分发的 Apache Commons Lang 2.6 采用 Apache License 2.0。原版 JAR 保留随附许可证及 NOTICE，其散列与本版 Paper 对照服随包清单一致。

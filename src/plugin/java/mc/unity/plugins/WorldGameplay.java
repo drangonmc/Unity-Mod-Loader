@@ -70,13 +70,14 @@ final class WorldGameplay {
             var event=new EntityExplodeEvent(host.views.entity(cause),loc,blocks,fraction,result);host.fire(event);
             if(event.isCancelled())return cancelled(exp);fraction=event.getYield();
         }
-        mc.unity.runtime.WorldActions.yield(exp,fraction);
+        if(result==org.bukkit.ExplosionResult.DESTROY || result==org.bukkit.ExplosionResult.DESTROY_WITH_DECAY)mc.unity.runtime.WorldActions.yield(exp,fraction);
         return new ArrayList<>(blocks.stream().filter(b->b.getWorld().equals(world)).map(b->new BlockPos(b.getX(),b.getY(),b.getZ())).distinct().toList());
     }
     @SuppressWarnings({"unchecked","rawtypes"})
     Object spawn(ServerLevel level,Object[] args){
         var at=(Location)args[0];at.checkFinite();
-        var type=(org.bukkit.entity.EntityType)args[1];
+        var type=args[1] instanceof org.bukkit.entity.EntityType t?t:java.util.Arrays.stream(org.bukkit.entity.EntityType.values())
+            .filter(t->t.getEntityClass()==args[1] && t.isSpawnable()).findFirst().orElseThrow(()->new IllegalArgumentException("No spawnable entity type for "+args[1]));
         var nativeType=BuiltInRegistries.ENTITY_TYPE.getValue(Identifier.parse(type.getKey().toString()));
         var entity=nativeType.create(level,EntitySpawnReason.TRIGGERED);
         if(entity==null)throw new IllegalArgumentException("Cannot create "+type);

@@ -53,13 +53,15 @@ final class WorldActionPatches {
             }));if(hits[0]!=1)throw new IOException("Explosion phase anchor");return bytes;
         });
         plan.add("net/minecraft/world/level/block/state/BlockBehaviour",260,"Unity explosion events","loot yield",(cf,model)->{
-            int[] hits={0,0};var bytes=cf.transformClass(model,ClassTransform.transformingMethodBodies(m->m.methodName().equalsString("onExplosionHit"),(b,e)->{
+            int[] hits={0,0,0};var bytes=cf.transformClass(model,ClassTransform.transformingMethodBodies(m->m.methodName().equalsString("onExplosionHit"),(b,e)->{
                 if(e instanceof InvokeInstruction i && i.name().equalsString("getBlockInteraction") && ++hits[0]==2)
                     b.invokestatic(H,"decay",sig("(Lnet/minecraft/world/level/Explosion;)Lnet/minecraft/world/level/Explosion$BlockInteraction;"));
-                else if(e instanceof InvokeInstruction i && i.name().equalsString("radius")){
+                else if(e instanceof InvokeInstruction i && i.name().equalsString("dropFromExplosion")){
+                    hits[2]++;b.invokestatic(H,"drop",sig("(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/Explosion;)Z"));
+                }else if(e instanceof InvokeInstruction i && i.name().equalsString("radius")){
                     hits[1]++;b.invokestatic(H,"radius",sig("(Lnet/minecraft/world/level/Explosion;)F"));
                 }else b.with(e);
-            }));if(hits[0]!=2 || hits[1]!=1)throw new IOException("Explosion loot anchors");return bytes;
+            }));if(hits[0]!=2 || hits[1]!=1 || hits[2]!=1)throw new IOException("Explosion loot anchors");return bytes;
         });
     }
 }

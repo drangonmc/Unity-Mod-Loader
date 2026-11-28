@@ -20,6 +20,8 @@ public interface PluginHost extends UnityMod, AutoCloseable {
     default net.minecraft.world.level.portal.TeleportTransition respawning(net.minecraft.server.level.ServerPlayer p,net.minecraft.world.level.portal.TeleportTransition t,boolean alive){return t;}
     default boolean menuOpen(net.minecraft.server.level.ServerPlayer p,net.minecraft.world.inventory.AbstractContainerMenu m,net.minecraft.world.MenuProvider provider){return true;}
     default void menuClose(net.minecraft.server.level.ServerPlayer p,String reason){}
+    default boolean machineAccess(net.minecraft.server.level.ServerLevel world,net.minecraft.core.BlockPos pos,net.minecraft.server.players.NameAndId owner,String operation){return false;}
+    default mc.unity.runtime.PortalHooks.Plan portal(net.minecraft.server.level.ServerPlayer player,mc.unity.runtime.PortalHooks.Plan plan,String reason){return plan;}
     void tick(MinecraftServer server);
     default void entityUntracked(net.minecraft.world.entity.Entity entity) {}
     default net.minecraft.network.chat.Component preLogin(com.mojang.authlib.GameProfile profile,java.net.InetAddress address){return null;}

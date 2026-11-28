@@ -83,7 +83,9 @@ final class GamePatches {
         LifecyclePatches.add(plan, client);
         LevelPatches.add(plan);
         BukkitPatches.add(plan);
+        PresentationPatches.add(plan);
         SocialPatches.add(plan);
+        PortalPatches.add(plan);
         LifePatches.add(plan);
         WorldActionPatches.add(plan);
         AttachmentWirePatches.add(plan);

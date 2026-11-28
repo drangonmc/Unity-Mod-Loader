@@ -19,7 +19,7 @@ final class PluginSession implements AutoCloseable {
         }
         @Override protected Class<?> findClass(String name) throws ClassNotFoundException {
             boolean material=name.equals("org.bukkit.Material");
-            if (!material && !name.equals("com.destroystokyo.paper.MaterialSetTag"))return super.findClass(name);
+            if (!material && !name.equals("org.bukkit.entity.EntityType") && !name.equals("com.destroystokyo.paper.MaterialSetTag"))return super.findClass(name);
             String path=name.replace('.','/')+".class";
             String pkg=name.substring(0,name.lastIndexOf('.'));
             var url = super.findResource(path);
@@ -30,7 +30,7 @@ final class PluginSession implements AutoCloseable {
                 try (var jar = connection.getJarFile()) {
                     var entry = jar.getJarEntry(path);
                     byte[] data;
-                    try (var in = jar.getInputStream(entry)) { data = material?BukkitMaterialPatch.apply(in.readAllBytes(),this):BukkitMaterialPatch.tagUniverse(in.readAllBytes(),this); }
+                    try (var in = jar.getInputStream(entry)) { data = material?BukkitMaterialPatch.apply(in.readAllBytes(),this):name.equals("org.bukkit.entity.EntityType")?BukkitEntityTypePatch.apply(in.readAllBytes(),this):BukkitMaterialPatch.tagUniverse(in.readAllBytes(),this); }
                     var location = connection.getJarFileURL();
                     synchronized (this) {
                         if (getDefinedPackage(pkg) == null) definePackage(pkg,jar.getManifest(),location);
@@ -42,7 +42,7 @@ final class PluginSession implements AutoCloseable {
         private static boolean owned(String n) {
             return n.startsWith("org.bukkit.") || n.startsWith("io.papermc.paper.") ||
                 n.startsWith("com.destroystokyo.paper.") || n.startsWith("net.kyori.") ||
-                n.startsWith("org.eclipse.sisu.") || n.startsWith("org.json.simple.") || n.startsWith("org.apache.commons.codec.") ||
+                n.startsWith("org.eclipse.sisu.") || n.startsWith("org.json.simple.") || n.startsWith("org.apache.commons.lang.") || n.startsWith("org.apache.commons.codec.") ||
                 n.startsWith("javax.inject.") || n.startsWith("org.apache.commons.logging.") || n.startsWith("org.eclipse.aether.") || n.startsWith("org.apache.maven.") || n.startsWith("org.codehaus.plexus.") ||
                 n.startsWith("org.apache.http.") || n.startsWith("org.yaml.snakeyaml.") || n.startsWith("net.md_5.bungee.") || n.startsWith("mc.unity.plugins.");
         }

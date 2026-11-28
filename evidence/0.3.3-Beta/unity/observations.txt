@@ -1,0 +1,116 @@
+[first.log]
+信息: U33 RULE VolumeA 65 true true true true
+信息: U33 RULE VolumeA 66 false true false true
+信息: U33 RULE VolumeA 67 true false true false
+信息: U33 RULE VolumeA 68 true false true false
+信息: U33 RULE VolumeA 69 true true true true
+信息: U33 RULE VolumeA 70 true true true true
+信息: U33 RULE VolumeB 65 true true true true
+信息: U33 RULE VolumeB 66 true true true true
+信息: U33 RULE VolumeB 67 true true true true
+信息: U33 RULE VolumeB 68 false true false true
+信息: U33 RULE VolumeB 69 true true true true
+信息: U33 RULE VolumeB 70 false true false true
+信息: U33 CHEST VolumeA 65 ALLOW
+信息: U33 CHEST VolumeA 66 DENY
+信息: U33 CHEST VolumeA 67 DENY
+信息: U33 CHEST VolumeA 68 DENY
+信息: U33 CHEST VolumeA 70 ALLOW
+信息: U33 CHEST VolumeB 65 ALLOW
+信息: U33 CHEST VolumeB 66 ALLOW
+信息: U33 CHEST VolumeB 67 ALLOW
+信息: U33 CHEST VolumeB 68 DENY
+信息: U33 CHEST VolumeB 70 DENY
+信息: U33 POLICY MINE 65, 80, 25 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY MINE 66, 80, 25 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=false Residence=true
+信息: U33 POLICY MINE 67, 80, 25 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=false
+信息: U33 POLICY MINE 68, 80, 25 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=false
+信息: U33 POLICY MINE 69, 80, 25 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+[23:18:46] [Server thread/INFO]: [STDOUT]: U33 ROUTE d72a93df-334e-34e6-81f8-67ddcdeb22db 65, 80, 32 -> 67, 80, 35
+信息: U33 POLICY EXTRACT 65, 80, 32 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 67, 80, 35 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=false
+[23:18:49] [Server thread/INFO]: [STDOUT]: U33 CARGO d72a93df-334e-34e6-81f8-67ddcdeb22db 0 WAITING_AT_INPUT true
+[23:18:49] [Server thread/INFO]: [STDOUT]: U33 ROUTE d72a93df-334e-34e6-81f8-67ddcdeb22db 66, 80, 39 -> 69, 80, 36
+信息: U33 POLICY EXTRACT 66, 80, 39 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=false Residence=true
+[23:18:57] [Server thread/INFO]: [STDOUT]: U33 CARGO d72a93df-334e-34e6-81f8-67ddcdeb22db 0 WAITING_AT_INPUT true
+[23:18:57] [Server thread/INFO]: [STDOUT]: U33 ROUTE d72a93df-334e-34e6-81f8-67ddcdeb22db 67, 80, 35 -> 69, 80, 36
+信息: U33 POLICY EXTRACT 67, 80, 35 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=false
+[23:19:01] [Server thread/INFO]: [STDOUT]: U33 CARGO d72a93df-334e-34e6-81f8-67ddcdeb22db 0 WAITING_AT_INPUT true
+[23:19:01] [Server thread/INFO]: [STDOUT]: U33 ROUTE d72a93df-334e-34e6-81f8-67ddcdeb22db 65, 80, 32 -> 69, 80, 36
+信息: U33 POLICY EXTRACT 65, 80, 32 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 69, 80, 36 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 69, 80, 36 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY EXTRACT 65, 80, 32 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 69, 80, 36 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 69, 80, 36 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY EXTRACT 65, 80, 32 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 69, 80, 36 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 69, 80, 36 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY EXTRACT 65, 80, 32 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 69, 80, 36 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 69, 80, 36 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY EXTRACT 65, 80, 32 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 69, 80, 36 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 69, 80, 36 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY EXTRACT 65, 80, 32 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 69, 80, 36 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 69, 80, 36 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=true Residence=true
+[23:19:39] [Server thread/INFO]: [STDOUT]: U33 CARGO d72a93df-334e-34e6-81f8-67ddcdeb22db 0 FLY_TO_INPUT true
+[23:19:39] [Server thread/INFO]: [STDOUT]: U33 ROUTE 0b731fd8-6b40-3e28-b59c-a5d6dcaf3d3d 67, 80, 35 -> 66, 80, 39
+信息: U33 POLICY EXTRACT 67, 80, 35 0b731fd8-6b40-3e28-b59c-a5d6dcaf3d3d WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 66, 80, 39 0b731fd8-6b40-3e28-b59c-a5d6dcaf3d3d WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 66, 80, 39 0b731fd8-6b40-3e28-b59c-a5d6dcaf3d3d WorldGuard=true Residence=true
+信息: U33 POLICY EXTRACT 67, 80, 35 0b731fd8-6b40-3e28-b59c-a5d6dcaf3d3d WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 66, 80, 39 0b731fd8-6b40-3e28-b59c-a5d6dcaf3d3d WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 66, 80, 39 0b731fd8-6b40-3e28-b59c-a5d6dcaf3d3d WorldGuard=true Residence=true
+信息: U33 POLICY EXTRACT 67, 80, 35 0b731fd8-6b40-3e28-b59c-a5d6dcaf3d3d WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 66, 80, 39 0b731fd8-6b40-3e28-b59c-a5d6dcaf3d3d WorldGuard=true Residence=true
+信息: U33 POLICY INSERT 66, 80, 39 0b731fd8-6b40-3e28-b59c-a5d6dcaf3d3d WorldGuard=true Residence=true
+[23:19:54] [Server thread/INFO]: [STDOUT]: U33 CARGO 0b731fd8-6b40-3e28-b59c-a5d6dcaf3d3d 0 FLY_TO_INPUT true
+[23:19:56] [Server thread/INFO]: 64, 81, 24 has the following block data: {components: {}, Energy: {energy: 0}, "unity:attachments": {"unity:machine_owner": {name: "VolumeA", id: "d72a93df-334e-34e6-81f8-67ddcdeb22db"}}, Cooldown: 20, CurrentY: 80, x: 64, y: 81, z: 24, id: "quietquarry:quarry_core", CursorIndex: 5, Inventory: {stacks: [{count: 1, id: "minecraft:iron_block"}, {count: 1, id: "minecraft:copper_block"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]}}
+[23:19:56] [Server thread/INFO]: [STDOUT]: U33 CARGO d72a93df-334e-34e6-81f8-67ddcdeb22db 0 IDLE false
+[23:19:56] [Server thread/INFO]: [STDOUT]: U33 CARGO 0b731fd8-6b40-3e28-b59c-a5d6dcaf3d3d 0 IDLE false
+信息: U33 CHEST VolumeA 69 ALLOW
+信息: U33 CHEST VolumeB 69 ALLOW
+信息: U33 CHEST VolumeB 66 ALLOW
+[23:19:57] [Server thread/INFO]: [STDOUT]: U33 SYNC WRITTEN
+[23:19:59] [Server thread/INFO]: VolumeA has the following entity data: [{count: 9, Slot: 4b, id: "minecraft:gold_ingot"}]
+[23:19:59] [Server thread/INFO]: VolumeB has the following entity data: [{count: 7, Slot: 4b, id: "minecraft:iron_ingot"}]
+[firstVolumeA-client.log]
+[firstVolumeB-client.log]
+[restart.log]
+信息: U33 RULE VolumeA 65 true true true true
+信息: U33 RULE VolumeA 66 false true false true
+信息: U33 RULE VolumeA 67 true false true false
+信息: U33 RULE VolumeA 68 true false true false
+信息: U33 RULE VolumeA 69 true true true true
+信息: U33 RULE VolumeA 70 true true true true
+信息: U33 RULE VolumeB 65 true true true true
+信息: U33 RULE VolumeB 66 true true true true
+信息: U33 RULE VolumeB 67 true true true true
+信息: U33 RULE VolumeB 68 false true false true
+信息: U33 RULE VolumeB 69 true true true true
+信息: U33 RULE VolumeB 70 false true false true
+信息: U33 CHEST VolumeA 65 ALLOW
+信息: U33 CHEST VolumeA 66 DENY
+信息: U33 CHEST VolumeA 67 DENY
+信息: U33 CHEST VolumeA 68 DENY
+信息: U33 CHEST VolumeA 70 ALLOW
+信息: U33 CHEST VolumeB 65 ALLOW
+信息: U33 CHEST VolumeB 66 ALLOW
+信息: U33 CHEST VolumeB 67 ALLOW
+信息: U33 CHEST VolumeB 68 DENY
+信息: U33 CHEST VolumeB 70 DENY
+[23:22:03] [Server thread/INFO]: 64, 81, 24 has the following block data: {components: {}, Energy: {energy: 0}, "unity:attachments": {"unity:machine_owner": {name: "VolumeA", id: "d72a93df-334e-34e6-81f8-67ddcdeb22db"}}, Cooldown: 20, CurrentY: 80, x: 64, y: 81, z: 24, id: "quietquarry:quarry_core", CursorIndex: 5, Inventory: {stacks: [{count: 1, id: "minecraft:iron_block"}, {count: 1, id: "minecraft:copper_block"}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}]}}
+[23:22:03] [Server thread/INFO]: [STDOUT]: U33 CARGO d72a93df-334e-34e6-81f8-67ddcdeb22db 0 IDLE false
+[23:22:03] [Server thread/INFO]: [STDOUT]: U33 CARGO 0b731fd8-6b40-3e28-b59c-a5d6dcaf3d3d 0 IDLE false
+信息: U33 CHEST VolumeA 69 ALLOW
+信息: U33 CHEST VolumeB 69 ALLOW
+信息: U33 CHEST VolumeB 66 ALLOW
+[23:22:07] [Server thread/INFO]: VolumeA has the following entity data: [{count: 9, Slot: 4b, id: "minecraft:gold_ingot"}]
+[23:22:07] [Server thread/INFO]: VolumeB has the following entity data: [{count: 7, Slot: 4b, id: "minecraft:iron_ingot"}]
+[23:22:07] [Server thread/INFO]: [STDOUT]: U33 ROUTE d72a93df-334e-34e6-81f8-67ddcdeb22db 66, 80, 39 -> 69, 80, 36
+信息: U33 POLICY EXTRACT 66, 80, 39 d72a93df-334e-34e6-81f8-67ddcdeb22db WorldGuard=false Residence=true
+[23:22:13] [Server thread/INFO]: [STDOUT]: U33 CARGO d72a93df-334e-34e6-81f8-67ddcdeb22db 0 WAITING_AT_INPUT true
+[restartVolumeA-client.log]
+[restartVolumeB-client.log]

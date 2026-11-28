@@ -30,5 +30,8 @@ public final class WorldActions {
     public static Explosion.BlockInteraction decay(Explosion e){
         Float v=yields.get(e);return v==null?e.getBlockInteraction():v<1?Explosion.BlockInteraction.DESTROY_WITH_DECAY:Explosion.BlockInteraction.DESTROY;
     }
-    public static float radius(Explosion e){Float v=yields.get(e);return v==null?e.radius():1f/v;}
+    public static boolean drop(net.minecraft.world.level.block.Block block,Explosion explosion){
+        Float value=yields.get(explosion);return (value==null || value!=0f) && block.dropFromExplosion(explosion);
+    }
+    public static float radius(Explosion e){Float v=yields.get(e);return v==null?e.radius():v<=1f/Float.MAX_VALUE?Float.MAX_VALUE:1f/v;}
 }

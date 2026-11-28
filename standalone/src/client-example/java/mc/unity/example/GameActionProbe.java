@@ -88,8 +88,8 @@ final class GameActionProbe {
                 var be=mc.level.getBlockEntity(pos);
                 if(be!=null)out.addProperty("nbt",be.saveWithFullMetadata(mc.level.registryAccess()).toString());
             }
-            case "qaAttachmentView" -> {
-                try {out.addProperty("values",(String)Class.forName("qa.unity32.SyncProbe",true,mc.unity.core.Attachments.class.getClassLoader()).getMethod("inspect",net.minecraft.world.entity.player.Player.class).invoke(null,me));}
+            case "qaMachineAttachments","qaAttachmentView" -> {
+                try {out.addProperty("values",(String)Class.forName(action.equals("qaMachineAttachments")?"qa.unity33.Routes":"qa.unity32.SyncProbe",true,mc.unity.core.Attachments.class.getClassLoader()).getMethod("inspect",net.minecraft.world.entity.player.Player.class).invoke(null,me));}
                 catch(ReflectiveOperationException ex){throw new IllegalStateException("Attachment witness",ex);}
             }
             case "qaCompletions" -> {

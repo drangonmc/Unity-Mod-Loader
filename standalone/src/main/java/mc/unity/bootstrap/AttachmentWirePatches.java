@@ -15,6 +15,14 @@ final class AttachmentWirePatches {
         });
     }
     static void add(TransformPlan plan){
+        plan.add("net/minecraft/server/level/ServerPlayer",267,"Unity attachment tracking","dimension change",(cf,m)->{
+            int[] hits={0};var bytes=cf.transformClass(m,ClassTransform.transformingMethodBodies(v->v.methodName().equalsString("teleport") &&
+                v.methodType().equalsString("(Lnet/minecraft/world/level/portal/TeleportTransition;)"+P),(b,e)->{
+                b.with(e);if(e instanceof InvokeInstruction i && i.owner().asInternalName().equals("net/minecraft/server/players/PlayerList") && i.name().equalsString("sendLevelInfo")){
+                    hits[0]++;b.aload(0).invokestatic(W,"self",MethodTypeDesc.ofDescriptor("("+P+")V"));
+                }
+            }));if(hits[0]!=1)throw new IOException("Cross-dimension self sync anchor");return bytes;
+        });
         String entity="net/minecraft/server/level/ServerEntity";var type=ClassDesc.of("net.minecraft.world.entity.Entity");
         for(String method:new String[]{"addPairing","removePairing"})tail(plan,entity,method,"("+P+")V",
             b->b.aload(0).getfield(ClassDesc.ofInternalName(entity),"entity",type).aload(1)

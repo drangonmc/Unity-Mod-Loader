@@ -97,6 +97,14 @@ final class BlockViews {
         public boolean isEmpty() {
             return stack.isEmpty();
         }
+        @Override public short getDurability() {
+            return (short) stack.getDamageValue();
+        }
+        @Override public void setDurability(short damage) {
+            if (stack.isEmpty()) return;
+            stack.setDamageValue(damage);
+            changed.run();
+        }
         public int getMaxStackSize() {
             return stack.getMaxStackSize();
         }
@@ -182,16 +190,21 @@ final class BlockViews {
         var cauldron=net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL;
         var fluid=net.minecraft.world.level.block.LiquidBlock.LEVEL;
         var levels=original.hasProperty(cauldron)?cauldron:original.hasProperty(fluid)?fluid:null;
-        Class<? extends BlockData> type=original.is(net.minecraft.world.level.block.Blocks.DISPENSER) ? org.bukkit.block.data.type.Dispenser.class :
+        var honey=net.minecraft.world.level.block.BeehiveBlock.HONEY_LEVEL;
+        var facing=original.hasProperty(honey)?net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING:net.minecraft.world.level.block.DispenserBlock.FACING;
+        Class<? extends BlockData> type=original.hasProperty(honey)?org.bukkit.block.data.type.Beehive.class:original.is(net.minecraft.world.level.block.Blocks.DISPENSER) ? org.bukkit.block.data.type.Dispenser.class :
             original.getBlock() instanceof net.minecraft.world.level.block.SlabBlock ? org.bukkit.block.data.type.Slab.class :
             original.hasProperty(water)?org.bukkit.block.data.Waterlogged.class:
             levels!=null?org.bukkit.block.data.Levelled.class:BlockData.class;
-        return Views.of(type,original.toString(),(m,a)->switch(m) {
+        BlockData delegate=Views.of(type,original.toString(),(m,a)->switch(m) {
             case "getMaterial" -> material(BuiltInRegistries.BLOCK.getKey(state.get().getBlock()));
             case "getAsString" -> net.minecraft.commands.arguments.blocks.BlockStateParser.serialize(state.get());
-            case "getFacing" -> org.bukkit.block.BlockFace.valueOf(state.get().getValue(net.minecraft.world.level.block.DispenserBlock.FACING).name());
-            case "getFaces" -> EnumSet.of(BlockFace.DOWN,BlockFace.UP,BlockFace.NORTH,BlockFace.SOUTH,BlockFace.WEST,BlockFace.EAST);
-            case "setFacing" -> {state.set(state.get().setValue(net.minecraft.world.level.block.DispenserBlock.FACING,net.minecraft.core.Direction.valueOf(((BlockFace)a[0]).name())));yield null;}
+            case "getFacing" -> org.bukkit.block.BlockFace.valueOf(state.get().getValue(facing).name());
+            case "getFaces" -> facing.getPossibleValues().stream().map(d->BlockFace.valueOf(d.name())).collect(java.util.stream.Collectors.toSet());
+            case "getHoneyLevel" -> state.get().getValue(honey);
+            case "getMaximumHoneyLevel" -> honey.getPossibleValues().getLast();
+            case "setHoneyLevel" -> {state.set(state.get().setValue(honey,(int)a[0]));yield null;}
+            case "setFacing" -> {state.set(state.get().setValue(facing,net.minecraft.core.Direction.valueOf(((BlockFace)a[0]).name())));yield null;}
             case "isTriggered" -> state.get().getValue(net.minecraft.world.level.block.DispenserBlock.TRIGGERED);
             case "setTriggered" -> {state.set(state.get().setValue(net.minecraft.world.level.block.DispenserBlock.TRIGGERED,(boolean)a[0]));yield null;}
             case "getType" -> org.bukkit.block.data.type.Slab.Type.valueOf(state.get().getValue(net.minecraft.world.level.block.SlabBlock.TYPE).name());
@@ -204,5 +217,7 @@ final class BlockViews {
             case "clone" -> data(state.get());
             default -> throw Views.unsupported("BlockData",m);
         });
+        if(delegate instanceof org.bukkit.block.data.type.Beehive hive)return BeehiveFacade.create(hive,original);
+        return delegate;
     }
 }

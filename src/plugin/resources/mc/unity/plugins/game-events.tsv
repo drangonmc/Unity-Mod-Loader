@@ -29,6 +29,7 @@ player.PlayerItemHeldEvent	Valid incoming slot change; cancellation sends previo
 player.PlayerJoinEvent	Original join broadcast; mutable Adventure message
 player.PlayerLevelChangeEvent	Joined player's level change observed at player tick
 player.PlayerMoveEvent	Accepted movement with correction and listener redirection
+player.PlayerPortalEvent	Nether portal search and End destination before player transfer
 player.PlayerQuitEvent	Original quit broadcast; disconnected reason; cause classification pending
 player.PlayerRespawnEvent	Resolved vanilla spawn before dimension placement and respawn packet
 player.PlayerTeleportEvent	Server player transition with cancellation and destination replacement

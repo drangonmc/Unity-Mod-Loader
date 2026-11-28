@@ -6,7 +6,7 @@ import org.bukkit.plugin.Plugin;
 import java.util.Set;
 
 /** An actual per-connection permissible holder; permission providers can replace the live base. */
-public abstract class CraftHumanEntity implements org.bukkit.entity.HumanEntity {
+public abstract class CraftHumanEntity extends CraftEntity implements org.bukkit.entity.HumanEntity {
     protected final Player view;
     private final ServerPlayer initial;
     protected PermissibleBase perm;

@@ -33,6 +33,20 @@ public final class Host implements PluginHost {
     MinecraftServer game;
     Server server;
     BukkitViews views;
+    public mc.unity.runtime.PortalHooks.Plan portal(ServerPlayer raw,mc.unity.runtime.PortalHooks.Plan plan,String reason){
+        if(org.bukkit.event.player.PlayerPortalEvent.getHandlerList().getRegisteredListeners().length==0)return plan;
+        var p=views.player(raw);var at=plan.target();
+        var dest=new org.bukkit.Location(views.world(plan.world()),at.x,at.y,at.z,plan.yaw(),plan.pitch());
+        var event=new org.bukkit.event.player.PlayerPortalEvent(p,p.getLocation(),dest,
+            org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.valueOf(reason),plan.search(),plan.create(),plan.creation());
+        fire(event);var to=event.getTo();if(event.isCancelled() || to==null || to.getWorld()==null)return null;to.checkFinite();
+        return new mc.unity.runtime.PortalHooks.Plan(((NativeWorldView)to.getWorld()).unityLevel(),new net.minecraft.world.phys.Vec3(to.getX(),to.getY(),to.getZ()),
+            to.getYaw(),to.getPitch(),Math.max(0,event.getSearchRadius()),event.getCanCreatePortal(),Math.max(0,event.getCreationRadius()));
+    }
+    private final MachineRegions machineRegions=new MachineRegions(this);
+    public boolean machineAccess(net.minecraft.server.level.ServerLevel world,net.minecraft.core.BlockPos pos,net.minecraft.server.players.NameAndId owner,String op){
+        return machineRegions.allows(world,pos,owner,op);
+    }
     final WorldGameplay gameplay=new WorldGameplay(this);
     public boolean creature(net.minecraft.world.entity.Entity entity,String reason){return gameplay.creature(entity,reason);}
     public List<net.minecraft.core.BlockPos> explode(net.minecraft.world.level.ServerExplosion e,List<net.minecraft.core.BlockPos> blocks){return gameplay.explode(e,blocks);}
@@ -149,6 +163,7 @@ public final class Host implements PluginHost {
                 thread.setContextClassLoader(cl);
                 enabled.add(cl.plugin);
                 cl.enable();
+                if(!cl.plugin.isEnabled())continue;
                 fire(new org.bukkit.event.server.PluginEnableEvent(cl.plugin));
                 LOG.info("Enabled " + f.name() + " " + f.description().getVersion());
             } finally {
@@ -269,7 +284,8 @@ public final class Host implements PluginHost {
                 .executes(c -> callback.applyAsInt(c.getSource(), new String[0]))
                 .then(Commands.argument("args", StringArgumentType.greedyString())
                           .suggests((ctx,b)->{String raw=b.getRemaining();var out=b.createOffset(b.getStart()+raw.lastIndexOf(' ')+1);
-                              for(String option:suggest.apply(ctx.getSource(),raw.split(" +",-1)))out.suggest(option);return out.buildFuture();})
+                              var options=suggest.apply(ctx.getSource(),raw.split(" +",-1));
+                              if(options!=null)for(String option:options)if(option!=null && option.toLowerCase(Locale.ROOT).startsWith(out.getRemainingLowerCase()))out.suggest(option);return out.buildFuture();})
                           .executes(c
                                     -> callback.applyAsInt(
                                         c.getSource(), StringArgumentType.getString(c, "args").split(" +"))));
@@ -521,24 +537,19 @@ public final class Host implements PluginHost {
     public List<String> names() {
         return enabled.stream().map(JavaPlugin::getName).toList();
     }
+    void disable(JavaPlugin plugin){
+        if(!enabled.remove(plugin))return;
+        try{
+            fire(new org.bukkit.event.server.PluginDisableEvent(plugin));
+        }finally{
+            try{plugin.setEnabled(false);}
+            catch(RuntimeException|LinkageError problem){LOG.log(java.util.logging.Level.SEVERE,"Disabling "+plugin.getName(),problem);}
+            finally{HandlerList.unregisterAll(plugin);views.tasks.call("cancelTasks",new Object[]{plugin});}
+        }
+    }
     @Override
     public void serverStopping(MinecraftServer game) {
-        for (var p : enabled.reversed())
-            try {
-                fire(new org.bukkit.event.server.PluginDisableEvent(p));
-                try {
-                    p.setEnabled(false);
-                } finally {
-                    HandlerList.unregisterAll(p);
-                    views.tasks.call("cancelTasks", new Object[] {p});
-                }
-            } catch (Throwable e) {
-                if (e instanceof VirtualMachineError fatal)
-                    throw fatal;
-                if (e instanceof ThreadDeath death)
-                    throw death;
-                LOG.log(java.util.logging.Level.SEVERE, "Disabling " + p.getName(), e);
-            }
+        for(var p:List.copyOf(enabled).reversed())disable(p);
         levels.clear();
         worldsReady = false;
         enabled.clear();
@@ -547,7 +558,8 @@ public final class Host implements PluginHost {
     }
     @Override
     public void close() {
-        playerEvents.close();
+        mc.unity.runtime.EntityPresentation.clear();
+        machineRegions.close();playerEvents.close();
         if (closed)
             return;
         closed = true;

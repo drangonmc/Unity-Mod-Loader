@@ -7,6 +7,19 @@ import net.minecraft.world.level.storage.LevelResource;
 import org.bukkit.OfflinePlayer;
 
 final class OfflineViews {
+    static OfflinePlayer[] all(Host host){
+        var players=new LinkedHashMap<UUID,OfflinePlayer>();
+        for(var online:host.game.getPlayerList().getPlayers())players.put(online.getUUID(),host.views.player(online));
+        Path path=host.game.getWorldPath(LevelResource.PLAYER_DATA_DIR);
+        if(Files.isDirectory(path))try(var files=Files.newDirectoryStream(path,"*.dat")){
+            for(var file:files){
+                String name=file.getFileName().toString();UUID id;
+                try{id=UUID.fromString(name.substring(0,name.length()-4));}catch(IllegalArgumentException other){continue;}
+                players.computeIfAbsent(id,k->find(host,k));
+            }
+        }catch(java.io.IOException ex){throw new java.io.UncheckedIOException(ex);}
+        return players.values().toArray(OfflinePlayer[]::new);
+    }
     static OfflinePlayer find(Host host,Object lookup) {
         var players=host.game.getPlayerList();
         var online=lookup instanceof UUID id?players.getPlayer(id):players.getPlayerByName((String)lookup);

@@ -47,7 +47,7 @@ final class MenuViews {
             case "setItem" -> { menu.getSlot((int)a[0]).setByPlayer(nativeItem(a[1])); yield null; }
             case "getCursor" -> BlockViews.Stack.mirror(menu.getCarried(), menu::broadcastChanges);
             case "setCursor" -> { menu.setCarried(nativeItem(a[0])); yield null; }
-            case "close" -> { player.closeContainer(); yield null; }
+            case "close" -> { mc.unity.runtime.LifeHooks.close(player,"PLUGIN",true); yield null; }
             default -> throw Views.unsupported("InventoryView", m);
         });
     }

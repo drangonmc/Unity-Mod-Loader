@@ -73,6 +73,7 @@ public final class Attachments {
         else if (data.unknown.contains(name)) data.lastGood.put(name, data.unknown.get(name).copy());
         data.unknown.remove(name);
         T old = (T)(value == null ? data.values.remove(key) : data.values.put(key, value));
+        if(owner instanceof net.minecraft.server.level.ServerLevel l)l.getDataStorage().computeIfAbsent(DimensionState.TYPE).setDirty();
         if (owner instanceof BlockEntity tile)
             tile.setChanged();
         if (owner instanceof net.minecraft.world.level.chunk.ChunkAccess chunk)
@@ -105,6 +106,15 @@ public final class Attachments {
         }
         var saved = lastGood.get(name);
         if (saved != null) result.add(name, NbtOps.INSTANCE.convertTo(ops, saved));
+    }
+    private static final class DimensionState extends net.minecraft.world.level.saveddata.SavedData {
+        final Attachments values;
+        DimensionState(Attachments data){values=data;}
+        static final net.minecraft.world.level.saveddata.SavedDataType<DimensionState> TYPE=new net.minecraft.world.level.saveddata.SavedDataType<>(
+            Identifier.parse("unity:attachments"),()->new DimensionState(new Attachments()),CODEC.xmap(DimensionState::new,s->s.values),null);
+    }
+    public static Attachments ofLevel(net.minecraft.server.level.ServerLevel level,boolean create){
+        var storage=level.getDataStorage();var state=create?storage.computeIfAbsent(DimensionState.TYPE):storage.get(DimensionState.TYPE);return state==null?null:state.values;
     }
     private static final Codec<Attachments> CODEC = new Codec<>() {
         public <O> DataResult<O> encode(Attachments data, DynamicOps<O> ops, O prefix) {

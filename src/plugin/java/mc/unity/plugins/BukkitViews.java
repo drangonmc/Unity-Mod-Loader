@@ -135,7 +135,7 @@ final class BukkitViews {
             case "getUnsafe" -> legacy;
             case "isStopping" -> !host.game.isRunning();
             case "createBlockData" -> createBlockData(a);
-            case "getVersion" -> "Unity 0.3.2-Beta (MC: 26.2)";
+            case "getVersion" -> "Unity 0.3.3-Beta (MC: 26.2)";
             case "getBukkitVersion" -> "26.2-R0.1-SNAPSHOT";
             case "getMinecraftVersion" -> "26.2";
             case "getLogger" -> Host.LOG;
@@ -158,6 +158,13 @@ final class BukkitViews {
             case "getServicesManager" -> services;
             case "getMessenger" -> messenger;
             case "getScheduler" -> scheduler;
+            case "createPlayerProfile","createProfile","createProfileExact" -> {
+                UUID id=null;String name=null;for(var x:a){if(x instanceof UUID value)id=value;if(x instanceof String value)name=value;}
+                if(id==null && (name==null || name.isBlank()))throw new IllegalArgumentException("Missing profile identity");
+                yield LoginProfiles.view(id,name,new LinkedHashSet<>());
+            }
+            case "getOfflinePlayers" -> OfflineViews.all(host);
+            case "shutdown" -> {host.game.halt(false);yield null;}
             case "getConsoleSender" -> sender(host.game.createCommandSourceStack());
             case "getPluginCommand" -> host.commands.get(a[0].toString()) instanceof PluginCommand pc ? pc : null;
             case "getWorlds" -> levels().stream().map(this::world).toList();
@@ -239,6 +246,7 @@ final class BukkitViews {
                     .map(l -> l.plugin)
                     .filter(Objects::nonNull)
                     .toArray(Plugin[] ::new);
+            case "disablePlugin" -> {host.disable((org.bukkit.plugin.java.JavaPlugin)a[0]);yield null;}
             case "isPluginEnabled" -> {
                 var p = a[0] instanceof Plugin v ? v : (Plugin)manage("getPlugin", a);
                 yield p != null &&p.isEnabled();
@@ -291,15 +299,33 @@ final class BukkitViews {
                 type = org.bukkit.entity.EntityType.valueOf(id.getPath().toUpperCase(Locale.ROOT));
             } catch (IllegalArgumentException noEnum) {}
         }
+        if(type==org.bukkit.entity.EntityType.UNKNOWN){
+            var registered=ModEntityTypes.lookup(id.toString());
+            if(registered!=null)type=registered;
+        }
         final var kind = type;
         var iface = kind.getEntityClass();
         if (iface == null)
             iface = raw instanceof net.minecraft.world.entity.LivingEntity
                         ? org.bukkit.entity.LivingEntity.class
                         : org.bukkit.entity.Entity.class;
+        if(raw instanceof net.minecraft.world.entity.LivingEntity && !org.bukkit.entity.LivingEntity.class.isAssignableFrom(iface))iface=org.bukkit.entity.LivingEntity.class;
         if(raw instanceof net.minecraft.world.entity.projectile.Projectile && !org.bukkit.entity.Projectile.class.isAssignableFrom(iface))
             iface=org.bukkit.entity.Projectile.class;
         return Views.of(iface, raw.getName().getString(), raw.getUUID(), (m, a) -> switch (m) {
+            case "getBlock","setBlock","getTransformation","setTransformation","setBrightness","getBrightness" ->
+                DisplayView.call((net.minecraft.world.entity.Display)raw,m,a);
+            case "isPersistent" -> mc.unity.runtime.EntityPresentation.canSave(raw);
+            case "setPersistent" -> {mc.unity.runtime.EntityPresentation.persistent(raw,(boolean)a[0]);yield null;}
+            case "isVisibleByDefault","getVisibleByDefault" -> mc.unity.runtime.EntityPresentation.defaultVisible(raw);
+            case "setVisibleByDefault" -> {mc.unity.runtime.EntityPresentation.defaultVisible(raw,(boolean)a[0]);yield null;}
+            case "teleport","teleportAsync" -> {
+                var to=a[0] instanceof Location l?l:((org.bukkit.entity.Entity)a[0]).getLocation();
+                to.checkFinite();var target=((NativeWorldView)Objects.requireNonNull(to.getWorld())).unityLevel();
+                java.util.function.Supplier<Boolean> move=()->!raw.isRemoved() && raw.teleportTo(target,to.getX(),to.getY(),to.getZ(),Set.of(),to.getYaw(),to.getPitch(),false);
+                if(m.equals("teleportAsync"))yield raw.level().getServer().submit(move);
+                yield move.get();
+            }
             case "getBasePotionType" -> {
                 var contents=((net.minecraft.world.entity.projectile.arrow.AbstractArrow)raw).getPickupItemStackOrigin()
                     .getOrDefault(net.minecraft.core.component.DataComponents.POTION_CONTENTS,net.minecraft.world.item.alchemy.PotionContents.EMPTY);
@@ -349,6 +375,10 @@ final class BukkitViews {
         });
     }
     private final Map<UUID,Player> playerViews=new HashMap<>();
+    private net.minecraft.world.entity.Entity nativeEntity(org.bukkit.entity.Entity entity) {
+        var world=entity.getWorld();
+        return world instanceof NativeWorldView nativeWorld?nativeWorld.unityLevel().getEntity(entity.getUniqueId()):null;
+    }
     synchronized Player player(ServerPlayer p) {
         boolean machine=mc.unity.api.MachineActors.isMachine(p);
         var cached=machine?null:playerViews.get(p.getUUID());
@@ -565,6 +595,15 @@ final class BukkitViews {
             case "isFlying" -> Objects.requireNonNull(p).getAbilities().flying;
             case "getUniqueId" -> Objects.requireNonNull(p).getUUID();
             case "getWorld" -> world((ServerLevel)Objects.requireNonNull(p).level());
+            case "hideEntity","showEntity" -> {
+                var target=nativeEntity((org.bukkit.entity.Entity)a[1]);
+                if(target!=null)mc.unity.runtime.EntityPresentation.visible(target,Objects.requireNonNull(p),a[0],m.equals("showEntity"));
+                yield null;
+            }
+            case "getEyeLocation" -> new Location(world(Objects.requireNonNull(p).level()),
+                p.getX(),p.getEyeY(),p.getZ(),p.getYRot(),p.getXRot());
+            case "getEyeHeight" -> (double)(a.length>0 && Boolean.TRUE.equals(a[0])
+                ? p.getDefaultDimensions(net.minecraft.world.entity.Pose.STANDING).eyeHeight() : p.getEyeHeight());
             case "getLocation/into" -> {
                 var where = (Location)a[0];
                 if (where != null) {
@@ -607,20 +646,26 @@ final class BukkitViews {
                 case "minecraft:the_end" -> base + "_the_end";
                 default -> id;
             };
-            return Views.of(NativeWorldView.class, name, (m, a) -> switch (m) {
+            var uid=WorldIdentifiers.load(l,base);
+            return WorldFacade.create(Views.of(NativeWorldView.class, name, (m, a) -> switch (m) {
                 case "unityLevel" -> l;
+                case "getPlayers" -> l.players().stream().map(this::player).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
                 case "createExplosion" -> host.gameplay.createExplosion(l,a);
-                case "spawnEntity" -> host.gameplay.spawn(l,a);
+                case "spawnEntity","spawn" -> host.gameplay.spawn(l,a);
                 case "dropItem","dropItemNaturally" -> host.gameplay.drop(l,a,m.equals("dropItemNaturally"));
                 case "getName" -> name;
-                case "getUID" ->
-                    UUID.nameUUIDFromBytes((base + "/" + l.getSeed() + "/" + id)
-                                               .getBytes(java.nio.charset.StandardCharsets.UTF_8));
+                case "getUID" -> uid;
                 case "getKey" -> NamespacedKey.fromString(id);
                 case "getGameRuleValue" -> {
                     if(a[0] instanceof LegacyRule<?,?> legacy)yield legacy.current(l);
                     if(a[0] instanceof BukkitRule<?> rule)yield l.getGameRules().get(rule.rule);
-                    var rule=org.bukkit.GameRule.getByName((String)a[0]);yield rule instanceof BukkitRule<?> r?String.valueOf(l.getGameRules().get(r.rule)):"";
+                    var rule=LegacyRule.find((String)a[0]);if(rule instanceof LegacyRule<?,?> legacy)yield String.valueOf(legacy.current(l));
+                    yield rule instanceof BukkitRule<?> r?String.valueOf(l.getGameRules().get(r.rule)):"";
+                }
+                case "setGameRule" -> {
+                    if(a[0] instanceof LegacyRule r){l.getGameRules().set(((BukkitRule)r.modern).rule,r.write.apply(a[1]),host.game);yield true;}
+                    if(a[0] instanceof BukkitRule r){l.getGameRules().set(r.rule,r.getType().cast(a[1]),host.game);yield true;}
+                    yield false;
                 }
                 case "getEnvironment" -> l.dimension().equals(net.minecraft.world.level.Level.OVERWORLD) ? World.Environment.NORMAL :
                     l.dimension().equals(net.minecraft.world.level.Level.NETHER) ? World.Environment.NETHER :
@@ -710,7 +755,7 @@ final class BukkitViews {
                     l.getForceLoadedChunks().contains(
                         net.minecraft.world.level.ChunkPos.pack((int)a[0], (int)a[1]));
                 default -> throw Views.unsupported("World", m);
-            });
+            }),l);
         });
     }
     private boolean loadExisting(ServerLevel level, int x, int z) {

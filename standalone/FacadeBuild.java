@@ -47,6 +47,8 @@ class FacadeBuild {
         Path classes=Path.of(args[0]);var urls=new ArrayList<URL>();urls.add(classes.toUri().toURL());
         for(var s:Files.readAllLines(Path.of(args[1])))urls.add(Path.of(s).toUri().toURL());
         try(var files=new URLClassLoader(urls.toArray(URL[]::new),ClassLoader.getPlatformClassLoader())){
+            build(classes,files,"org.bukkit.craftbukkit.block.impl.CraftBeehive","mc.unity.plugins.BeehiveFacade","org.bukkit.block.data.type.Beehive","net.minecraft.world.level.block.state.BlockState");
+            build(classes,files,"org.bukkit.craftbukkit.CraftWorld","mc.unity.plugins.WorldFacade","mc.unity.plugins.NativeWorldView","net.minecraft.server.level.ServerLevel");
             build(classes,files,"org.bukkit.craftbukkit.CraftServer","mc.unity.plugins.ServerFacade","org.bukkit.Server","net.minecraft.server.MinecraftServer");
             build(classes,files,"org.bukkit.craftbukkit.entity.CraftPlayer","org.bukkit.craftbukkit.entity.CraftHumanEntity","org.bukkit.entity.Player","net.minecraft.server.level.ServerPlayer");
         }

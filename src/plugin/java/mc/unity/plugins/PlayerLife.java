@@ -31,7 +31,7 @@ final class PlayerLife {
             keep?0:p.getExperienceReward(world,source.getEntity()),0,0,0,msg,world.getGameRules().get(GameRules.SHOW_DEATH_MESSAGES),!keep);
         event.setKeepInventory(keep);event.setKeepLevel(keep);
         host.fire(event);
-        if(event.isCancelled()){p.setHealth((float)event.getReviveHealth());return true;}
+        if(event.isCancelled()){float health=(float)event.getReviveHealth();p.setHealth(Float.isFinite(health) && health>0?Math.min(health,p.getMaxHealth()):p.getMaxHealth());return true;}
         plans.put(p,event);
         int[] xp=event.getKeepLevel()?new int[]{1,p.experienceLevel,p.totalExperience,Float.floatToIntBits(p.experienceProgress)}:
             new int[]{0,event.getNewLevel(),event.getNewTotalExp(),event.getNewExp()};

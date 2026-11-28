@@ -123,6 +123,10 @@ public final class PluginRegistries implements RegistryAccess {
                     if(a.length>1)throw Views.unsupported("ItemType","typed metadata factory");
                     yield stack;
                 }
+                case "getMaxDurability" -> (short)BuiltInRegistries.ITEM.getValue(Identifier.parse(name.toString())).components().getOrDefault(net.minecraft.core.component.DataComponents.MAX_DAMAGE,0).intValue();
+                case "getMaxStackSize" -> BuiltInRegistries.ITEM.getValue(Identifier.parse(name.toString())).components().getOrDefault(net.minecraft.core.component.DataComponents.MAX_STACK_SIZE,1);
+                case "hasBlockType" -> BuiltInRegistries.ITEM.getValue(Identifier.parse(name.toString())) instanceof net.minecraft.world.item.BlockItem;
+                case "isEdible" -> BuiltInRegistries.ITEM.getValue(Identifier.parse(name.toString())).components().has(net.minecraft.core.component.DataComponents.FOOD);
                 case "asMaterial" -> BlockViews.material(Identifier.parse(name.toString()));
                 case "createBlockData" -> {
                     var state=BuiltInRegistries.BLOCK.getOptional(Identifier.parse(name.toString())).orElseThrow().defaultBlockState();

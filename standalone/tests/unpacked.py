@@ -137,7 +137,7 @@ def run(options):
         installed_api=digest(api_game/"mods"/fabric_name,"sha512")
         if installed_api!=json.loads((extracted/"standalone/beta-gameplay.json").read_bytes())["fabricApi"]["sha512"]:raise AssertionError("Packaged full API install differs")
         worldedit=getattr(options,"worldedit_jar",None)
-        if version in ("0.2.9-Beta","0.3.0-Beta","0.3.1-Beta","0.3.2-Beta"):
+        if version in ("0.2.9-Beta","0.3.0-Beta","0.3.1-Beta","0.3.2-Beta","0.3.3-Beta"):
             transfer_source=options.neo_source
             transfer_binary=options.world_refs/"neo.jar"
             rebuilt_transfer=extracted/"neo-transfer-rebuilt.jar"

@@ -1,0 +1,54 @@
+[first.log]
+[23:15:47 INFO]: [Unity33Rules] U33 RULE VolumeA 65 true true true true
+[23:15:47 INFO]: [Unity33Rules] U33 RULE VolumeA 66 false true false true
+[23:15:47 INFO]: [Unity33Rules] U33 RULE VolumeA 67 true false true false
+[23:15:47 INFO]: [Unity33Rules] U33 RULE VolumeA 68 true false true false
+[23:15:47 INFO]: [Unity33Rules] U33 RULE VolumeA 69 true true true true
+[23:15:47 INFO]: [Unity33Rules] U33 RULE VolumeA 70 true true true true
+[23:15:47 INFO]: [Unity33Rules] U33 RULE VolumeB 65 true true true true
+[23:15:47 INFO]: [Unity33Rules] U33 RULE VolumeB 66 true true true true
+[23:15:47 INFO]: [Unity33Rules] U33 RULE VolumeB 67 true true true true
+[23:15:47 INFO]: [Unity33Rules] U33 RULE VolumeB 68 false true false true
+[23:15:47 INFO]: [Unity33Rules] U33 RULE VolumeB 69 true true true true
+[23:15:47 INFO]: [Unity33Rules] U33 RULE VolumeB 70 false true false true
+[23:16:01 INFO]: [Unity33Rules] U33 CHEST VolumeA 65 ALLOW
+[23:16:02 INFO]: [Unity33Rules] U33 CHEST VolumeA 66 DENY
+[23:16:02 INFO]: [Unity33Rules] U33 CHEST VolumeA 67 DENY
+[23:16:03 INFO]: [Unity33Rules] U33 CHEST VolumeA 68 DENY
+[23:16:03 INFO]: [Unity33Rules] U33 CHEST VolumeA 70 ALLOW
+[23:16:04 INFO]: [Unity33Rules] U33 CHEST VolumeB 65 ALLOW
+[23:16:05 INFO]: [Unity33Rules] U33 CHEST VolumeB 66 ALLOW
+[23:16:05 INFO]: [Unity33Rules] U33 CHEST VolumeB 67 ALLOW
+[23:16:06 INFO]: [Unity33Rules] U33 CHEST VolumeB 68 DENY
+[23:16:06 INFO]: [Unity33Rules] U33 CHEST VolumeB 70 DENY
+[23:16:09 INFO]: VolumeA has the following entity data: [{Slot: 4b, id: "minecraft:gold_ingot", count: 9}]
+[23:16:09 INFO]: VolumeB has the following entity data: [{Slot: 4b, id: "minecraft:iron_ingot", count: 7}]
+[firstVolumeA-client.log]
+[firstVolumeB-client.log]
+[restart.log]
+[23:16:50 INFO]: [Unity33Rules] U33 RULE VolumeA 65 true true true true
+[23:16:50 INFO]: [Unity33Rules] U33 RULE VolumeA 66 false true false true
+[23:16:50 INFO]: [Unity33Rules] U33 RULE VolumeA 67 true false true false
+[23:16:50 INFO]: [Unity33Rules] U33 RULE VolumeA 68 true false true false
+[23:16:50 INFO]: [Unity33Rules] U33 RULE VolumeA 69 true true true true
+[23:16:50 INFO]: [Unity33Rules] U33 RULE VolumeA 70 true true true true
+[23:16:50 INFO]: [Unity33Rules] U33 RULE VolumeB 65 true true true true
+[23:16:50 INFO]: [Unity33Rules] U33 RULE VolumeB 66 true true true true
+[23:16:50 INFO]: [Unity33Rules] U33 RULE VolumeB 67 true true true true
+[23:16:50 INFO]: [Unity33Rules] U33 RULE VolumeB 68 false true false true
+[23:16:50 INFO]: [Unity33Rules] U33 RULE VolumeB 69 true true true true
+[23:16:50 INFO]: [Unity33Rules] U33 RULE VolumeB 70 false true false true
+[23:16:50 INFO]: [Unity33Rules] U33 CHEST VolumeA 65 ALLOW
+[23:16:51 INFO]: [Unity33Rules] U33 CHEST VolumeA 66 DENY
+[23:16:51 INFO]: [Unity33Rules] U33 CHEST VolumeA 67 DENY
+[23:16:51 INFO]: [Unity33Rules] U33 CHEST VolumeA 68 DENY
+[23:16:52 INFO]: [Unity33Rules] U33 CHEST VolumeA 70 ALLOW
+[23:16:53 INFO]: [Unity33Rules] U33 CHEST VolumeB 65 ALLOW
+[23:16:53 INFO]: [Unity33Rules] U33 CHEST VolumeB 66 ALLOW
+[23:16:54 INFO]: [Unity33Rules] U33 CHEST VolumeB 67 ALLOW
+[23:16:55 INFO]: [Unity33Rules] U33 CHEST VolumeB 68 DENY
+[23:16:56 INFO]: [Unity33Rules] U33 CHEST VolumeB 70 DENY
+[23:16:56 INFO]: VolumeA has the following entity data: [{Slot: 4b, id: "minecraft:gold_ingot", count: 9}]
+[23:16:57 INFO]: VolumeB has the following entity data: [{Slot: 4b, id: "minecraft:iron_ingot", count: 7}]
+[restartVolumeA-client.log]
+[restartVolumeB-client.log]

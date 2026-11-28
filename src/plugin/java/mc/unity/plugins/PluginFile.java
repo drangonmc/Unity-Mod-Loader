@@ -190,7 +190,7 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
             }
             finally {
                 try { if(libraries!=null)libraries.close(); }
-                finally {super.close();}
+                finally {try{if(archive!=null)archive.close();}finally{super.close();}}
             }
         }
         private URL ownResource(String name) {return super.findResource(name);}
@@ -203,28 +203,37 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
             if(libraries!=null)urls.addAll(Collections.list(libraries.findResources(name)));
             return Collections.enumeration(urls);
         }
+        private JarFile archive;
         @Override protected Class<?> findClass(String name) throws ClassNotFoundException {
-            if(name.equals("com.sk89q.worldguard.protection.managers.migration.UUIDMigration") &&
-                    file.description().getMain().equals("com.sk89q.worldguard.bukkit.WorldGuardPlugin")){
-                try(var jar=new java.util.jar.JarFile(file.jar().toFile(),true,java.util.zip.ZipFile.OPEN_READ,Runtime.version())){
-                    var item=jar.getJarEntry(name.replace('.','/')+".class");
-                    if(item==null)throw new ClassNotFoundException(name);
-                    byte[] bytes;try(var in=jar.getInputStream(item)){bytes=in.readAllBytes();}
-                    if(item.getCodeSigners()!=null)return super.findClass(name);
-                    var origin=file.jar().toUri().toURL();String pkg=name.substring(0,name.lastIndexOf('.'));
-                    var manifest=jar.getManifest();
+            byte[] adapter=platformClasses.get(name);
+            if(adapter!=null)return defineClass(name,adapter,0,adapter.length);
+            boolean timer=name.equals("com.sk89q.worldguard.protection.managers.migration.UUIDMigration") &&
+                file.description().getMain().equals("com.sk89q.worldguard.bukkit.WorldGuardPlugin");
+            if(!timer && file.description().getAPIVersion()==null)return super.findClass(name);
+            try {
+                var entry=archive.getJarEntry(name.replace('.','/')+".class");
+                if(entry==null)throw new ClassNotFoundException(name);
+                byte[] bytes;
+                try(var in=archive.getInputStream(entry)){bytes=in.readAllBytes();}
+                var signers=entry.getCodeSigners();
+                if(signers==null){
+                    if(file.description().getAPIVersion()!=null)bytes=ModernMaterials.transform(bytes,this);
+                    if(timer)bytes=PluginTimers.migration(bytes,this);
+                }
+                var origin=file.jar().toUri().toURL();
+                int dot=name.lastIndexOf('.');
+                if(dot>0){
+                    String pkg=name.substring(0,dot);
+                    var manifest=archive.getManifest();
                     if(getDefinedPackage(pkg)==null)try{
                         if(manifest!=null)definePackage(pkg,manifest,origin);else definePackage(pkg,null,null,null,null,null,null,null);
                     }catch(IllegalArgumentException race){if(getDefinedPackage(pkg)==null)throw race;}
-                    var defined=getDefinedPackage(pkg);
-                    if(defined.isSealed() && !defined.isSealed(origin))throw new SecurityException("Sealed package "+pkg);
-                    bytes=PluginTimers.migration(bytes,this);
-                    return defineClass(name,bytes,0,bytes.length,new java.security.CodeSource(origin,(java.security.CodeSigner[])null));
-                }catch(IOException failure){throw new ClassNotFoundException(name,failure);}
-            }
-            byte[] data=platformClasses.get(name);
-            return data==null ? super.findClass(name) : defineClass(name,data,0,data.length);
+                    if(getDefinedPackage(pkg).isSealed() && !getDefinedPackage(pkg).isSealed(origin))throw new SecurityException("Sealed package "+pkg);
+                }
+                return defineClass(name,bytes,0,bytes.length,new java.security.CodeSource(origin,signers));
+            }catch(IOException failure){throw new ClassNotFoundException(name,failure);}
         }
+
         Loader(PluginFile file, Host host) throws Exception {
             super(file.name(), new URL[] {file.jar.toUri().toURL()}, Host.class.getClassLoader());
             this.file = file;
@@ -241,6 +250,7 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
 
                 }
             }
+            archive=new JarFile(file.jar().toFile(),true,java.util.zip.ZipFile.OPEN_READ,Runtime.version());
         }
         void link(Map<String, Loader> available) {
             if (!file.description().getLibraries().isEmpty()) {
