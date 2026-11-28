@@ -13,7 +13,8 @@ public final class ServerHooks {
     private static Platforms forge;
     private static PluginSession plugins;
     private static List<TickingMod> ticking = List.of();
-    private static MinecraftServer running, preparing;
+    private static volatile MinecraftServer running, preparing;
+    public static MinecraftServer currentServer(){return running!=null?running:preparing;}
     public static void about(MinecraftServer server) {preparing=server;mc.unity.core.Events.about(server); }
     private static boolean stopping;
     private static boolean sharedClientSession;
@@ -56,6 +57,7 @@ public final class ServerHooks {
     }
     public static Component playerMessage(Component text, net.minecraft.server.level.ServerPlayer player,
                                           boolean join) {
+        if (join)pendingLogins.values().remove(player);
         return plugins == null ? text : plugins.host().playerMessage(text, player, join);
     }
     public static boolean changeSlot(net.minecraft.server.level.ServerPlayer player, int slot) {
@@ -105,6 +107,7 @@ public final class ServerHooks {
             plugins.host().levelTick(player);
     }
     public static void chunkLoad(net.minecraft.world.level.chunk.LevelChunk chunk, boolean fresh) {
+        if(!mc.unity.core.Events.CHUNK_LOAD.empty())mc.unity.core.Events.CHUNK_LOAD.post(new mc.unity.core.Events.ChunkTransition(chunk,fresh));
         if (plugins != null && chunk.getLevel() instanceof net.minecraft.server.level.ServerLevel)
             plugins.host().chunkLoad(chunk, fresh);
     }
@@ -135,11 +138,20 @@ public final class ServerHooks {
         if(c.isConnected()){c.send(new net.minecraft.network.protocol.login.ClientboundLoginDisconnectPacket(denial));c.disconnect(denial);}
         return false;
     }
+    private static final java.util.Map<net.minecraft.network.Connection,net.minecraft.server.level.ServerPlayer> pendingLogins=java.util.Collections.synchronizedMap(new java.util.IdentityHashMap<>());
+    public static void pluginDisconnected(net.minecraft.network.Connection connection){
+        if(connection.isConnected())return;
+        var player=pendingLogins.remove(connection);
+        var session=plugins;
+        var host=session==null?null:session.host();
+        if(player!=null && host!=null)player.level().getServer().execute(()->host.forgetLogin(player));
+    }
     public static boolean allowPluginPlacement(net.minecraft.network.Connection c,net.minecraft.server.level.ServerPlayer p){
         if(plugins==null || !(c.getRemoteAddress() instanceof java.net.InetSocketAddress remote))return true;
+        pendingLogins.put(c,p);
         var denial=plugins.host().login(p,remote.getAddress());
         if(denial==null)return true;
-        c.disconnect(denial);return false;
+        pendingLogins.remove(c);c.disconnect(denial);return false;
     }
     public static void worldSave(net.minecraft.server.level.ServerLevel level) {
         if (plugins != null)
@@ -160,7 +172,7 @@ public final class ServerHooks {
         dispatcher.register(Commands.literal("unity").executes(c -> {
             c.getSource().sendSuccess(
                 ()
-                    -> Component.literal("Unity 0.2.9-Beta standalone | MC 26.2 | native " + names() +
+                    -> Component.literal("Unity 0.3.0-Beta standalone | MC 26.2 | native " + names() +
                                          " | platform mods " + forge.ids() + " | plugins " +
                                          (plugins == null ? List.of() : plugins.host().names())),
                 false);
@@ -198,6 +210,7 @@ public final class ServerHooks {
         }
     }
     public static void stopped(MinecraftServer server) {
+        pendingLogins.clear();
         if (nativeMods == null || (sharedClientSession && server!=running && server!=preparing) || (running != null && server != running))
             return;
         running = null; preparing=null;

@@ -42,7 +42,8 @@ final class PluginSession implements AutoCloseable {
         private static boolean owned(String n) {
             return n.startsWith("org.bukkit.") || n.startsWith("io.papermc.paper.") ||
                 n.startsWith("com.destroystokyo.paper.") || n.startsWith("net.kyori.") ||
-                n.startsWith("org.eclipse.aether.") || n.startsWith("org.apache.maven.") || n.startsWith("org.codehaus.plexus.") ||
+                n.startsWith("org.eclipse.sisu.") || n.startsWith("org.json.simple.") || n.startsWith("org.apache.commons.codec.") ||
+                n.startsWith("javax.inject.") || n.startsWith("org.apache.commons.logging.") || n.startsWith("org.eclipse.aether.") || n.startsWith("org.apache.maven.") || n.startsWith("org.codehaus.plexus.") ||
                 n.startsWith("org.apache.http.") || n.startsWith("org.yaml.snakeyaml.") || n.startsWith("net.md_5.bungee.") || n.startsWith("mc.unity.plugins.");
         }
         @Override

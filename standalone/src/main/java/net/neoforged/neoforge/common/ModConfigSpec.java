@@ -126,6 +126,10 @@ public final class ModConfigSpec implements IConfigSpec {
         }
         public BooleanValue define(String k, boolean v) { return put(k, new BooleanValue(v)); }
         @SuppressWarnings("unchecked")
+        public <T> ConfigValue<T> define(String k,T value) {
+            Objects.requireNonNull(value);
+            return define(k,value,value.getClass()::isInstance);
+        }
         public <T> ConfigValue<T> define(String k, T v, Predicate<Object> valid) {
             return put(k, new ConfigValue<>(v, raw -> valid.test(raw) ? (T)raw : null));
         }

@@ -1,0 +1,16 @@
+[first.log]
+[14:52:18 INFO]: [Unity29Probe] UNITY29 write VolumeA permission=LuckPerms economy=EssentialsX Economy balance=291.0 pdc=291
+[14:52:18 INFO]: VolumeA has the following entity data: 17.0f
+[14:52:19 INFO]: [Unity29Probe] UNITY29 write VolumeB permission=LuckPerms economy=EssentialsX Economy balance=292.0 pdc=292
+[14:52:19 INFO]: VolumeB has the following entity data: 15.0f
+[14:52:22 INFO]: VolumeA has the following entity data: [24.5d, 80.0d, 5.5d]
+[firstVolumeA-client.log]
+[firstVolumeB-client.log]
+[restart.log]
+[14:53:10 INFO]: [Unity29Probe] UNITY29 read VolumeA permission=LuckPerms economy=EssentialsX Economy balance=291.0 pdc=291
+[14:53:10 INFO]: VolumeA has the following entity data: 17.0f
+[14:53:10 INFO]: [Unity29Probe] UNITY29 read VolumeB permission=LuckPerms economy=EssentialsX Economy balance=292.0 pdc=292
+[14:53:10 INFO]: VolumeB has the following entity data: 15.0f
+[14:53:11 INFO]: VolumeA has the following entity data: [24.5d, 80.0d, 5.5d]
+[restartVolumeA-client.log]
+[restartVolumeB-client.log]

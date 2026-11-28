@@ -8,7 +8,7 @@ import javax.tools.ToolProvider;
 
 /** JDK-only source build. Arguments: project directory, original 26.2 Mojang server bundle. */
 class Build {
-    static final String VERSION = "0.2.9-Beta";
+    static final String VERSION = "0.3.0-Beta";
     public static void main(String[] args) throws Exception {
         if (args.length < 2 || args.length > 3)
             throw new IllegalArgumentException(
@@ -55,7 +55,8 @@ class Build {
                 try(var jar=new JarFile(file.toFile(),true)){for(var e:Collections.list(jar.entries())){
                     var n=e.getName();if(e.isDirectory()||n.endsWith("module-info.class")||n.startsWith("META-INF/versions/"))continue;
                     boolean license=n.toLowerCase(Locale.ROOT).contains("license")||n.toLowerCase(Locale.ROOT).contains("notice");
-                    if(!n.endsWith(".class")&&!n.equals("org/spongepowered/asm/mixin/refmap/mixin.refmap.json")&&!license)continue;
+                    boolean neoSource=part[1].startsWith("unity-neo-transfer-") && n.startsWith("META-INF/unity-sources/") && n.endsWith(".java");
+                    if(!n.endsWith(".class")&&!n.equals("org/spongepowered/asm/mixin/refmap/mixin.refmap.json")&&!license&&!neoSource)continue;
                     var out=license?bundled.resolve("META-INF/licenses/"+part[1]+"/"+n):bundled.resolve(n);
                     Files.createDirectories(out.getParent());try(var in=jar.getInputStream(e)){Files.copy(in,out);}
                 }}

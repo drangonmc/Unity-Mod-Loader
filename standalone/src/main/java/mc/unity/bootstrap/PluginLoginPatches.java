@@ -1,5 +1,6 @@
 package mc.unity.bootstrap;
 import java.lang.classfile.*;
+import java.lang.classfile.instruction.ReturnInstruction;
 import java.lang.constant.*;
 import static java.lang.constant.ConstantDescs.*;
 
@@ -13,6 +14,12 @@ final class PluginLoginPatches {
         var player=ClassDesc.of("net.minecraft.server.level.ServerPlayer");
         var hook=ClassDesc.of("mc.unity.runtime.ServerHooks");
         // Apply after the registry gate so pre-login runs while vanilla is still in VERIFYING.
+        plan.add("net/minecraft/network/Connection",321,"Bukkit connection","disconnect cleanup",(cf,m)->{
+            int[] hits={0};
+            var bytes=cf.transformClass(m,ClassTransform.transformingMethodBodies(method->method.methodName().equalsString("handleDisconnection") && method.methodType().equalsString("()V"),
+                (c,e)->{if(e instanceof ReturnInstruction){hits[0]++;c.aload(0).invokestatic(hook,"pluginDisconnected",MethodTypeDesc.of(CD_void,conn));}c.with(e);}));
+            if(hits[0]==0)throw new IllegalStateException("Missing disconnect anchor");return bytes;
+        });
         plan.add(login,321,"Bukkit connection","asynchronous pre-login", (cf,m)->{
             int[] hits={0};
             var out=cf.transformClass(m,ClassTransform.transformingMethodBodies(

@@ -17,7 +17,7 @@ def run(o):
     plugin_build(base.ROOT,next(o.plugins.glob("Vault*.jar")),o.cache,pl/"Unity29Probe.jar")
     (g/"cache").mkdir();shutil.copy2(o.cache/"mojang-server-26.2.jar",g/"cache/mojang_26.2.jar")
     with (g/"server.properties").open("a") as file:file.write("difficulty=normal\n")
-    loader=o.dist/"unity-loader-0.2.9-Beta.jar";rows=[]
+    loader=o.dist/("unity-loader-"+getattr(o,"version","0.2.9-Beta")+".jar");rows=[]
     command=["java","-Dstdout.encoding=UTF-8","-Dstderr.encoding=UTF-8","-Dterminal.jline=false","-Dterminal.ansi=false","-XX:ActiveProcessorCount=4","-Xmx2g","-jar",str(paper),"--nogui"]
     os.environ["PAPER_DEFAULT_CENTRAL_REPOSITORY"]="https://repo.maven.apache.org/maven2/"
     for phase in ("first","restart"):
@@ -51,9 +51,10 @@ def run(o):
             for w in ws:exited(w)
             s.send("save-all flush","Saved the game",120)
     assert rows[0]==rows[1]
-    (out/"result.json").write_text(json.dumps({"runs":rows,"paper":digest(paper),"client":digest(loader),"probe":digest(pl/"Unity29Probe.jar"),
+    (out/"result.json").write_text(json.dumps({"runs":rows,"paper":digest(paper),"client":digest(loader),"pdcWire":{n:digest(pl/"Unity29Probe"/("pdc-"+n+".nbt")) for n in base.NAMES},"probe":digest(pl/"Unity29Probe.jar"),
         "plugins":{f.name:digest(f,"sha512") for f in o.plugins.glob("*.jar")},"logs":{f.name:digest(f) for f in out.glob("*.log")}},indent=2),"utf8")
 if __name__=="__main__":
     p=argparse.ArgumentParser()
+    p.add_argument("--version",default="0.2.9-Beta")
     for name in ("paper","dist","cache","eula","out","plugins"):p.add_argument("--"+name,type=lambda s:Path(s).resolve(),required=True)
     run(p.parse_args())

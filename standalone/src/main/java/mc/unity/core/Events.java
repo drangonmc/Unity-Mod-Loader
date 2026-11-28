@@ -57,6 +57,29 @@ public final class Events {
     }
     public static final TickSignal SERVER_TICK_PRE = new TickSignal(), SERVER_TICK_POST = new TickSignal();
     public static final Signal<Void> CLIENT_TICK_PRE = new Signal<>(), CLIENT_TICK_POST = new Signal<>();
+    public record LevelTick(net.minecraft.server.level.ServerLevel level,java.util.function.BooleanSupplier time) {}
+    public record ChunkTransition(net.minecraft.world.level.chunk.LevelChunk chunk,boolean fresh) {}
+    public static final Signal<LevelTick> LEVEL_TIME_PRE=new Signal<>(),LEVEL_TIME_POST=new Signal<>();
+    public static final Signal<ChunkTransition> CHUNK_LOAD=new Signal<>();
+    public static final Signal<net.minecraft.world.level.chunk.LevelChunk> CHUNK_UNLOAD=new Signal<>();
+    public static final class Joining {
+        public final net.minecraft.world.entity.Entity entity;
+        public final boolean loaded;
+        public boolean cancelled;
+        Joining(net.minecraft.world.entity.Entity entity,boolean loaded){this.entity=entity;this.loaded=loaded;}
+    }
+    public static final Signal<Joining> ENTITY_JOIN=new Signal<>();
+    public static boolean joinEntity(Object object,boolean loaded){
+        if(ENTITY_JOIN.empty() || !(object instanceof net.minecraft.world.entity.Entity entity))return true;
+        var joining=new Joining(entity,loaded);ENTITY_JOIN.post(joining);return !joining.cancelled;
+    }
+    public static void beforeLevelTick(net.minecraft.server.level.ServerLevel level,java.util.function.BooleanSupplier time) {
+        beforeLevelTick(level);if(!LEVEL_TIME_PRE.empty())LEVEL_TIME_PRE.post(new LevelTick(level,time));
+    }
+    public static void afterLevelTick(net.minecraft.server.level.ServerLevel level,java.util.function.BooleanSupplier time) {
+        if(!LEVEL_TIME_POST.empty())LEVEL_TIME_POST.post(new LevelTick(level,time));afterLevelTick(level);
+    }
+    public static void chunkUnloaded(net.minecraft.world.level.chunk.LevelChunk chunk){CHUNK_UNLOAD.post(chunk);}
     public static final Signal<net.minecraft.server.level.ServerPlayer> PLAYER_LOGIN = new Signal<>(),
                                                                         PLAYER_LOGOUT = new Signal<>();
     public static void about(net.minecraft.server.MinecraftServer s) {
@@ -184,6 +207,7 @@ public final class Events {
         LEVEL_LOAD.clear();
         LEVEL_UNLOAD.clear();
         REGISTRY.clear();
+        LEVEL_TIME_PRE.clear();LEVEL_TIME_POST.clear();CHUNK_LOAD.clear();CHUNK_UNLOAD.clear();ENTITY_JOIN.clear();
         LEVEL_TICK_PRE.clear();
         LEVEL_TICK_POST.clear();
         SERVER_TICK_PRE.clear();

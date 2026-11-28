@@ -38,7 +38,7 @@ public final class MenuData {
         },true);
         registered=true;
     }
-    public static synchronized void close(){registered=false;synchronized(received){received.clear();}}
+    public static synchronized void close(){WRITER.remove();registered=false;synchronized(received){received.clear();}}
     public static OptionalInt open(Player p,MenuProvider provider,Consumer<RegistryFriendlyByteBuf> writer) {
         if(!(p instanceof ServerPlayer sp))return OptionalInt.empty();
         var previous=WRITER.get();WRITER.set(Objects.requireNonNull(writer));

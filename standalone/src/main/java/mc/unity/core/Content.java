@@ -354,6 +354,7 @@ public final class Content {
         tabOrder.clear();
         Events.clear();
         ConfigurationNetwork.clear();
+        LivingFlow.clear();
         PlayNetwork.clear();
         LoginSync.clear();
     }

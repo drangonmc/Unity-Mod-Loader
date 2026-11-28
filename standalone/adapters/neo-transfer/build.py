@@ -14,7 +14,12 @@ CLASSES=("transfer/TransferPreconditions","transfer/ResourceHandler","transfer/R
          "event/entity/player/PlayerInteractEvent","client/model/quad/BakedColors","client/event/RegisterPictureInPictureRenderersEvent","client/gui/PictureInPictureRendererRegistration",
          "common/extensions/ContainerExtension","common/MutableDataComponentHolder","world/inventory/StackCopySlot","transfer/DelegatingResourceHandler","transfer/IndexModifier","transfer/ItemAccessResourceHandler","fluids/capability/FluidResourceHandlerAdapter",
          "common/extensions/IMenuTypeExtension","network/IContainerFactory","client/event/RegisterItemModelsEvent","client/event/RegisterSpecialModelRendererEvent",
-         "client/event/ExtractBlockOutlineRenderStateEvent","client/event/SubmitCustomGeometryEvent","client/IRenderableSection","client/CustomBlockOutlineRenderer","event/entity/player/FluidTooltipEvent")
+         "client/event/ExtractBlockOutlineRenderStateEvent","client/event/SubmitCustomGeometryEvent","client/IRenderableSection","client/CustomBlockOutlineRenderer","event/entity/player/FluidTooltipEvent",
+         "event/level/BlockEvent","event/level/block/BreakBlockEvent","common/util/BlockSnapshot",
+         "event/entity/player/AttackEntityEvent","event/tick/LevelTickEvent","event/level/LevelEvent","event/level/ChunkEvent","event/entity/EntityJoinLevelEvent",
+         "common/damagesource/DamageContainer","common/damagesource/IReductionFunction",
+         "event/entity/living/LivingShieldBlockEvent","event/entity/living/LivingIncomingDamageEvent","event/entity/living/LivingDamageEvent",
+         "event/entity/living/LivingDeathEvent","event/entity/living/LivingDropsEvent")
 def build(binary,source,out):
     expect=(Path(__file__).parent/"inputs.sha256").read_text().splitlines()
     for f,h in zip((binary,source),expect,strict=True):

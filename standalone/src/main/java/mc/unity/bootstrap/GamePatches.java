@@ -84,6 +84,7 @@ final class GamePatches {
         LevelPatches.add(plan);
         BukkitPatches.add(plan);
         ActionPatches.add(plan, client);
+        LivingEventPatches.add(plan);
         PluginLoginPatches.add(plan);
         if (client) {TransferPatches.client(plan);MachineRenderPatches.add(plan); }
         ExtendedMenus.add(plan);

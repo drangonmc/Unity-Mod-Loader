@@ -4,7 +4,7 @@
   "newAdapterRebuild": {
     "unity-biome-adapter-0.2.3.jar": "b58cfab9f9e2538a5668ba2bfc8de91afdf17bd237a1ddd0cbb7e297054f8665",
     "unity-transfer-adapter-0.2.3.jar": "c8c8026fb951d3922fd7ccd247445c97558f3bb1e1eee0518b30b83aa4a5ca01",
-    "unity-neo-transfer-26.2.0.93.jar": "bee01c76e569e2528d5394467f7a732729b26902855334d092361e4a1cbcab2d"
+    "unity-neo-transfer-26.2.0.93.jar": "f546988657791abdeec7d5d09e025c288f49b9ffa4161e813b07cc463ba95bf7"
   },
   "worldFixtureRebuild": {
     "worldprobe.jar": "e4ce17c88f34fbd336e505dbe8cc0bf14d635cd4dfe7cde3e60edfd29301a1e3",
@@ -12,39 +12,38 @@
     "worldprobe_neo.jar": "d9b8b575555b7df1c1c914cbc964cd734ccb2071ffa990d6ceb5aeba37829fe1",
     "native/worldprobe-native.jar": "b8990714e60da7f765e344428a861064808b8a0672b5cf374e56d3d99e9bde34"
   },
-  "clientApiRebuildSHA256": "0d440d6ea2012ebc6d0e437ad6c04d7cddd542620bfee80e97faca67da4082eb",
+  "clientApiRebuildSHA256": "d3a2657eb5ba5c828508307f5d577c796dc403846ecbd473c9a4b24378271ca4",
   "adapterRebuildSHA256": "186bca4d3cf1d03a04acacfa46760687d91584acdd5ba5924e0e1b3440b26ab5",
-  "archiveSHA256": "fd5d692671e4dae921c6fed8c4b7f6483dfaac475e357db806dc86d20106688f",
+  "archiveSHA256": "58536e9b10f2f50cf6ac016f2ebc6b871395ae5ee883a5e8d9e0f27bb63cdce7",
   "serverStarts": 2,
   "worldCount": 1,
   "checks": {
     "packaged-start": [
-      "[12:50:49] [Server thread/INFO]: [STDOUT]: [Unity] Standalone ready; native [world-marker]",
-      "[12:50:49] [Server thread/INFO]: Unity 0.2.9-Beta standalone | MC 26.2 | native [world-marker] | platform mods [alwaysshield, back-command, bedrockcrafter-fabric, commandsspy, cratedelight, crop_harvest, fabric-api-lookup-api-v1, fabric-biome-api-v1, fabric-block-api-v1, fabric-loot-api-v3, fabric-rendering-fluids-v1, fabric-transfer-api-v1, immersiveores, inventorystorages, laserbladetools, mcwfences, moreberryuses, morebricks, multiloaderdataextensions, playerabilitylib, puzzleslib, blockrunner, pvpcontrol, randomitem, repair_commands, simplekillcommand, stackedblocks, storagedelight, treefeller, verticalslabs] | plugins []",
-      "[12:51:06] [Server thread/INFO]: [Not Secure] [Server] PACKAGED_WAIT",
-      "[12:51:06] [Server thread/INFO]: [Not Secure] [Server] PACKAGED_WAIT",
-      "[12:51:06] [Server thread/INFO]: [Not Secure] [Server] PACKAGED_WAIT",
-      "[12:51:07] [Server thread/INFO]: [Not Secure] [Server] PACKAGED_READY",
-      "[12:51:07] [Server thread/INFO]: Unity marker placed on game tick at 3, 300, 3; total 1",
-      "[12:51:07] [Server thread/INFO]: [Not Secure] [Server] PACKAGED_WORLD",
-      "[12:51:07] [Server thread/INFO]: Storage unity_example:marks has the following contents: 1",
-      "[12:51:07] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_oak_wood",
-      "[12:51:07] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_cobblestone",
-      "[12:51:07] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_red_dye",
-      "[12:51:07] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_diamond_pickaxe",
-      "[12:51:08] [Server thread/INFO]: Saved the game"
+      "[14:56:56] [Server thread/INFO]: [STDOUT]: [Unity] Standalone ready; native [world-marker]",
+      "[14:56:56] [Server thread/INFO]: Unity 0.3.0-Beta standalone | MC 26.2 | native [world-marker] | platform mods [alwaysshield, back-command, bedrockcrafter-fabric, commandsspy, cratedelight, crop_harvest, fabric-api-lookup-api-v1, fabric-biome-api-v1, fabric-block-api-v1, fabric-loot-api-v3, fabric-rendering-fluids-v1, fabric-transfer-api-v1, immersiveores, inventorystorages, laserbladetools, mcwfences, moreberryuses, morebricks, multiloaderdataextensions, playerabilitylib, puzzleslib, blockrunner, pvpcontrol, randomitem, repair_commands, simplekillcommand, stackedblocks, storagedelight, treefeller, verticalslabs] | plugins []",
+      "[14:57:15] [Server thread/INFO]: [Not Secure] [Server] PACKAGED_WAIT",
+      "[14:57:16] [Server thread/INFO]: [Not Secure] [Server] PACKAGED_WAIT",
+      "[14:57:16] [Server thread/INFO]: [Not Secure] [Server] PACKAGED_READY",
+      "[14:57:16] [Server thread/INFO]: Unity marker placed on game tick at 3, 300, 3; total 1",
+      "[14:57:16] [Server thread/INFO]: [Not Secure] [Server] PACKAGED_WORLD",
+      "[14:57:16] [Server thread/INFO]: Storage unity_example:marks has the following contents: 1",
+      "[14:57:16] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_oak_wood",
+      "[14:57:16] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_cobblestone",
+      "[14:57:16] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_red_dye",
+      "[14:57:16] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_diamond_pickaxe",
+      "[14:57:18] [Server thread/INFO]: Saved the game"
     ],
     "packaged-restart": [
-      "[12:51:37] [Server thread/INFO]: [STDOUT]: [Unity] Standalone ready; native [world-marker]",
-      "[12:51:37] [Server thread/INFO]: Unity 0.2.9-Beta standalone | MC 26.2 | native [world-marker] | platform mods [alwaysshield, back-command, bedrockcrafter-fabric, commandsspy, cratedelight, crop_harvest, fabric-api-lookup-api-v1, fabric-biome-api-v1, fabric-block-api-v1, fabric-loot-api-v3, fabric-rendering-fluids-v1, fabric-transfer-api-v1, immersiveores, inventorystorages, laserbladetools, mcwfences, moreberryuses, morebricks, multiloaderdataextensions, playerabilitylib, puzzleslib, blockrunner, pvpcontrol, randomitem, repair_commands, simplekillcommand, stackedblocks, storagedelight, treefeller, verticalslabs] | plugins []",
-      "[12:51:37] [Server thread/INFO]: [Not Secure] [Server] PACKAGED_READY",
-      "[12:51:37] [Server thread/INFO]: [Not Secure] [Server] PACKAGED_WORLD",
-      "[12:51:37] [Server thread/INFO]: Storage unity_example:marks has the following contents: 1",
-      "[12:51:37] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_oak_wood",
-      "[12:51:37] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_cobblestone",
-      "[12:51:37] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_red_dye",
-      "[12:51:37] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_diamond_pickaxe",
-      "[12:51:38] [Server thread/INFO]: Saved the game"
+      "[14:57:56] [Server thread/INFO]: [STDOUT]: [Unity] Standalone ready; native [world-marker]",
+      "[14:57:56] [Server thread/INFO]: Unity 0.3.0-Beta standalone | MC 26.2 | native [world-marker] | platform mods [alwaysshield, back-command, bedrockcrafter-fabric, commandsspy, cratedelight, crop_harvest, fabric-api-lookup-api-v1, fabric-biome-api-v1, fabric-block-api-v1, fabric-loot-api-v3, fabric-rendering-fluids-v1, fabric-transfer-api-v1, immersiveores, inventorystorages, laserbladetools, mcwfences, moreberryuses, morebricks, multiloaderdataextensions, playerabilitylib, puzzleslib, blockrunner, pvpcontrol, randomitem, repair_commands, simplekillcommand, stackedblocks, storagedelight, treefeller, verticalslabs] | plugins []",
+      "[14:57:57] [Server thread/INFO]: [Not Secure] [Server] PACKAGED_READY",
+      "[14:57:57] [Server thread/INFO]: [Not Secure] [Server] PACKAGED_WORLD",
+      "[14:57:57] [Server thread/INFO]: Storage unity_example:marks has the following contents: 1",
+      "[14:57:57] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_oak_wood",
+      "[14:57:57] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_cobblestone",
+      "[14:57:57] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_red_dye",
+      "[14:57:57] [Server thread/INFO]: [Not Secure] [Server] TAG_OK_diamond_pickaxe",
+      "[14:57:57] [Server thread/INFO]: Saved the game"
     ]
   },
   "installedSamples": {
@@ -111,13 +110,13 @@
   },
   "clientProfile": "mc.unity.bootstrap.ClientEntry",
   "byteIdenticalRebuild": {
-    "unity-client-witness.jar": "f9e984be508c4e7d58d8e83ef2af21fe06eb270f09fab981162935bc3ab2d27f",
-    "unity-loader-0.2.9-Beta.jar": "ea275f5dce5d93afa70ba1a3b251ebf6bc3c1d1cb852746e494da56928395d30",
+    "unity-client-witness.jar": "aae22888838ce74356947a246fbd69efed9194ab11e72eb13529ee52ea2b85f6",
+    "unity-loader-0.3.0-Beta.jar": "1194063810b8554311704e6788cc5956ed379104ea500c7ae6a632323f8e760d",
     "unity-world-marker.jar": "635ac8142b421d04bdd98dc240e7da855d5b2022e83665ac6b500457038fd9be",
     "UnityEditRegions.jar": "7175974a1d4d0a3bf3ffc18c8bbc284dfe59954cc371cb6746e78859f283deb8"
   },
   "logSHA256": {
-    "packaged-start.log": "adf5d7d4d65973634abfce0918af7b01a2b6c278dcf8bc685bd09012c483802e",
-    "packaged-restart.log": "fb8fdd2fe733bd1a070bf05f845fd9bfc246743c00198d2232421cdd40836872"
+    "packaged-start.log": "885529b2a04fcc3c7b5fcfafda52d86717e6a403c874cfd981926f90d04ea836",
+    "packaged-restart.log": "aede23ad30410ab4929d1b2f0064b6e4caee29ffcf0ba46b29d7bd3ba25b3928"
   }
 }

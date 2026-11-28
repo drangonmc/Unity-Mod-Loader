@@ -439,11 +439,16 @@ public final class Host implements PluginHost {
     }
     @Override
     public void entityUntracked(net.minecraft.world.entity.Entity e) { if (views!=null) views.forget(e); }
+    private net.minecraft.network.chat.Component nativeReason(net.kyori.adventure.text.Component rich) {
+        var json=net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().serializeToTree(rich);
+        return net.minecraft.network.chat.ComponentSerialization.CODEC.parse(game.registryAccess().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE),json).getOrThrow();
+    }
+    @Override public void forgetLogin(ServerPlayer p){if(views!=null)views.forgetIfCurrent(p);}
     @Override public net.minecraft.network.chat.Component preLogin(com.mojang.authlib.GameProfile profile,java.net.InetAddress address) {
         if (org.bukkit.event.player.AsyncPlayerPreLoginEvent.getHandlerList().getRegisteredListeners().length==0)return null;
         var event=new org.bukkit.event.player.AsyncPlayerPreLoginEvent(profile.name(),address,profile.id(),false,LoginProfiles.view(profile));
         fire(event);
-        return event.getLoginResult()==org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result.ALLOWED?null:net.minecraft.network.chat.Component.literal(event.getKickMessage());
+        return event.getLoginResult()==org.bukkit.event.player.AsyncPlayerPreLoginEvent.Result.ALLOWED?null:nativeReason(event.kickMessage());
     }
     @Override public net.minecraft.network.chat.Component login(ServerPlayer raw,java.net.InetAddress address){
         if (org.bukkit.event.player.PlayerLoginEvent.getHandlerList().getRegisteredListeners().length==0)return null;
@@ -451,7 +456,7 @@ public final class Host implements PluginHost {
         fire(event);
         if(event.getResult()==org.bukkit.event.player.PlayerLoginEvent.Result.ALLOWED)return null;
         views.forget(raw.getUUID());
-        return net.minecraft.network.chat.Component.literal(event.getKickMessage());
+        return nativeReason(event.kickMessage());
     }
     @Override
     public void worldEvent(ServerLevel level, boolean load) {

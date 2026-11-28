@@ -4,7 +4,7 @@ from pathlib import Path
 
 def validate(root,options,digest):
     pins=json.loads((root/"standalone/tests/reference/review29/originals.json").read_bytes())
-    engine=digest(options.dist/"unity-loader-0.2.9-Beta.jar")
+    engine=digest(options.dist/("unity-loader-"+getattr(options,"version","0.2.9-Beta")+".jar"))
     expected={r["filename"]:r["sha512"] for r in pins["plugins"]}
     reports={}
     for host in ("unity","paper"):

@@ -48,6 +48,16 @@ public class PluginRoundTrip extends JavaPlugin {
                 var copied=p.getPersistentDataContainer().getAdapterContext().newPersistentDataContainer();
                 copied.readFromBytes(bytes);
                 if(!Objects.equals(value,copied.get(key,PersistentDataType.INTEGER)))throw new AssertionError("PDC bytes");
+                var fixture=copied.getAdapterContext().newPersistentDataContainer();
+                var nested=PersistentDataType.LIST.listTypeFrom(PersistentDataType.LIST.integers());
+                var nestedKey=new NamespacedKey(this,"cross_host_fixture");
+                var contents=List.of(List.of(17,29),List.of(3));
+                fixture.set(nestedKey,nested,contents);
+                var wire=fixture.serializeToBytes();
+                copied.readFromBytes(wire,true);
+                if (!contents.equals(copied.get(nestedKey,nested))) throw new AssertionError("cross-host list encoding");
+                java.nio.file.Files.createDirectories(getDataFolder().toPath());
+                java.nio.file.Files.write(getDataFolder().toPath().resolve("pdc-"+p.getName()+".nbt"),wire);
             }catch(java.io.IOException e){throw new IllegalStateException(e);}
             var stack=new ItemStack(Material.PAPER,leader?3:5);
             var meta=stack.getItemMeta();meta.getPersistentDataContainer().set(key,PersistentDataType.STRING,"tag-"+value);stack.setItemMeta(meta);

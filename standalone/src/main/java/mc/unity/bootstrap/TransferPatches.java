@@ -51,8 +51,14 @@ final class TransferPatches {
             var value=ClassDesc.of("net.neoforged.neoforge.transfer."+(item?"item.ItemResource":"fluid.FluidResource"));
             var fn=ClassDesc.of("java.util.function.Function");
             plan.add(source.replace('.','/'),170,"NeoForge transfer","default resource",(cf,model)->cf.transformClass(model,ClassTransform.endHandler(b->{
-                b.withField("unityResource",value,ClassFile.ACC_PRIVATE);
-                b.withMethodBody("computeDefaultResource",MethodTypeDesc.of(value,fn),ClassFile.ACC_PUBLIC|ClassFile.ACC_SYNCHRONIZED,c->{
+                var sig=MethodTypeDesc.of(value,fn);
+                b.withField("unityResource",value,ClassFile.ACC_PRIVATE|ClassFile.ACC_VOLATILE);
+                b.withMethodBody("computeDefaultResource",sig,ClassFile.ACC_PUBLIC,c->{
+                    var miss=c.newLabel();
+                    c.aload(0).getfield(owner,"unityResource",value).dup().ifnull(miss).areturn().labelBinding(miss).pop()
+                        .aload(0).aload(1).invokespecial(owner,"unityInitResource",sig).areturn();
+                });
+                b.withMethodBody("unityInitResource",sig,ClassFile.ACC_PRIVATE|ClassFile.ACC_SYNCHRONIZED,c->{
                     var done=c.newLabel();c.aload(0).getfield(owner,"unityResource",value).ifnonnull(done)
                         .aload(0).aload(1).aload(0).invokeinterface(fn,"apply",MethodTypeDesc.of(CD_Object,CD_Object)).checkcast(value)
                         .putfield(owner,"unityResource",value).labelBinding(done).aload(0).getfield(owner,"unityResource",value).areturn();

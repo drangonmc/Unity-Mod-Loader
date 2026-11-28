@@ -36,16 +36,10 @@ final class LevelPatches {
                             if (method.methodName().equalsString("tickChildren") &&
                                 i.owner().asInternalName().equals(level) && i.name().equalsString("tick")) {
                                 hits[2]++;
-                                int slot = code.allocateLocal(TypeKind.REFERENCE);
-                                var signal = MethodTypeDesc.ofDescriptor("(L" + level + ";)V");
-                                code.dup2()
-                                    .pop()
-                                    .dup()
-                                    .astore(slot)
-                                    .invokestatic(events, "beforeLevelTick", signal)
-                                    .with(e)
-                                    .aload(slot)
-                                    .invokestatic(events, "afterLevelTick", signal);
+                                int slot=code.allocateLocal(TypeKind.REFERENCE),time=code.allocateLocal(TypeKind.REFERENCE);
+                                var pair=MethodTypeDesc.ofDescriptor("(L"+level+";Ljava/util/function/BooleanSupplier;)V");
+                                code.astore(time).astore(slot).aload(slot).aload(time).invokestatic(events,"beforeLevelTick",pair)
+                                    .aload(slot).aload(time).with(e).aload(slot).aload(time).invokestatic(events,"afterLevelTick",pair);
                                 return;
                             }
                         }

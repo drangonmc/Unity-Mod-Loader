@@ -186,6 +186,7 @@ public final class NeoBus implements IEventBus {
                     k -> Events.PLAY_REGISTRATION.listen(v -> post(new RegisterPayloadHandlersEvent())));
                 supported = true;
             }
+            if(owner==null) supported |= gameplay(kind);
             if(owner==null && Set.of("net.neoforged.neoforge.client.event.ExtractBlockOutlineRenderStateEvent",
                     "net.neoforged.neoforge.client.event.SubmitCustomGeometryEvent").contains(kind.getName())){
                 clientCallbacks.add(kind.getName());supported=true;
@@ -227,6 +228,56 @@ public final class NeoBus implements IEventBus {
                 }
             });
         }
+    }
+    private boolean gameplay(Class<?> kind) {
+        boolean bound=false;
+        if(kind.isAssignableFrom(net.neoforged.neoforge.event.entity.EntityJoinLevelEvent.class)){
+            bridges.computeIfAbsent(net.neoforged.neoforge.event.entity.EntityJoinLevelEvent.class,k->Events.ENTITY_JOIN.listen(v->
+                v.cancelled=post(new net.neoforged.neoforge.event.entity.EntityJoinLevelEvent(v.entity,v.entity.level(),v.loaded)).isCanceled()));bound=true;
+        }
+        if(kind.isAssignableFrom(net.neoforged.neoforge.event.level.ChunkEvent.Load.class)){
+            bridges.computeIfAbsent(net.neoforged.neoforge.event.level.ChunkEvent.Load.class,k->Events.CHUNK_LOAD.listen(v->
+                post(new net.neoforged.neoforge.event.level.ChunkEvent.Load(v.chunk(),v.fresh()))));bound=true;
+        }
+        if(kind.isAssignableFrom(net.neoforged.neoforge.event.level.ChunkEvent.Unload.class)){
+            bridges.computeIfAbsent(net.neoforged.neoforge.event.level.ChunkEvent.Unload.class,k->Events.CHUNK_UNLOAD.listen(v->
+                post(new net.neoforged.neoforge.event.level.ChunkEvent.Unload(v))));bound=true;
+        }
+        if(kind.isAssignableFrom(net.neoforged.neoforge.event.tick.LevelTickEvent.Pre.class)){
+            bridges.computeIfAbsent(net.neoforged.neoforge.event.tick.LevelTickEvent.Pre.class,k->Events.LEVEL_TIME_PRE.listen(v->
+                post(new net.neoforged.neoforge.event.tick.LevelTickEvent.Pre(v.time(),v.level()))));bound=true;
+        }
+        if(kind.isAssignableFrom(net.neoforged.neoforge.event.tick.LevelTickEvent.Post.class)){
+            bridges.computeIfAbsent(net.neoforged.neoforge.event.tick.LevelTickEvent.Post.class,k->Events.LEVEL_TIME_POST.listen(v->
+                post(new net.neoforged.neoforge.event.tick.LevelTickEvent.Post(v.time(),v.level()))));bound=true;
+        }
+        for(var entry:Map.of(
+                net.neoforged.neoforge.event.level.block.BreakBlockEvent.class,mc.unity.core.Actions.Kind.BREAK,
+                net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent.class,mc.unity.core.Actions.Kind.PLACE,
+                net.neoforged.neoforge.event.level.BlockEvent.EntityMultiPlaceEvent.class,mc.unity.core.Actions.Kind.PLACE,
+                net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickItem.class,mc.unity.core.Actions.Kind.RIGHT_ITEM,
+                net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.EntityInteract.class,mc.unity.core.Actions.Kind.INTERACT_ENTITY,
+                net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.LeftClickEmpty.class,mc.unity.core.Actions.Kind.LEFT_EMPTY,
+                net.neoforged.neoforge.event.entity.player.PlayerInteractEvent.RightClickEmpty.class,mc.unity.core.Actions.Kind.RIGHT_EMPTY,
+                net.neoforged.neoforge.event.entity.player.AttackEntityEvent.class,mc.unity.core.Actions.Kind.ATTACK_ENTITY).entrySet()) {
+            if (!kind.isAssignableFrom(entry.getKey()))continue;
+            var key=entry.getValue()==mc.unity.core.Actions.Kind.PLACE?net.neoforged.neoforge.event.level.BlockEvent.EntityPlaceEvent.class:entry.getKey();
+            bridges.computeIfAbsent(key,k->mc.unity.core.Actions.attachScoped(new NeoActions(this,entry.getValue())));bound=true;
+        }
+        if(List.of(net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent.class,
+                net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Pre.class,
+                net.neoforged.neoforge.event.entity.living.LivingDamageEvent.Post.class).stream().anyMatch(kind::isAssignableFrom)){
+            bridges.computeIfAbsent(NeoDamage.class,k->mc.unity.core.LivingFlow.bind((e,s,a)->new NeoDamage(this,e,s,a)));bound=true;
+        }
+        if(kind.isAssignableFrom(net.neoforged.neoforge.event.entity.living.LivingDeathEvent.class)){
+            bridges.computeIfAbsent(net.neoforged.neoforge.event.entity.living.LivingDeathEvent.class,k->
+                mc.unity.core.LivingFlow.DEATH.listen(v->v.cancelled=post(new net.neoforged.neoforge.event.entity.living.LivingDeathEvent(v.entity,v.source)).isCanceled()));bound=true;
+        }
+        if(kind.isAssignableFrom(net.neoforged.neoforge.event.entity.living.LivingDropsEvent.class)){
+            bridges.computeIfAbsent(net.neoforged.neoforge.event.entity.living.LivingDropsEvent.class,k->
+                mc.unity.core.LivingFlow.DROPS.listen(v->v.cancelled=post(new net.neoforged.neoforge.event.entity.living.LivingDropsEvent(v.entity,v.source,v.items,v.recentlyHit)).isCanceled()));bound=true;
+        }
+        return bound;
     }
     public <T extends Event> T post(T event) {
         handlers.post(event);

@@ -46,7 +46,16 @@ final class PersistentTags implements PersistentDataContainer {
     }
     public boolean has(NamespacedKey key){return read.get().contains(key.toString());}
     public <P,C> boolean has(NamespacedKey key,PersistentDataType<P,C> type) {
-        Tag tag=read.get().get(key.toString());return tag!=null && tag.getId()==tagType(type.getPrimitiveType());
+        Tag tag=read.get().get(key.toString());
+        return matches(type,tag);
+    }
+    private static boolean matches(PersistentDataType<?,?> type,Tag tag) {
+        if(tag==null || tag.getId()!=tagType(type.getPrimitiveType()))return false;
+        if(tag instanceof ListTag list){
+            if(type instanceof ListPersistentDataType<?,?> typed)return list.stream().allMatch(t->matches(typed.elementType(),t));
+            if(type.getPrimitiveType()==PersistentDataContainer[].class)return list.stream().allMatch(t->t instanceof CompoundTag);
+        }
+        return true;
     }
     public <P,C> C get(NamespacedKey key,PersistentDataType<P,C> type) {
         Tag raw=read.get().get(key.toString());
@@ -69,7 +78,10 @@ final class PersistentTags implements PersistentDataContainer {
         var out=new ByteArrayOutputStream();NbtIo.write(read.get(),new DataOutputStream(out));return out.toByteArray();
     }
     public void readFromBytes(byte[] bytes,boolean clear) throws IOException {
-        CompoundTag input=NbtIo.read(new DataInputStream(new ByteArrayInputStream(bytes)),NbtAccounter.defaultQuota());
+        var stream=new ByteArrayInputStream(bytes);
+        boolean gzip=bytes.length>=2 && (bytes[0]&255)==0x1f && (bytes[1]&255)==0x8b;
+        CompoundTag input=gzip ? NbtIo.readCompressed(stream,NbtAccounter.defaultQuota())
+            : NbtIo.read(new DataInputStream(stream),NbtAccounter.defaultQuota());
         if(clear)write.accept(input);else edit(tag->{for(String key:input.keySet())tag.put(key,input.get(key));});
     }
     public void copyTo(PersistentDataContainer other,boolean replace) {

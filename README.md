@@ -1,38 +1,32 @@
-# Unity 0.2.9 Beta · Rebuild 1 · Minecraft Java 26.2
+# Unity 0.3.0 Beta
 
-本次维护构建从已验收的 `v0.2.8-beta`（`e689f40`）重新开发，使用 Java 25 和 Unity 独立内核。新标签为 `v0.2.9-beta-rebuild.1`。先前的 0.2.9、0.3.0 构建已经作废。
+Minecraft Java 26.2，Java 25。Unity 使用独立内核启动游戏。本版的 Git 标签是 [`0.3.0-Beta`](https://github.com/drangonmc/Unity-Mod-Loader/releases/tag/0.3.0-Beta)。此前标签 `v0.3.0-beta` 对应的旧发行包已撤回。
 
 ## 安装
 
-解压完整 Standalone ZIP 到新目录。专服使用 `Start-Unity.cmd`，按 Minecraft 的提示处理 EULA。客户端先安装原版 26.2，再运行 `Install-Unity-Client.cmd`，选择 Unity 配置。原始模组放入游戏目录的 `mods/`；Bukkit 插件只放入 `standalone-instance/plugins/`。需要对 WorldEdit 的方块写入执行 WorldGuard 区域规则时，将随包的 `versions/0.2.9-Beta/UnityEditRegions.jar` 也复制到插件目录。获准复制容器数据的编辑者需要 `worldedit.setnbt`。
+解压完整 Standalone ZIP 到独立目录。专服运行 `Start-Unity.cmd`，按 Minecraft 的提示处理 EULA。客户端先通过官方启动器安装 Minecraft 26.2，再运行 `Install-Unity-Client.cmd` 并选择 Unity 配置。作者原始模组放入游戏目录的 `mods/`，Bukkit 插件放入 `standalone-instance/plugins/`。使用 WorldEdit 和 WorldGuard 的区域编辑桥时，将随包的 `versions/0.3.0-Beta/UnityEditRegions.jar` 复制到插件目录。
 
-## 原包与传输
+## 已验证的 NeoForge 事件与玩法
 
-主要机器样本是 Iron Tanks 3.3.1 的储罐和 Logistics Drones 1.1.0 的充电站。第三方传输设备为 Tiny Pipes 7.0.1 的整块管道。三者均使用作者发布的 NeoForge JAR。运行时调用 NeoForge 26.2.0.93 的物品、流体与能量传输实现，Unity 提供原版容器、组件、注册、菜单与网络适配。随包保留所选上游类的源文件与许可证。样本散列和作者下载地址见 `standalone/tests/reference/review29/originals.json`。
-
-| 实际设备 | 初始值 | 传输完成后与重启回读 |
+| 作者原包 | 触发条件 | 本版观察 |
 | --- | --- | --- |
-| 两个 Iron Tanks 储罐及 Tiny Pipes 流体管 | 在供给侧先模拟插入并回滚，再提交 7,250 mB 水 | 源罐 0，目标 7,250 mB。客户端读取到水和正确数量。 |
-| Copper Hopper、Tiny Pipes 物品管与箱子 | 铜漏斗中有 12 个带 `minecraft:custom_data` 的绿宝石 | 漏斗保留 1 个过滤样品，箱子收到 11 个。两名玩家各自打开箱子核对数量和组件。 |
-| 两座 Logistics Drones 充电站及 Tiny Pipes 能量管 | 源站 12,345 FE，目标 0；目标站有 7 张带序列号 29012 的纸 | 源站 0，目标 12,345 FE。两名玩家打开充电站的原始界面，读取到菜单同步的电量、纸的数量和序列号。 |
+| Vines Cutter 1.0.2-26.2 | 生存玩家剪断贴墙藤蔓柱顶部。下方各段仍有独立支撑 | 三段藤蔓全部移除，两台客户端与专服一致。 |
+| No Berry Damage 2.1.3+mc26.2 | 对玩家施加甜浆果丛伤害 | NeoForge 收到已取消的伤害事件，两台客户端和服务端读取的生命值均保持 15。普通伤害的正对照仍可扣血。 |
+| Villager Bonus Drops 1.0.0+neoforge.26.2 | 盔甲匠死亡 | 两名玩家都能看到掉落的高炉，重启后再次核对。 |
 
-测试见证模组只设置初值和作者管道的连接面。转运由游戏 tick 执行。两名客户端在混装服同时在线，服务端 82 个固定样本 JAR，每个客户端 80 个，另外使用官方 Fabric API 与验收见证。WorldEdit 7.4.6 原包执行 `//copy`、`//paste`、`//undo` 和 `//redo`。撤销后相应目标位置为空气；重做及关服重启后，源与副本仍有同样的水、能量和物品。充电站朝北，三个管道的西面抽取、东面输出配置也得到核对。测试安装了 WorldGuard 7.0.19。
+模组版本、下载地址和 SHA-512 见 [作者原包清单](standalone/tests/reference/review30/originals.json)。专服核对了 85 个作者模组文件，每个客户端核对了 83 个。两个客户端均使用真实游戏渲染器、独立进程和隐藏窗口，从回环网络连接同一专服。
 
-## Bukkit/Paper 插件
+- **破坏与放置。** 26.2 SDK 的破坏事件为 `BreakBlockEvent`。在 HIGHEST 取消后，常规监听器跳过事件，选择接收已取消事件的 LOWEST 和 Bukkit MONITOR 都收到取消标记。允许破坏时三个 NeoForge 优先级按序执行。取消放置后仍有 6 块砖，随后允许放置一次剩 5 块。两台客户端对照专服检查方块。
+- **交互与伤害。** 取消右键后拉杆维持关闭，取消近战后目标生命值不变。Bukkit 取消普通伤害后目标保持 15 点。另一次伤害由 NeoForge Pre 从 4 改为 2，Post 报告 2，两台客户端与服务端均读到 13 点。
+- **死亡与掉落。** 监听器恢复 4 点生命并取消死亡。另一组用例取消整批掉落，包括同服 Fabric 模组在死亡回调中额外生成的皮革。允许替换掉落时仅留下 5 个绿宝石。重启后检查存活实体、掉落、双方背包、生命值和世界方块。停服后另外用原版 NBT 读取器核对两个玩家文件和区块调色板。
+- **上版回归。** 保留 Iron Tanks、Tiny Pipes、Logistics Drones、Copper Hopper、WorldEdit、WorldGuard、LuckPerms、Vault 和 EssentialsX。实测传输了 7,250 mB 水、12 个带组件物品中的 11 个和 12,345 FE。WorldEdit 执行复制、撤销、重做后重新打开两个充电站。Paper 26.2 build 121 与 Unity 跑同一个 Bukkit 插件，对照权限、余额、背包物品 PDC、嵌套列表二进制和重启后的玩家状态。
 
-| 原包 | 已验证的用途 |
-| --- | --- |
-| LuckPerms Bukkit 5.5.71 | 给两名非 OP 玩家分别授予和拒绝同一个节点。同时验证运行期添加、删除 Bukkit 权限附件。重启后用相同 UUID 复查。 |
-| Vault 1.7.3 | 查询实际权限提供者 LuckPerms，通过真实经济提供者 EssentialsX Economy 写入并读取余额。 |
-| EssentialsX 2.22.0 | 玩家 A 余额 291，玩家 B 余额 292。客户端执行 `/sethome` 和 `/home`，用服务端坐标核对传送结果，重启后再回家。 |
+## 运行时修正
 
-同一份测试插件在 Paper 26.2 build 121 与 Unity 上分别运行。它通过 `plugin.yml` 的 `libraries:` 加载 Commons Text，实际使用了 Commons Lang 传递依赖。玩家 PDC 与背包物品 PDC 分别存储独立值，原始 NBT 字节可读回独立容器，重启后保留。补充路径包括生命值、饥饿值、飞行、播放声音和九格自定义库存；两个客户端均打开库存核对了物品。EssentialsX 2.22.0 在这两个 26.2 宿主均提示版本不在其官方支持范围，本页记录 Unity 的实测子集。
+扩展菜单通道经过同一 JVM 两次关闭、注册的契约测试。插件权限查询复用玩家的权限对象，登录阶段断线会清理尚未入世界的玩家视图。插件类加载域拥有 Sisu、JSON.simple、Commons Codec、JSR-330 和 Commons Logging 的随包版本。停服时单独处理插件私有清理错误。踢出与登录拒绝消息保留富文本。默认物品、流体资源对象的热路径使用 volatile 读取，首次创建时加锁。
 
-## 审查修复及范围
+PDC 默认写出与本次 Paper 构建一致的原始 NBT，同时接受 GZIP 输入，非空嵌套列表按元素类型检查。NeoForge 配置界面支持 Vines Cutter 使用的双参数工厂，可以打开本地 TOML。复杂配置编辑器和任意版本的前置库仍需按模组验证。
 
-- ABI 预检对一个方法里的全部缺失指令联合检查。两边各调用一个缺失接口的分支在初始化前被拒绝，验证帧里的缺失类型进入可汇总的预检错误。JVM 链接时还可能校验参数和父类型之间的赋值关系；静态条件分析不能证明所有可选集成都能装载。
-- Forge 破坏事件保留前置适配器写入的 XP，只有 Forge 返回显式覆写才修改它。Bukkit 交互事件保留原版潜行语义，并记录监听器在 ALLOW、DEFAULT 和 DENY 间实际作出的修改。
-- 适配器契约递归检查父接口，并接受由基类继承的公开实例实现。注册目标必须属于根表，Lambda 锚点比较完整 JVM 类名。实体元数据写入与过期清理按 UUID 原子执行，打包器默认版本已改为 0.2.9。
-- 本版验收针对上述储罐、充电站、管道、插件和命令。原始 Tiny Pipes 还附有面向可选模组的配方；本次组合不安装 Tiny Redstone 和 Refined Storage，日志保留相关配方解析告警。无人机自动航线、所有 NeoForge 游戏事件、Kotlin 入口和跨平台 FakePlayer 仍需分别验收。本版没有以样本结果推算整个生态的兼容率。
+兼容清单覆盖以上组合和路径。原始 Tiny Pipes 中依赖可选模组及公共标签的部分配方在本组合中仍有解析告警。Kotlin、跨平台 FakePlayer、其他 Bukkit 运营事件以及完整 NeoForge SDK 覆盖率均未作为本次验收结果。
 
-完整运行回执和发布校验保存在 `evidence/0.2.9-Beta/`。
+[可复验的联机记录](evidence/0.3.0-Beta/unity/result.json) · [Paper 对照](evidence/0.3.0-Beta/paper/result.json) · [上游组件与许可证](NOTICE.md)

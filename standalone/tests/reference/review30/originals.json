@@ -1,0 +1,35 @@
+[
+  {
+    "project": "vinescutter",
+    "projectId": "AMJaak05",
+    "versionId": "63093hpm",
+    "version": "1.0.2-26.2",
+    "filename": "vinescutter-1.0.2-26.2.jar",
+    "url": "https://cdn.modrinth.com/data/AMJaak05/versions/63093hpm/vinescutter-1.0.2-26.2.jar",
+    "size": 9612,
+    "sha512": "7f8f27ad6859f55edc404f16af33fd6c133327f77839c9c9eab009665c2f83817e1bca260fa8a04573f890fbf651a1403feaf7d5596ee4097dcccc2670dde8ab",
+    "dependencies": []
+  },
+  {
+    "project": "no-berry-damage",
+    "projectId": "iuAn2I5l",
+    "versionId": "pZAfbfYh",
+    "version": "2.1.3+mc26.2",
+    "filename": "no-berry-damage-neoforge-2.1.3.jar",
+    "url": "https://cdn.modrinth.com/data/iuAn2I5l/versions/pZAfbfYh/no-berry-damage-neoforge-2.1.3.jar",
+    "size": 42162,
+    "sha512": "0f3e76618727b27dc11a1c61c910236bc816a9de4f6a0dfedcf2c00f788efaed99da4d8d0782bb6494b3ee98039d7246861f915920b488c5fbd957e56e72e014",
+    "dependencies": []
+  },
+  {
+    "project": "villager-bonus-drops",
+    "projectId": "oEn1JIxU",
+    "versionId": "8omBmuty",
+    "version": "1.0.0+neoforge.26.2",
+    "filename": "baifen-mod-neoforge-26.2-1.0.0+neoforge.26.2.jar",
+    "url": "https://cdn.modrinth.com/data/oEn1JIxU/versions/8omBmuty/baifen-mod-neoforge-26.2-1.0.0%2Bneoforge.26.2.jar",
+    "size": 13648,
+    "sha512": "60299d0024e90e7de85873c1aa139d22a1ab16c2bc330001d34d748ea57e2be405f3a8ae846b909d4aea66124ebcebc4e99ce83fcb6f7726d4ea97bf19b840d7",
+    "dependencies": []
+  }
+]

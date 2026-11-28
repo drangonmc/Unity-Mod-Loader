@@ -68,8 +68,11 @@ final class BukkitViews {
         metadata.remove(player);displayNames.remove(player);compassTargets.remove(player);
         var removed=playerViews.remove(player);
         if(removed instanceof org.bukkit.craftbukkit.entity.CraftHumanEntity human)human.clearSessionPermissions();
-        var base=playerPermissions.remove(player);
-        if(base!=null)base.clearPermissions();
+
+    }
+    synchronized void forgetIfCurrent(ServerPlayer p) {
+        if (playerViews.get(p.getUUID()) instanceof org.bukkit.craftbukkit.entity.CraftHumanEntity view && view.getHandle()==p)
+            forget(p.getUUID());
     }
     void forget(ServerLevel world) {
         worlds.remove(world);
@@ -132,7 +135,7 @@ final class BukkitViews {
             case "getUnsafe" -> legacy;
             case "isStopping" -> !host.game.isRunning();
             case "createBlockData" -> createBlockData(a);
-            case "getVersion" -> "Unity 0.2.9-Beta (MC: 26.2)";
+            case "getVersion" -> "Unity 0.3.0-Beta (MC: 26.2)";
             case "getBukkitVersion" -> "26.2-R0.1-SNAPSHOT";
             case "getMinecraftVersion" -> "26.2";
             case "getLogger" -> Host.LOG;
@@ -347,10 +350,9 @@ final class BukkitViews {
         playerViews.put(p.getUUID(),view);
         return view;
     }
-    private final Map<UUID,org.bukkit.permissions.PermissibleBase> playerPermissions=new HashMap<>();
     private org.bukkit.permissions.PermissibleBase consolePermissions;
-    private synchronized org.bukkit.permissions.PermissibleBase permissible(CommandSourceStack src,ServerPlayer p) {
-        if(p!=null)return playerPermissions.computeIfAbsent(p.getUUID(),ignored->new org.bukkit.permissions.PermissibleBase(player(p)));
+    private synchronized org.bukkit.permissions.Permissible permissible(CommandSourceStack src,ServerPlayer p) {
+        if(p!=null)return player(p);
         if(consolePermissions==null)consolePermissions=new org.bukkit.permissions.PermissibleBase(sender(src));
         return consolePermissions;
     }
@@ -484,7 +486,7 @@ final class BukkitViews {
                     : a[0] instanceof net.kyori.adventure.text.Component text ?
                         net.minecraft.network.chat.ComponentSerialization.CODEC.parse(p.registryAccess().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE),
                             net.kyori.adventure.text.serializer.gson.GsonComponentSerializer.gson().serializeToTree(text)).getOrThrow()
-                        : net.minecraft.network.chat.Component.literal((String)a[0]);
+                        : StackMeta.fromLegacy((String)a[0]);
                 p.connection.disconnect(reason);yield null;
             }
             case "getPlayerProfile" -> LoginProfiles.view(p.getGameProfile());

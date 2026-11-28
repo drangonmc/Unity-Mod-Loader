@@ -61,6 +61,25 @@ final class GameActionProbe {
             case "qaSelect" -> {
                 me.getInventory().setSelectedSlot(slot);
             }
+            case "qaNearby" -> {
+                var center=new Vec3(req.get("x").getAsDouble(),req.get("y").getAsDouble(),req.get("z").getAsDouble());
+                if (!mc.level.hasChunkAt(BlockPos.containing(center))) return false;
+                var items=new JsonObject();var living=new JsonArray();
+                var box=new AABB(center,center).inflate(2.6);
+                for (var entity:mc.level.getEntitiesOfClass(net.minecraft.world.entity.Entity.class,box)) {
+                    if (entity.distanceToSqr(center)>2.6*2.6) continue;
+                    if (entity instanceof net.minecraft.world.entity.item.ItemEntity item) {
+                        var stack=item.getItem();
+                        String id=BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();
+                        items.addProperty(id,(items.has(id)?items.get(id).getAsInt():0)+stack.getCount());
+                    } else if (entity instanceof net.minecraft.world.entity.LivingEntity mob && !mob.isDeadOrDying()) {
+                        var row=new JsonObject();
+                        row.addProperty("kind",BuiltInRegistries.ENTITY_TYPE.getKey(mob.getType()).toString());
+                        row.addProperty("health",mob.getHealth());living.add(row);
+                    }
+                }
+                out.add("items",items);out.add("living",living);
+            }
             case "qaTransferState" -> {
                 var pos=new BlockPos(req.get("x").getAsInt(),req.get("y").getAsInt(),req.get("z").getAsInt());
                 var state=mc.level.getBlockState(pos);

@@ -165,19 +165,19 @@ record PluginFile(Path jar, PluginDescriptionFile description, boolean paper, Li
                 // The pool belongs exclusively to this plugin class loader and is drained after onDisable.
                 var i18n = file.description().getMain().equals("com.earth2me.essentials.Essentials") ?
                     findLoadedClass("com.earth2me.essentials.I18n") : null;
-                if(i18n!=null){
+                if(i18n!=null)try{
                     var accessor=java.lang.invoke.MethodHandles.privateLookupIn(i18n,java.lang.invoke.MethodHandles.lookup())
                             .findStaticVarHandle(i18n,"BUNDLE_LOADER_EXECUTOR",java.util.concurrent.ExecutorService.class);
                     var pool=(java.util.concurrent.ExecutorService)accessor.get();pool.shutdown();
                     try {if(!pool.awaitTermination(5,java.util.concurrent.TimeUnit.SECONDS))pool.shutdownNow();}
                     catch(InterruptedException interrupted){pool.shutdownNow();Thread.currentThread().interrupt();}
-                }
-                if(progress!=null) {
+                } catch (ReflectiveOperationException | RuntimeException ex){Host.LOG.log(java.util.logging.Level.WARNING,"Closing EssentialsX locale executor",ex);}
+                if(progress!=null) try {
                     var timer=java.lang.invoke.MethodHandles.privateLookupIn(progress,java.lang.invoke.MethodHandles.lookup())
                         .findStaticVarHandle(progress,"timer",java.util.Timer.class);
                     ((java.util.Timer)timer.get()).cancel();
-                }
-            } catch(ReflectiveOperationException ex){throw new IOException("Closing WorldEdit command feedback",ex);}
+                } catch(ReflectiveOperationException | RuntimeException ex){Host.LOG.log(java.util.logging.Level.WARNING,"Closing WorldEdit command feedback",ex);}
+            }
             finally {
                 try { if(libraries!=null)libraries.close(); }
                 finally {super.close();}

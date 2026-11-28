@@ -527,6 +527,7 @@ public final class Platforms implements AutoCloseable {
             } finally {
                 SessionEvent.clear();
                 ForgeCommands.clear();
+                mc.unity.adapter.neoforge.MenuData.close();
                 NeoBus.clear();
             }
         } finally {

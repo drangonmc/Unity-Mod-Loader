@@ -144,7 +144,7 @@ def verify(s,ws,first):
     return record
 
 def main(o):
-    stage=o.dist;loader=stage/"unity-loader-0.2.9-Beta.jar";bundle=o.cache/"mojang-server-26.2.jar"
+    stage=o.dist;loader=stage/("unity-loader-"+getattr(o,"version","0.2.9-Beta")+".jar");bundle=o.cache/"mojang-server-26.2.jar"
     dst=o.out;dst.mkdir(parents=True,exist_ok=True);base.acceptance.EVIDENCE=content.EVIDENCE=dst
     o.regions=True;o.plain=False
     game_root=dst/"instance";game_root.mkdir()
@@ -162,21 +162,28 @@ def main(o):
             spec=json.loads((o.machines/(slug+'.json')).read_bytes())
             f=o.machines/spec['filename'];assert digest(f,'sha512')==spec['sha512']
             shutil.copy2(f,root/'mods');corpus[root.name][f.name]=spec['sha512']
+    if hasattr(o,'install_events'):o.install_events(g,games,corpus)
     (g/'unity-mods').mkdir(exist_ok=True)
     machines.build(base.ROOT,o.machines,o.sdk,o.cache,loader,g/'unity-mods/transfer-setup.jar')
     os.environ['PAPER_DEFAULT_CENTRAL_REPOSITORY']='https://repo.maven.apache.org/maven2/'
     cmd=['java','-Xmx2g','-XX:ActiveProcessorCount=4','-Dstdout.encoding=UTF-8','-Dstderr.encoding=UTF-8','-Dmc.unity.contentQA=true','-jar',str(loader),'--server-jar',str(bundle),'--runtime-dir',str(o.cache),'nogui']
     if os.environ.get('UNITY29_RECORD_THREADS'):cmd.insert(1,'-XX:StartFlightRecording=name=threadStart,settings=profile,filename=thread-starts.jfr,duration=75s')
     runs=[]
+    client_sessions={}
     for phase in ("first","restart"):
         with contextlib.ExitStack() as done:
             server=Server(g,phase,loader,bundle,o.cache,cmd);done.callback(server.close);server.expect("Standalone ready",150)
             if phase=="first":setup_machines(server)
             ws=[]
+            client_sessions[phase]=[]
             for d,n in zip(games,base.NAMES):
                 w=Window(o.cache/'client-home',d,phase+'-'+n,port,loader,n);done.callback(exited,w);ws.append(w)
                 result=w.act('status',timeout=160);assert result['remote'] and result['gpu'] and not result['visible']
-            try:runs.append(verify(server,ws,phase=="first"))
+                client_sessions[phase].append(dict(player=n,pid=w.process.pid,remote=result['remote'],gpu=result['gpu'],visible=result['visible']))
+            try:
+                run=verify(server,ws,phase=="first")
+                if hasattr(o,"verify_events"):run["neoEvents"]=o.verify_events(server,ws,phase=="first")
+                runs.append(run)
             except Exception:
                 import traceback
                 (dst/(phase+"-failure.txt")).write_text(traceback.format_exc(),"utf8")
@@ -194,7 +201,7 @@ def main(o):
         for msg in ("UNITY29_ACTUAL_FAILURE","Views$UnsupportedCall:","Could not pass event","failed handling ","Unable to inject LuckPerms","Failed to initialize provider","NoSuchMethodError:","NoClassDefFoundError:"):
             assert msg not in output,(phase,msg)
 
-    (dst/'result.json').write_text(json.dumps({"loader":digest(loader),"runs":runs,"authors":corpus,"probe":digest(g/"plugins/Unity29Probe.jar"),"plugins":rawplugins,"worldEditGuard":{r["slug"]:r["sha512"] for r in rows},"clientWitness":digest(stage/"unity-client-witness.jar"),"logs":{f.name:digest(f) for f in dst.glob("*.log")}},indent=2),'utf8')
+    (dst/'result.json').write_text(json.dumps({"loader":digest(loader),"runs":runs,"clientSessions":client_sessions,"pdcWire":{n:digest(g/"plugins/Unity29Probe"/("pdc-"+n+".nbt")) for n in base.NAMES},"authors":corpus,"probe":digest(g/"plugins/Unity29Probe.jar"),"plugins":rawplugins,"worldEditGuard":{r["slug"]:r["sha512"] for r in rows},"clientWitness":digest(stage/"unity-client-witness.jar"),"logs":{f.name:digest(f) for f in dst.glob("*.log")}},indent=2),'utf8')
 if __name__=="__main__":
     p=argparse.ArgumentParser()
     for key in ('dist','cache','authors','eula','out','samples','plugins','machines','sdk','region_bridge','old_machines'):
