@@ -1,5 +1,8 @@
 # Unity 0.3.0 Beta · Minecraft Java 26.2
 
+> **旧版撤回公告 · 2026-11-28**
+> 维护者已将此前的 Unity 0.2.9 和 0.3.0 构建全部作废，请勿部署或继续分发旧包。下文保留为历史说明。可在 [0.2.8 Beta 发行页](https://github.com/drangonmc/Unity-Mod-Loader/releases/tag/v0.2.8-beta) 取得上一个已验收版本。
+
 Unity 使用独立内核，服务端入口是 `mc.unity.bootstrap.Main`。解压 Standalone ZIP，使用 Java 25 运行 `Start-Unity.cmd`。客户端先安装原版 26.2，再运行 `Install-Unity-Client.cmd`。模组放在相应游戏目录的 `mods/`，Bukkit 插件放在 `standalone-instance/plugins/`。
 
 ## NeoForge 玩法事件
